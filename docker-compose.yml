@@ -1,0 +1,57 @@
+services:
+  backend-dev:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.backend
+      target: dev
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "8080:8080" # HOST_PORT:CONTAINER_PORT
+    environment: # environmental variables that can be used in backend files like process.env.API_PORT
+      - NODE_ENV=development
+      - API_PORT=8080
+      - APP_PORT=3000
+
+  app-dev:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.frontend
+      target: dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment: # environmental variables that can be used in frontend files like process.env.REACT_APP_API_URL
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:8080/api # except NODE_ENV frontend environmental variables must have names like REACT_APP_<NAME>
+    depends_on:
+      - backend-dev
+
+  backend-prod:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.backend
+      target: prod
+    ports:
+      - "8888:8888"
+    environment:
+      - NODE_ENV=production
+      - API_PORT=8888
+      - APP_PORT=8000
+
+  app-prod:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.frontend
+      target: prod
+    ports:
+      - "8000:80"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://localhost:8888/api
+    depends_on:
+      - backend-prod
+

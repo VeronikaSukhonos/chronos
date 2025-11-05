@@ -1,0 +1,24 @@
+# development stage
+FROM node:lts-alpine AS dev
+
+WORKDIR /app
+
+COPY backend/package.json ./
+RUN npm install
+
+COPY backend/ .
+
+CMD ["npx", "nodemon", "index.js"]
+
+# production stage
+FROM node:25-alpine AS prod
+
+WORKDIR /app
+
+COPY backend/package.json ./
+RUN npm install
+
+COPY backend/ .
+
+CMD ["node", "index.js"]
+
