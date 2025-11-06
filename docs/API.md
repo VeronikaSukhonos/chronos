@@ -1,11 +1,11 @@
 # API documentation
 
-This document contains a short description of all endpoints of (**chronos API**)[https://github.com/VeronikaSukhonos/chronos/tree/main/backend].
+This document contains a short description of all [**chronos API**](https://github.com/VeronikaSukhonos/chronos/tree/main/backend) endpoints.
 
 Unless otherwise specified, all request bodies must be sent as `application/json`.
 
 Response structure:
-* all - `message` (string)
+* always - `message` (string)
 * if return data - `data` (object with a property corresponding to the entity, e.g., `user: {}` or `users: [ {}, {} ]`)
 * in case of validator errors - `errors` (array of objects, e.g., `{ parameter: 'login', error: 'Login is required.' }`)
 
@@ -14,12 +14,15 @@ Response structure:
 1. `POST /api/auth/register` - registers a new user
 
 **Parameters**: `login`, `email`, `password`
+
 **Important**: sends an email confirmation link to the user's email
 
 2. `POST /api/auth/login` - logs in a registered user (issues a pair of access and refresh tokens)
 
 **Parameters**: `login` or `email`, `password`
+
 **Data**: logged-in user data (`login`, `email`, `fullName`, `dob`, `registerDate`), access token
+
 **Important**: only for users with a confirmed email
 
 3. `POST /api/auth/logout` - logs out an authorized user
@@ -29,6 +32,7 @@ Response structure:
 4. `POST /api/auth/password-reset` - sends a password reset link to the user's email
 
 **Parameter**: `email`
+
 **Important**: only for users with a confirmed email
 
 5. `POST /api/auth/password-reset/:confirmToken` - confirms a new password with a token from the email
@@ -38,14 +42,16 @@ Response structure:
 6. `POST /api/auth/email-confirmation` - repeats sending an email confirmation link to the user's email
 
 **Parameter**: `login`, optional `email` (opportunity to provide another email address)
+
 **Important**: works only for users who have not confirmed their email address after registration
 
 7. `POST /api/auth/email-confirmation/:confirmToken` - confirms an email address with a token from the email
 
 8. `POST /api/auth/refresh` - issues a new pair of access and refresh tokens
 
-**Important**: refresh token must be provided in the cookies (`refreshToken=<token>`)
 **Data**: access token
+
+**Important**: refresh token must be provided in the cookies (`refreshToken=<token>`)
 
 **\*** here and in other endpoints requiring authorization an access token must be provided in the `Authorization` header (`Bearer <token>`)
 
@@ -60,6 +66,7 @@ All endpoints require authorization.
 * by email (`?email=chronosuser@gmail.com`)
 
 **Data**: array of users (`id`, `login`, `avatar`)
+
 **Important**: only the first value of a parameter is used if multiple provided
 
 2. `GET /api/users/:userId` - gets specified user data
@@ -69,6 +76,7 @@ All endpoints require authorization.
 3. `PATCH /api/users/avatar` - uploads a user avatar
 
 **Parameter**: `avatar` (1 file)
+
 **Important**: accepts file upload - requires `multipart/form-data`
 
 4. `PATCH /api/users` - updates a user profile
@@ -80,6 +88,7 @@ All endpoints require authorization.
 6. `PATCH /api/users/email` - updates a user email
 
 **Parameters**: `password`, `email`
+
 **Important**: sends an email confirmation link to the user's email, new email must be confirmed to be updated
 
 7. `PATCH /api/users/password` - updates a user password
@@ -102,22 +111,27 @@ All endpoints require authorization.
 * by hidden (`?hidden=true`)
 
 **Data**: array of calendars (`id`, `name`, `color`)
+
 **Important**: only the first value of a parameter is used if multiple provided, hidden calendars can be seen only by authors
 
 2. `GET /api/calendars/:calendarId` - gets information about specified calendar
 
 **Data**: calendar data (everything) // TODO think if regular users can see participants, or only author can, maybe participants should be another endpoint???
+
 **Important:** works if an authorized user has access to the calendar
 
 3. `POST /api/calendars` - creates a new calendar
 
 **Parameters**: `name`, optional `description`, `color` (default `#ade4ff`), `participants`
+
 **Data**: created calendar data (everything)
 
 4. `POST /api/calendars/:calendarId/events` - creates a new event in a calendar
 
 **Parameters**: `name`, `type`, `startDate`, optional `description`, `color` (default - color of calendar), `participants` (default - author, all calendar participants), `repeat`, `tags`, optional for arrangements `endDate` (default is `startDate` + 1 hour), `link`
+
 **Data**: created event data (everything)
+
 **Important**: works if an authorized user is an author or participant of a calendar
 
 // TODO can select event participants only from calendar participants or from all users (in this case a user is added as calendar participant)???
@@ -125,7 +139,9 @@ All endpoints require authorization.
 5. `PATCH /api/calendars/:calendarId` - updates a calendar
 
 **Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants`
+
 **Data**: updated calendar data (everything)
+
 **Important**: works if an authorized user is an author of a calendar
 
 6. `POST /api/calendars/:calendarId/confirm` - confirms adding a calendar
@@ -163,12 +179,15 @@ All endpoints require authorization.
 2. `GET /api/events/:eventId` - gets information about a specified event
 
 **Data**: event data (everything) // TODO think if regular users can see participants, or only author can, maybe participants should be another endpoint???
+
 **Important:** works if an authorized user has access to the event
 
 3. `PATCH /api/events/:eventId` - updates an event
 
 **Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants`, `tags`, `repeat`, `link` (if an arrangement)
+
 **Data**: updated event data (everything)
+
 **Important**: works if an authorized user is an author of a event
 
 4. `POST /api/events/:eventId/done` - does a task
@@ -192,11 +211,14 @@ All endpoints require authorization.
 2. `POST /api/tags` - creates a new tag
 
 **Data**: created tag data (everything)
+
 **Parameter**: `title`
 
 3. `PATCH /api/tags/tagId` - updates a tag title
 
 **Data**: updated tag data (everything)
+
 **Parameter**: `title`
 
 4. `DELETE /api/tags/tagId` - deletes a tag
+
