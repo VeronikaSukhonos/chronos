@@ -12,7 +12,7 @@ services:
     environment: # environmental variables that can be used in backend files like process.env.API_PORT
       - NODE_ENV=development
       - API_PORT=8080
-      - APP_PORT=3000
+      - APP_PORT=5173
 
   app-dev:
     build:
@@ -23,10 +23,11 @@ services:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
-    environment: # environmental variables that can be used in frontend files like process.env.REACT_APP_API_URL
+      - "5173:5173"
+    environment: # environmental variables that can be used in frontend files like process.env.VITE_API_URL
       - NODE_ENV=development
-      - REACT_APP_API_URL=http://localhost:8080/api # except NODE_ENV frontend environmental variables must have names like REACT_APP_<NAME>
+      - VITE_API_URL=http://localhost:8080/api # except NODE_ENV frontend environmental variables must have names like VITE_<NAME>
+      - APP_PORT=5173
     depends_on:
       - backend-dev
 
@@ -51,7 +52,7 @@ services:
       - "8000:80"
     environment:
       - NODE_ENV=production
-      - REACT_APP_API_URL=http://localhost:8888/api
+      - VITE_API_URL=http://localhost:8888/api
+      - APP_PORT=8000
     depends_on:
       - backend-prod
-

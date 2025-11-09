@@ -1,15 +1,14 @@
-const express = require('express');
-const controller = require('../controllers/test');
+import { Router } from 'express';
+import { getAll, createOne, getOne, updateOne, deleteOne } from '../controllers/test';
 
-const router = express.Router();
+const router = Router();
 
 router.route('/')
-  .get(controller.getAll)
-  .post(controller.createOne);
+  .get(getAll)
+  .post(createOne);
 router.route('/:test')
-  .get(controller.getOne)
-  .patch(controller.updateOne)
-  .delete(controller.deleteOne);
+  .get(getOne)
+  .patch(updateOne)
+  .delete(deleteOne);
 
-module.exports = router;
-
+export default router;

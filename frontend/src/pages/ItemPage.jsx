@@ -11,7 +11,7 @@ function ItemPage() {
   useEffect(() => {
     async function getItem() {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/test/${test_id}`);
+        const response = await axios.get(`${process.env.VITE_API_URL}/test/${test_id}`);
         setItem(response.data.data);
         setMessage('');
       } catch(err) {

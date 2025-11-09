@@ -30,7 +30,7 @@ docker compose up <app-dev/app-prod>
 > You can run this command without `docker compose build`, in that case the application will be build first (if not yet builded) and then automatically launched.
 
 API server will run at `http://localhost:8080` in development build and at `http://localhost:8888` in production build,     
-the web application will run at `http://localhost:3000` in development build and at `http://localhost:8000` in production build.
+the web application will run at `http://localhost:5173` in development build and at `http://localhost:8000` in production build.
 
 If you want to see some container's console logs, in Docker Desktop click on the corresponding container and open Logs tab.
 

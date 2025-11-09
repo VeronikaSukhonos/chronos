@@ -8,7 +8,7 @@ RUN npm install
 
 COPY backend/ .
 
-CMD ["npx", "nodemon", "index.js"]
+CMD ["npm", "run", "dev"]
 
 # production stage
 FROM node:25-alpine AS prod
@@ -20,5 +20,4 @@ RUN npm install
 
 COPY backend/ .
 
-CMD ["node", "index.js"]
-
+CMD ["npm", "start"]

@@ -7,7 +7,7 @@ Unless otherwise specified, all request bodies must be sent as `application/json
 Response structure:
 * always - `message` (string)
 * if return data - `data` (object with a property corresponding to the entity, e.g., `user: {}` or `users: [ {}, {} ]`)
-* in case of validator errors - `errors` (array of objects, e.g., `{ parameter: 'login', error: 'Login is required.' }`)
+* in case of validator errors - `errors` (array of objects, e.g., `{ param: 'login', error: 'Login is required' }`)
 
 ## Authentication module
 

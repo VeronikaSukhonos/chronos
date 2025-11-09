@@ -11,7 +11,7 @@ function HomePage() {
   useEffect(() => {
     async function getItems() {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/test/`);
+        const response = await axios.get(`${process.env.VITE_API_URL}/test/`);
         setItems(response.data.data);
         setMessage('');
       } catch(err) {
@@ -25,7 +25,7 @@ function HomePage() {
   async function createItem(e) {
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/test`, { title });
+      const response = await axios.post(`${process.env.VITE_API_URL}/test`, { title });
         setItems([...items, response.data.data]);
         setMessage('');
       } catch(err) {
@@ -37,9 +37,9 @@ function HomePage() {
     return async (e) => {
       e.preventDefault();
       try {
-        await axios.patch(`${process.env.REACT_APP_API_URL}/test/${id}`, { title: `(updated)` });
+        await axios.patch(`${process.env.VITE_API_URL}/test/${id}`, { title: `(updated)` });
         setItems(items.map(item => { return { ...item, title: item._id !== id ? item.title:`(updated)` } }));
-        // const response = await axios.get(`${process.env.REACT_APP_API_URL}/test/`);
+        // const response = await axios.get(`${process.env.VITE_API_URL}/test/`);
         // setItems(response.data.data);
         setMessage('');
       } catch(err) {
@@ -52,7 +52,7 @@ function HomePage() {
     return async (e) => {
       e.preventDefault();
       try {
-        await axios.delete(`${process.env.REACT_APP_API_URL}/test/${id}`);
+        await axios.delete(`${process.env.VITE_API_URL}/test/${id}`);
         setItems(items.filter(item => item._id !== id));
         setMessage('');
       } catch(err) {
@@ -87,4 +87,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

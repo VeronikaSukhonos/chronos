@@ -8,7 +8,7 @@ RUN npm install
 
 COPY frontend/ .
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
 
 # build stage
 FROM node:25-alpine AS build
@@ -28,4 +28,3 @@ FROM nginx:alpine AS prod
 COPY --from=build /app/build /usr/share/nginx/html
 
 CMD ["nginx", "-g", "daemon off;"]
-
