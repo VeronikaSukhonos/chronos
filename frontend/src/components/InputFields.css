@@ -1,0 +1,101 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field-container {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  background: var(--main-bg-color);
+  border: 1px solid transparent;
+  border-radius: 15px;
+  outline: 1px solid transparent;
+  padding: 3px 7px;
+  min-height: 36px;
+  transition:
+    border ease-in-out 0.5s,
+    outline ease-in-out 0.5s;
+}
+
+.field-container:focus-within {
+  border: 1px solid var(--accent-bg-color);
+  outline: 1px solid var(--accent-bg-color);
+}
+
+.field-container:focus-within svg path {
+  fill: var(--accent-color);
+}
+
+.field-container.area {
+  height: auto;
+}
+
+.field-label {
+  display: block;
+  color: var(--accent-color);
+  font-size: 0.95rem;
+  font-weight: bold;
+  padding: 0 0 3px 7px;
+  position: relative;
+  transition: all ease-in-out 0.3s;
+}
+
+.field-label.required::after {
+  content: '*';
+  color: var(--attention-color);
+  font-size: 13px;
+  padding-left: 4px;
+  position: absolute;
+}
+
+.field-container input,
+.field-container input:focus,
+.field-container textarea,
+.field-container textarea:focus {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  caret-color: var(--accent-color);
+  color: var(--main-color);
+  outline: none;
+  flex-grow: 1;
+}
+
+.field-container textarea {
+  min-height: 128px;
+}
+
+.field-container input::placeholder,
+.field-container textarea::placeholder {
+  color: var(--faded-accent-color);
+  font-size: 0.9rem;
+  transition: all ease-in-out 0.3s;
+}
+
+.field-container input:autofill,
+.field-container input:focus:autofill
+.field-container input:-webkit-autofill,
+.field-container input:focus:-webkit-autofill {
+  -webkit-text-fill-color: var(--main-color);
+  -webkit-box-shadow: 0 0 0 1000px var(--main-bg-color) inset;
+}
+
+.field-container svg {
+  height: auto;
+  width: 22px;
+  cursor: pointer;
+}
+
+.field-container svg path {
+  fill: var(--faded-accent-color);
+  transition: all ease-in-out 0.5s;
+}
+
+.field-err {
+  color: var(--attention-color);
+  font-size: 0.8rem;
+  padding-left: 7px;
+}

@@ -1,29 +1,95 @@
+import { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 import Auth from '../api/authApi.js';
 import { selectAuthUser, setCredentials } from '../store/authSlice.js';
+import { MainButton } from '../components';
+import { useClickOutside } from '../hooks';
+import { Logo, SearchIcon, AddIcon, ProfileIcon, SettingsIcon, LogoutIcon } from '../assets';
+import './Header.css';
+import './DropdownMenu.css';
 
 const Header = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const auth = useSelector(selectAuthUser.user);
+
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [authMenuOpen, setAuthMenuOpen] = useState(false);
+  const searchContainerRef = useRef(null);
+  const authContainerRef = useRef(null);
+
+  const doSearch = () => {
+    console.log('Searching...'); // TODO
+  };
+
+  const openEventCreateForm = () => {
+    console.log('Event creation form opens...'); // TODO
+  };
 
   const logout = async () => {
     try {
       await Auth.logout();
       dispatch(setCredentials());
       navigate('/login');
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
+  useClickOutside([searchContainerRef], () => { if (searchOpen) setSearchOpen(() => false); });
+  useClickOutside([authContainerRef], () => { if (authMenuOpen) setAuthMenuOpen(false); });
+
+  if (!auth) return <></>
+
   return (
-    <div>
-      Header
-      {auth ? <button onClick={logout}>Logout</button> : ''}
-    </div>
+    <header>
+      <nav>
+        <Link className="logo" to="/">
+          <Logo />
+        </Link>
+
+        <div className="search-container" ref={searchContainerRef}>
+          {/* <SearchForm
+            id='search' name='search'
+            cb={setSearch} val={search}
+            p='Search post titles...'
+            classes={searchOpen ? ['open'] : ['close']}
+            apply={applySearch}
+          /> */}
+          <div className="main-button square">
+            <SearchIcon
+              className={"search-icon " + (searchOpen ? 'open' : 'close')}
+              onClick={() => setSearchOpen(open => !open)}
+            />
+          </div>
+        </div>
+
+        <MainButton Icon={AddIcon} onClick={openEventCreateForm} type="button" square={true} />
+
+        <div className="dropdown-menu-container" ref={authContainerRef}>
+          <div className="dropdown-menu-button" onClick={() => setAuthMenuOpen((open) => !open)}>
+            <img className="avatar" src={`${import.meta.env.VITE_API_URL}${auth.avatar}`} alt="My avatar" />
+          </div>
+          <ul className={authMenuOpen ? "open" : "close"}>
+            <li className="dropdown-menu-important"><div>{auth.login}</div></li>
+            <li>
+              <NavLink to={`/users/${auth.id}`} end onClick={() => setAuthMenuOpen(false)}>
+                <ProfileIcon /><div>Profile</div>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to={"/settings"} onClick={() => setAuthMenuOpen(false)}>
+                <SettingsIcon /><div>Settings</div>
+              </NavLink>
+            </li>
+            <li>
+              <button type="button" onClick={logout}><LogoutIcon /><div>Log Out</div></button>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
   );
 };
 

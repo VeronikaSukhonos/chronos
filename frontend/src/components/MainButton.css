@@ -1,0 +1,45 @@
+.main-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--accent-bg-color);
+  background-image: linear-gradient(
+    to bottom,
+    var(--accent-bg-color) 0%,
+    var(--accent-bg-color) 25%,
+    var(--extra-accent-bg-color) 50%,
+    var(--accent-bg-color) 75%,
+    var(--accent-bg-color) 100%
+  );
+  background-size: auto 400%;
+  border: none;
+  border-radius: 15px;
+  color: var(--accent-color);
+  font-family: 'Unbounded', sans-serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+  min-height: 36px;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: all ease-in-out 0.7s;
+}
+
+.main-button.square {
+  min-height: 45px;
+  min-width: 45px;
+}
+
+.main-button:not(:disabled):hover {
+  background-position: center bottom;
+  box-shadow: 0 0 4px 1px var(--main-shadow-color);
+}
+
+.main-button svg {
+  height: 27px;
+  width: 27px;
+  transition: all ease-in-out 0.5s;
+}
+
+.main-button:not(:disabled):hover svg {
+  transform: scale(1.05);
+}

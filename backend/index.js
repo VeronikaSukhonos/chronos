@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
+import path from 'path';
 
 import authRouter from './routes/authRouter.js';
 // import usersRouter from './routes/usersRouter.js';
@@ -16,6 +17,8 @@ const app = express();
 
 const hostname = 'localhost';
 const port = process.env.API_PORT;
+
+app.use('/api/avatars', express.static(path.join('db', 'avatars')));
 
 app.use(json());
 app.use(cookieParser());

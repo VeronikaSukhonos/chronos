@@ -1,0 +1,45 @@
+.basic-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--lighter-main-bg-color);
+  border-radius: 20px;
+  padding: 20px;
+  width: 400px;
+  max-width: 100%;
+}
+
+.basic-form-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.basic-form-title.small {
+  font-size: 1rem;
+}
+
+.basic-form-feedback,
+.basic-form-note {
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.basic-form-feedback.ok {
+  color: var(--darker-accent-bg-color);
+}
+
+.basic-form-feedback.fail {
+  color: var(--attention-color);
+}
+
+.basic-form-note a {
+  color: var(--faded-accent-color);
+  font-weight: bold;
+  transition: all ease-in-out 0.5s;
+}
+
+.basic-form-note a:hover {
+  color: var(--darker-accent-bg-color);
+}

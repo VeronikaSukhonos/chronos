@@ -37,10 +37,10 @@ export const createConfirmToken = async (user, email) => {
     );
 
     if (email) {
-      //     const pEmail = new PendingEmail(
-//       user.id, email, confirmToken,
-//       new Date((new Date()).getTime()
-//         + getExpTime(config.CONFIRM_TOKEN_EXP_TIME));
+      user.pendingEmail = {
+        email, token: confirmToken,
+        expDate: new Date((new Date()).getTime() + getExpTime(config.CONFIRM_TOKEN_EXP_TIME))
+      };
     } else {
       user.passwordToken = confirmToken;
     }

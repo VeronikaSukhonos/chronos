@@ -1,0 +1,107 @@
+.dropdown-menu-container {
+  position: relative;
+}
+
+.dropdown-menu-button {
+  display: flex;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all ease-in-out 0.3s;
+}
+
+.dropdown-menu-button:hover {
+  box-shadow: 0 0 5px 1px var(--main-shadow-color);
+}
+
+.dropdown-menu-container ul {
+  display: flex;
+  flex-direction: column;
+  background: var(--lighter-main-bg-color);
+  border-radius: 18px;
+  box-shadow: 0 0 4px 1px var(--main-shadow-color);
+  padding: 10px 0;
+  height: auto;
+  width: max-content;
+  position: absolute;
+  top: 120%;
+  right: 0;
+  opacity: 0;
+  z-index: -1;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all ease-in-out 0.3s;
+}
+
+.dropdown-menu-container ul.open {
+  z-index: 100;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-menu-container ul li {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  transition: all ease-in-out 0.3s;
+}
+
+.dropdown-menu-container ul li a,
+.dropdown-menu-container ul li button {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  color: var(--accent-color);
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 6px 14px 4px 14px;
+  cursor: pointer;
+  transition: all ease-in-out 0.3s;
+}
+
+.dropdown-menu-container ul li button {
+  background: none;
+  border: none;
+}
+
+.dropdown-menu-container ul li svg {
+  height: 20px;
+  width: 20px;
+}
+
+.dropdown-menu-container ul li:hover {
+  transform: scale(1.03);
+}
+
+.dropdown-menu-container ul li.dropdown-menu-important,
+.dropdown-menu-container ul li.dropdown-menu-important:hover {
+  color: var(--accent-color);
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 3px;
+  transform: none;
+}
+
+.dropdown-menu-container ul::before {
+  content: '';
+  background: var(--lighter-main-bg-color);
+  border-left: 2px solid var(--main-shadow-color);
+  border-top: 2px solid var(--main-shadow-color);
+  height: 8px;
+  width: 8px;
+  position: absolute;
+  top: -6px;
+  right: 15px;
+  opacity: 0;
+  transform: rotate(45deg) translateY(-10px);
+  transition: all ease-in-out 0.3s;
+}
+
+.dropdown-menu-container ul.open::before {
+  opacity: 1;
+  transform: rotate(45deg) translateY(0);
+}

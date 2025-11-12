@@ -4,10 +4,10 @@ import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
   plugins: [react(), svgr()],
-  server: { // TODO check
-    watch: { usePolling: true },
+  server: {
     host: true,
     strictPort: true,
-    port: process.env.APP_PORT
+    port: process.env.APP_PORT,
+    watch: { usePolling: true }
   }
 });

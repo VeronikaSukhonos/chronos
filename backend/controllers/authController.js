@@ -25,6 +25,7 @@ class Auth {
       const user = await User.create({ login, email, password });
 
       // await Email.sendEmailConfirmation(user, email);
+      // TODO create main calendar
       return res.status(201).json({
         message: 'Registered successfully. Please check your email to confirm it',
         data: { user: new UserDto(user) }
@@ -40,7 +41,7 @@ class Auth {
       const { login, password } = req.body;
       const user = await User.findOne().byLoginOrEmail(login).select('+password +email +isConfirmed');
 
-      if (!user || !user.checkPassword(password))
+      if (!user || !await user.checkPassword(password))
         return res.status(401).json({ message: 'Invalid credentials' });
       if (!user.isConfirmed) {
         return res.status(403).json({
@@ -75,7 +76,7 @@ class Auth {
     try {
       await createRefreshToken(req.user, res);
       return res.status(200).json({
-        message: 'Refreshed tokens successfully.',
+        message: 'Refreshed tokens successfully',
         data: { user: new UserDto(req.user), accessToken: createAccessToken(req.user) }
       });
     } catch (err) {

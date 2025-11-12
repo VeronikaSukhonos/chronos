@@ -1,7 +1,7 @@
 import { Logo } from '../assets';
 
 const LoadPage = () => {
-  return <Logo />;
+  return <div className="center-container"><Logo /></div>;
 };
 
 export default LoadPage;

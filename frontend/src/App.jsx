@@ -17,21 +17,22 @@ import NotFoundPage from './pages/NotFoundPage.jsx';
 const App = () => {
   const dispatch = useDispatch();
 
-  const [load, setLoad] = useState(false);
+  const [load, setLoad] = useState(true);
 
   useEffect(() => {
     Auth.refresh()
       .then(({ data: res }) => {
         dispatch(setCredentials(res.data));
-        setLoad(true);
+        setLoad(false);
       })
-      .catch(() => {
+      .catch((err) => {
         dispatch(setCredentials());
-        setLoad(true);
+        setLoad(false);
+        console.log(err.message);
       });
   }, []);
 
-  return !load ? <LoadPage /> : (
+  return load ? <LoadPage /> : (
     <>
       <Header />
 

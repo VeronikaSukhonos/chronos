@@ -1,1 +1,9 @@
 export { default as Logo } from './logo.svg?react';
+export { default as AttentionIcon } from './attention.svg?react';
+export { default as PwCloseIcon } from './eye-close.svg?react';
+export { default as PwOpenIcon } from './eye-open.svg?react';
+export { default as SearchIcon } from './search.svg?react';
+export { default as AddIcon } from './add.svg?react';
+export { default as ProfileIcon } from './profile.svg?react';
+export { default as SettingsIcon } from './settings.svg?react';
+export { default as LogoutIcon } from './logout.svg?react';

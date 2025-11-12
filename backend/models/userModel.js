@@ -34,7 +34,8 @@ const userSchema = new Schema({
     type: Date
   },
   avatar: {
-    type: String
+    type: String,
+    default: '/avatars/default.png'
   },
   registerDate: {
     type: Date,
@@ -65,6 +66,8 @@ const userSchema = new Schema({
 userSchema.pre('save', async function(next) {
   if (this.isModified('password'))
     this.password = await bcrypt.hash(this.password, 10);
+  if (this.isModified('avatar'))
+    this.avatar = `/avatars/${this.avatar}`;
   next();
 })
 
@@ -75,5 +78,7 @@ userSchema.methods.checkPassword = async function(password) {
 userSchema.query.byLoginOrEmail = function(login) {
   return this.or([{ login }, { email: login }]);
 };
+
+// http://localhost:8080/api/avatars/default.png
 
 export default model('User', userSchema);
