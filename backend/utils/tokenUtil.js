@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+
 import config from '../config.js';
 
 export const createAccessToken = (user) => {
@@ -22,6 +23,7 @@ export const createRefreshToken = async (user, res) => {
       maxAge: getExpTime(config.REFRESH_TOKEN_EXP_TIME),
       httpOnly: true, path: '/api/auth/refresh'
     });
+
     return refreshToken;
   } catch (err) {
     err.message = `Creating refresh token failed: ${err.message}`;
@@ -39,7 +41,7 @@ export const createConfirmToken = async (user, email) => {
     if (email) {
       user.pendingEmail = {
         email, token: confirmToken,
-        expDate: new Date((new Date()).getTime() + getExpTime(config.CONFIRM_TOKEN_EXP_TIME))
+        expDate: new Date(Date.now() + getExpTime(config.CONFIRM_TOKEN_EXP_TIME))
       };
     } else {
       user.passwordToken = confirmToken;
@@ -51,11 +53,10 @@ export const createConfirmToken = async (user, email) => {
     err.message = `Creating confirm token failed: ${err.message}`;
     throw err;
   }
-}
+};
 
 export const getExpTime = (t) => {
-  const time = parseInt(t);
-  const unit = t.at(-1);
+  const time = parseInt(t), unit = t.at(-1);
 
   if (!time || !['m', 'd'].includes(unit)) throw new Error('Invalid expire time');
   return unit === 'm' ? time * 60 * 1000 : time * 24 * 60 * 60 * 1000;

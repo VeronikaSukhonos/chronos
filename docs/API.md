@@ -6,8 +6,8 @@ Unless otherwise specified, all request bodies must be sent as `application/json
 
 Response structure:
 * always - `message` (string)
-* if return data - `data` (object with a property corresponding to the entity, e.g., `user: {}` or `users: [ {}, {} ]`)
-* in case of validator errors - `errors` (array of objects, e.g., `{ param: 'login', error: 'Login is required' }`)
+* if returns data - `data` (object with a property corresponding to the entity, e.g., `user: {}` or `users: [ {}, {} ]`)
+* in case of validation errors - `errors` (array of objects, e.g., `{ param: 'login', error: 'Login is required' }`)
 
 ## Authentication module
 
@@ -204,6 +204,8 @@ All endpoints require authorization.
 
 # Tags Module
 
+All endpoints require authorization.
+
 1. `GET /api/tags` - gets all tags of an authorized user
 
 **Data**: array of tags (everything)
@@ -221,4 +223,3 @@ All endpoints require authorization.
 **Parameter**: `title`
 
 4. `DELETE /api/tags/tagId` - deletes a tag
-

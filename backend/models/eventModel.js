@@ -1,17 +1,24 @@
 import { Schema, model } from "mongoose";
+
 const eventSchema = new Schema({
   authorId: {
-    type: ObjectId
+    type: Schema.Types.ObjectId,
+    ref: "User"
   },
   calendarId: {
-    type: ObjectId
+    type: Schema.Types.ObjectId,
+    ref: "Calendar"
   },
   name: {
     type: String,
-    required: [true, "Name is required"]
+    trim: true,
+    required: [true, "Name is required"],
+    maxLength: [60, "Name must be at most 60 characters"]
   },
   description: {
-    type: String
+    type: String,
+    trim: true,
+    maxLength: [250, "Description must be at most 250 characters"]
   },
   startDate: {
     type: Date,
@@ -28,24 +35,29 @@ const eventSchema = new Schema({
     default: false
   },
   color: {
-    type: String
+    type: String,
+    // TODO here possibly should be a function for default value - takes the value from the calendar color 
   },
   repeat: {
     type: Map // temporarily
   },
   participants: {
-    type: Array
+    type: [{ type: Schema.Types.ObjectId, ref: "User" }]
   },
   tags: {
-    type: Array
+    type: [{ type: Schema.Types.ObjectId, ref: "Tag" }]
   },
   createDate: {
     type: Date,
-    default: () => Date.now()
+    default: () => Date.now(),
+    immutable: true
   },
   type: {
     type: String,
-    required: [true, "Type is required"]
+    enum: ["arrangement", "reminder", "task"],
+    required: [true, "Type is required"],
+    immutable: true
   }
 });
+
 export default model("Event", eventSchema);

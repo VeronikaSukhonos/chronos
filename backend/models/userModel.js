@@ -1,6 +1,18 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+const pendingEmailSchema = new Schema({
+  email: {
+    type: String
+  },
+  token: {
+    type: String
+  },
+  expDate: {
+    type: Date
+  }
+}, { _id: false });
+
 const userSchema = new Schema({
   login: {
     type: String,
@@ -39,7 +51,6 @@ const userSchema = new Schema({
   },
   registerDate: {
     type: Date,
-    required: true,
     default: () => Date.now(),
     immutable: true,
     select: false
@@ -47,12 +58,13 @@ const userSchema = new Schema({
   isConfirmed: {
     type: Boolean,
     required: true,
-    default: true, // TODO false
+    default: false,
     select: false
   },
   pendingEmail: {
-    email: String, token: String, expDate: Date
-  }, // select: false
+    type: pendingEmailSchema,
+    select: false
+  },
   passwordToken: {
     type: String,
     select: false
@@ -79,6 +91,10 @@ userSchema.query.byLoginOrEmail = function(login) {
   return this.or([{ login }, { email: login }]);
 };
 
-// http://localhost:8080/api/avatars/default.png
+userSchema.query.byEmailOrPendingEmail = function(email) {
+  return this.or(
+    [{ email }, { 'pendingEmail.email': email, 'pendingEmail.expDate': { $gt: new Date() } }]
+  );
+};
 
 export default model('User', userSchema);

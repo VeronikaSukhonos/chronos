@@ -1,31 +1,45 @@
 import { Schema, model } from "mongoose";
+
 const calendarSchema = new Schema({
   authorId: {
-    type: ObjectId
+    type: Schema.Types.ObjectId,
+    ref: "User"
   },
   participants: {
-    type: Array
+    type: [{ type: Schema.Types.ObjectId, ref: "User" }]
   },
   followers: {
-    type: Array
+    type: [{ type: Schema.Types.ObjectId, ref: "User" }]
   },
   name: {
     type: String,
-    required: [true, "Name is required"]
+    trim: true,
+    required: [true, "Name is required"],
+    maxLength: [30, "Name must be at most 30 characters"]
   },
   description: {
-    type: String
-  },
-  hidden: {
-    type: Boolean,
-    default: false
+    type: String,
+    trim: true,
+    maxLength: [250, "Description must be at most 250 characters"]
   },
   color: {
-    type: String
+    type: String,
+    default: "#ade4ff"
+  },
+  isHidden: {
+    type: Boolean,
+    default: false
   },
   isPublic: {
     type: Boolean,
     default: false
+  },
+  type: {
+    type: String,
+    enum: ["main", "holidays", "other"],
+    immutable: true,
+    default: "other"
   }
 });
+
 export default model("Calendar", calendarSchema);

@@ -27,7 +27,7 @@ const userParams = {
     .isLength({ max: 60 }).withMessage('Full name must be at most 60 characters'),
   dob: body('dob').optional().trim()
     .isDate({ format: 'DD/MM/YYYY' }).withMessage('Date of birth must be in DD/MM/YYYY format').bail()
-    .custom((val) => Date(val) <= Date.now()).withMessage('Date of birth must not be in the future')
+    .custom((val) => new Date(val) <= Date.now()).withMessage('Date of birth must not be in the future')
 };
 
 const register = [userParams.login, userParams.email, userParams.password, isValid];
@@ -38,7 +38,23 @@ const login = [
   isValid
 ];
 
+const emailConfirmation = [
+  body('login').notEmpty().withMessage('Login is required'),
+  body('email').optional().trim()
+    .isEmail().withMessage('Email must be valid').bail()
+    .normalizeEmail({ gmail_remove_dots: false, gmail_remove_subaddress: false })
+    .isLength({ max: 100 }).withMessage('Email must be at most 100 characters'),
+  isValid
+];
+
+const passwordReset = [body('email').notEmpty().withMessage('Email is required'), isValid];
+
+const confirmPasswordReset = [userParams.password, isValid];
+
 export default {
   register,
-  login
+  login,
+  emailConfirmation,
+  passwordReset,
+  confirmPasswordReset
 };

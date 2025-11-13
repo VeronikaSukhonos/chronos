@@ -13,9 +13,17 @@ router.post('/login', valid.login, Auth.login);
 router.post('/logout', isAuth, Auth.logout);
 router.post('/refresh', checkRefreshToken, Auth.refresh);
 
-// router.post('/password-reset', valid.passwordReset, Auth.passwordReset);
-// router.post('/password-reset/:confirmToken', checkConfirmToken, valid.confirmPasswordReset, Auth.confirmPasswordReset);
-// router.post('/email-confirmation/', valid.emailConfirmation, Auth.emailConfirmation);
-// router.post('/email-confirmation/:confirmToken', checkConfirmToken, Auth.confirmEmail);
+router.post('/email-confirmation',
+  valid.emailConfirmation, Auth.emailConfirmation
+);
+router.post('/email-confirmation/:confirmToken',
+  checkConfirmToken, Auth.confirmEmailConfirmation
+);
+router.post('/password-reset',
+  valid.passwordReset, Auth.passwordReset
+);
+router.post('/password-reset/:confirmToken',
+  checkConfirmToken, valid.confirmPasswordReset, Auth.confirmPasswordReset
+);
 
 export default router;
