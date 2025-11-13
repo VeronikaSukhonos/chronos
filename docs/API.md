@@ -13,7 +13,7 @@ Response structure:
 
 1. `POST /api/auth/register` - registers a new user
 
-**Parameters**: `login`, `email`, `password`
+**Parameters**: `login` (can specify login or email), `password`
 
 **Important**: sends an email confirmation link to the user's email
 
@@ -99,7 +99,9 @@ All endpoints require authorization.
 
 **Parameter**: `password`
 
-// TODO add enpoint for adding other user's dob to an authorized user calendar
+9. `POST /api/users/:userId/birthday` - adds a user's birthday to an authorized user's calendar
+
+**Parameters**: optional `calendar` (default - holidays)
 
 # Calendars module
 
