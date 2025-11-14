@@ -138,7 +138,9 @@ class Auth {
       const { email } = req.body;
       const user = await User.findOne({ email }).select('+email +isConfirmed');
 
-      if (!user) return res.status(404).json({ message: 'User is not found' });
+      if (!user) return res.status(404).json({
+        message: 'User with this email is not found'
+      });
       if (!user.isConfirmed) {
         return res.status(403).json({
           message: 'Email is not confirmed. Please confirm your email first'

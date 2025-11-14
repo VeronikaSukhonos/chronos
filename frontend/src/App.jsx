@@ -11,6 +11,8 @@ import { Header } from './components';
 import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
+import EmailConfirmationPage from './pages/EmailConfirmationPage.jsx';
+import PasswordResetPage from './pages/PasswordResetPage.jsx';
 import LoadPage from './pages/LoadPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
@@ -42,6 +44,10 @@ const App = () => {
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/email-confirmation" element={<EmailConfirmationPage />} />
+          <Route path="/email-confirmation/:confirmToken" element={<EmailConfirmationPage />} />
+          <Route path="/password-reset" element={<PasswordResetPage />} />
+          <Route path="/password-reset/:confirmToken" element={<PasswordResetPage />} />
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

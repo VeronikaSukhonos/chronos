@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 import { setCredentials } from '../store/authSlice.js';
-import apiConfig from './apiConfig.js';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const timeout = 7000;
@@ -48,7 +47,7 @@ api.interceptors.response.use(async (res) => {
         return api.request(originalReq);
       } catch (_) {
         dispatch(setCredentials());
-        return Promise.reject({ message: apiConfig.error.IRT });
+        return Promise.reject({ message: 'Please log in again' });
       }
     } else if (err.response.data.errors) {
       const errors = {};
@@ -59,11 +58,12 @@ api.interceptors.response.use(async (res) => {
       }
       err.errors = Object.keys(errors).length ? errors : undefined;
     }
-    err.message = err.response.data.message;
+    err.message = err.response.data.message
+      .replace('confirm token. Please request a new one', 'confirmation link');
   } else if (err.request) {
-    err.message = apiConfig.error.SNR;
+    err.message = 'Server is not responding. Please try again later';
   } else {
-    err.message = apiConfig.error.SWW;
+    err.message = 'Something went wrong. Please try again later';
   }
   return Promise.reject(err);
 });

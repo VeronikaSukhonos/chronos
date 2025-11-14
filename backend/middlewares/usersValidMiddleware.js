@@ -40,7 +40,7 @@ const login = [
 
 const emailConfirmation = [
   body('login').notEmpty().withMessage('Login is required'),
-  body('email').optional().trim()
+  body('email').optional({ checkFalsy: true }).trim()
     .isEmail().withMessage('Email must be valid').bail()
     .normalizeEmail({ gmail_remove_dots: false, gmail_remove_subaddress: false })
     .isLength({ max: 100 }).withMessage('Email must be at most 100 characters'),

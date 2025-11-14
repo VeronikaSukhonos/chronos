@@ -17,21 +17,21 @@ class Auth {
     return await api.post('/auth/refresh');
   }
 
-  // async passwordResetRequest(params) {
-  //   return await api.post(`/auth/password-reset`, params);
-  // }
+  async passwordResetRequest(params) {
+    return await api.post(`/auth/password-reset`, params);
+  }
 
-  // async passwordResetConfirm(params, confirmToken) {
-  //   return await api.post(`/auth/password-reset/${confirmToken}`, params);
-  // }
+  async passwordResetConfirm(params, confirmToken) {
+    return await api.post(`/auth/password-reset/${confirmToken}`, params);
+  }
 
-  // async emailConfirmationRequest(params) {
-  //   return await api.post(`/auth/email-confirmation`, params);
-  // }
+  async emailConfirmationRequest(params) {
+    return await api.post(`/auth/email-confirmation`, params);
+  }
 
-  // async emailConfirmationConfirm(confirmToken) {
-  //   return await api.post(`/auth/email-confirmation/${confirmToken}`);
-  // }
+  async emailConfirmationConfirm(confirmToken) {
+    return await api.post(`/auth/email-confirmation/${confirmToken}`);
+  }
 }
 
 export default new Auth;

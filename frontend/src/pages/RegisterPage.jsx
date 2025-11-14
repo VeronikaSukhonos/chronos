@@ -1,88 +1,84 @@
-import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Link, Navigate } from 'react-router-dom';
 
 import Auth from '../api/authApi.js';
-import { selectAuthUser, setCredentials } from '../store/authSlice.js';
+import { selectAuthUser } from '../store/authSlice.js';
 import { TextField, PasswordField, MainButton } from '../components';
+import { useForm } from '../hooks';
 import { Logo } from '../assets';
+import valid from '../utils/validation.js';
 import '../components/BasicForm.css';
 
 const RegisterPage = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const auth = useSelector(selectAuthUser.user);
 
-  const [login, setLogin] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const {
+    params, setParam, load, feedback, errors, resetForm, setSuccess, setFailure
+  } = useForm({login: '', email: '', password: '', passwordConfirmation: ''}, () => {
+    return {
+      login: valid.login(params),
+      email: valid.email(params),
+      password: valid.password(params),
+      passwordConfirmation: valid.passwordConfirmation(params)
+    };
+  });
 
-  const [load, setLoad] = useState(false);
-  const [feedback, setFeedback] = useState({ msg: '', status: '' });
-  const [errors, setErrors] = useState({});
-
-  const submit = async (e) => {
+  const submit = (e) => {
     e.preventDefault();
-    setLoad(true);
-    setFeedback({ msg: '', status: '' });
-    setErrors({});
-    try {
-      const { data: res } = await Auth.register({ login, email, password });
+    if (!resetForm()) return;
 
-      setLoad(false);
-      setFeedback({ msg: res.message, status: 'ok' });
-      dispatch(setCredentials(res.data));
-      navigate('/');
-    } catch (err) {
-      setLoad(true);
-      if (err.errors) setErrors(err.errors);
-      else setFeedback({ msg: err.message, status: 'fail' });
-    }
-  }
+    Auth.register(params)
+      .then(({ data: res }) => {
+        setSuccess(res);
+      })
+      .catch((err) => {
+        setFailure(err);
+      });
+  };
 
   return !auth ? (
     <div className="center-container">
-      <h1 className="basic-form-title">Register to</h1>
+      <div className="basic-form-title">Register to</div>
       <Logo />
       <div className="basic-form-title small">make every day count</div>
 
       <form className="basic-form" onSubmit={submit}>
         <TextField
           label="Login"
-          onChange={e => setLogin(e.target.value)}
+          onChange={setParam}
           id="login"
-          val={login}
+          val={params.login}
           err={errors}
           req={true}
           ac="username"
         />
         <TextField
           label="Email"
-          onChange={e => setEmail(e.target.value)}
+          onChange={setParam}
           id="email"
-          val={email}
+          val={params.email}
           err={errors}
           req={true}
           ac="email"
         />
         <PasswordField
-          onChange={e => setPassword(e.target.value)}
-          val={password}
+          onChange={setParam}
+          val={params.password}
           err={errors}
           req={true}
         />
-        {/* <PasswordField
+        <PasswordField
           label="Password Confirmation"
-          onChange={e => setPasswordConfirmation(e.target.value)}
-          val={passwordConfirmation}
+          onChange={setParam}
+          id="passwordConfirmation"
+          val={params.passwordConfirmation}
+          err={errors}
           req={true}
-        /> */}
+        />
 
         {feedback && <p className={"basic-form-feedback " + (feedback.status)}>{feedback.msg}</p>}
 
-        <MainButton title="Register" />
+        <MainButton title="Register" dis={load} />
 
         <div className="basic-form-note">Already planning your days? <Link to="/login">Log in</Link></div>
       </form>

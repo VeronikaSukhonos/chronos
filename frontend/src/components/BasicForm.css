@@ -1,11 +1,12 @@
 .basic-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
   background: var(--lighter-main-bg-color);
   border-radius: 20px;
   padding: 20px;
-  width: 400px;
+  width: 450px;
   max-width: 100%;
 }
 
@@ -14,6 +15,8 @@
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--accent-color);
+  text-align: center;
+  line-height: 1.2;
 }
 
 .basic-form-title.small {
@@ -42,4 +45,16 @@
 
 .basic-form-note a:hover {
   color: var(--darker-accent-bg-color);
+}
+
+.basic-form-result-icon.ok path {
+  fill: var(--darker-accent-bg-color);
+  stroke: var(--darker-accent-bg-color);
+  opacity: 0.75;
+}
+
+.basic-form-result-icon.fail path {
+  fill: var(--attention-color);
+  stroke: var(--attention-color);
+  opacity: 0.75;
 }

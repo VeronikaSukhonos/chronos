@@ -19,19 +19,22 @@
   font-size: 1.3rem;
   font-weight: bold;
   min-height: 36px;
+  width: 100%;
   padding: 7px 10px;
-  cursor: pointer;
   transition: all ease-in-out 0.7s;
 }
 
 .main-button.square {
   min-height: 45px;
   min-width: 45px;
+  max-height: 45px;
+  max-width: 45px;
 }
 
 .main-button:not(:disabled):hover {
   background-position: center bottom;
   box-shadow: 0 0 4px 1px var(--main-shadow-color);
+  cursor: pointer;
 }
 
 .main-button svg {
@@ -42,4 +45,8 @@
 
 .main-button:not(:disabled):hover svg {
   transform: scale(1.05);
+}
+
+.main-button:disabled {
+  opacity: 0.65;
 }

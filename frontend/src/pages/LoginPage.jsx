@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 import Auth from '../api/authApi.js';
 import { selectAuthUser, setCredentials } from '../store/authSlice.js';
 import { TextField, PasswordField, MainButton } from '../components';
+import { useForm } from '../hooks';
 import { Logo } from '../assets';
 import '../components/BasicForm.css';
 
@@ -14,31 +14,29 @@ const LoginPage = () => {
 
   const auth = useSelector(selectAuthUser.user);
 
-  const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    params, setParam, load, feedback, errors, resetForm, setSuccess, setFailure
+  } = useForm({login: '', password: ''}, () => {
+    return {
+      login: (() => params.login ? '' : 'Login is required')(),
+      password: (() => params.password ? '' : 'Password is required')()
+    };
+  });
 
-  const [load, setLoad] = useState(false);
-  const [feedback, setFeedback] = useState({ msg: '', status: '' });
-  const [errors, setErrors] = useState({});
-
-  const submit = async (e) => {
+  const submit = (e) => {
     e.preventDefault();
-    setLoad(true);
-    setFeedback({ msg: '', status: '' });
-    setErrors({});
-    try {
-      const { data: res } = await Auth.login({ login, password });
+    if (!resetForm()) return;
 
-      setLoad(false);
-      setFeedback({ msg: res.message, status: 'ok' });
-      dispatch(setCredentials(res.data));
-      navigate('/');
-    } catch (err) {
-      setLoad(true);
-      if (err.errors) setErrors(err.errors);
-      else setFeedback({ msg: err.message, status: 'fail' });
-    }
-  }
+    Auth.login(params)
+      .then(({ data: res }) => {
+        setSuccess(res);
+        dispatch(setCredentials(res.data));
+        navigate('/');
+      })
+      .catch((err) => {
+        setFailure(err);
+      });
+  };
 
   return !auth ? (
     <div className="center-container">
@@ -48,16 +46,16 @@ const LoginPage = () => {
       <form className="basic-form" onSubmit={submit}>
         <TextField
           label="Login or Email"
-          onChange={e => setLogin(e.target.value)}
+          onChange={setParam}
           id="login"
-          val={login}
+          val={params.login}
           err={errors}
           req={true}
           ac="username"
         />
         <PasswordField
-          onChange={e => setPassword(e.target.value)}
-          val={password}
+          onChange={setParam}
+          val={params.password}
           err={errors}
           req={true}
           ac="current-password"
@@ -65,7 +63,7 @@ const LoginPage = () => {
 
         {feedback && <p className={"basic-form-feedback " + (feedback.status)}>{feedback.msg}</p>}
 
-        <MainButton title="Log In" />
+        <MainButton title="Log In" dis={load} />
 
         <div className="basic-form-note"><Link to="/password-reset">Forgot your password?</Link></div>
         <div className="basic-form-note">First time here to plan smarter? <Link to="/register">Register</Link></div>
