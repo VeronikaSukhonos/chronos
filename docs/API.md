@@ -62,8 +62,7 @@ All endpoints require authorization.
 1. `GET /api/users` - gets all users
 
 **Filtering**:
-* by login (`?login=choronosuser`)
-* by email (`?email=chronosuser@gmail.com`)
+* by login or email (`?login=choronosuser` or `?login=chronosuser@gmail.com`)
 
 **Data**: array of users (`id`, `login`, `avatar`)
 
@@ -225,3 +224,4 @@ All endpoints require authorization.
 **Parameter**: `title`
 
 4. `DELETE /api/tags/tagId` - deletes a tag
+
