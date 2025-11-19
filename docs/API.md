@@ -64,7 +64,7 @@ All endpoints require authorization.
 **Filtering**:
 * by login - can be partial, by email - must be exact (`?login=choronosuser` or `?login=chronosuser@gmail.com`)
 
-**Data**: array of users (`id`, `login`, `avatar`)
+**Data**: array of users (`id`, `login`, `avatar`, if present - `fullName`, `dob`)
 
 **Important**: only the first value of a parameter is used if multiple provided
 
@@ -80,7 +80,7 @@ All endpoints require authorization.
 
 4. `PATCH /api/users` - updates a user profile
 
-**Parameters**: at least one of `login` (cannot be empty if provided), `fullName`, `dob`
+**Parameters**: at least one of `login` (cannot be empty if provided), `fullName`, `dob` (YYYY-MM-DD format)
 
 5. `DELETE /api/users/avatar` - deletes a user avatar
 

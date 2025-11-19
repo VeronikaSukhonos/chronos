@@ -25,7 +25,7 @@ const userParams = {
     })
     .matches(/^[A-Za-z\s]*$/).withMessage('Full name must contain only letters and spaces').bail()
     .isLength({ max: 60 }).withMessage('Full name must be at most 60 characters'),
-  dob: body('dob').optional().trim()
+  dob: body('dob').optional({ checkFalsy: true }).trim()
     .isDate({ format: 'YYYY-MM-DD' }).withMessage('Date of Birth must be in YYYY-MM-DD format').bail()
     .custom((val) => new Date(val) <= Date.now()).withMessage('Date of Birth must not be in the future')
 };

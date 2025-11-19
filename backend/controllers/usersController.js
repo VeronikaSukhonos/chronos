@@ -14,11 +14,14 @@ class Users {
     try {
       const filter = {};
 
-      filter.login = (req.query.login || '').toLowerCase();
+      filter.login = ((Array.isArray(req.query.login)
+        ? req.query.login[0] : req.query.login) || '').trim().toLowerCase();
 
       const user = await User.findOne({ email: filter.login }).select('+email');
       const users = user ? [user]
-        : await User.find(filter.login ? { login: { $regex: filter.login }} : {}).limit(limit);
+        : await User.find(
+            filter.login ? { login: { $regex: filter.login.replace(/[^a-z0-9]/g, '') }}: {})
+          .limit(limit);
 
       return res.status(200).json({
         message: users.length !== 0 ? 'Fetched users successfully' : 'No users found',
@@ -44,11 +47,20 @@ class Users {
         }
         user.login = login;
       }
-      user.fullName = fullName;
-      user.dob = dob;
+      if (user.fullName || fullName) user.fullName = fullName;
+      if (user.dob || dob) user.dob = dob;
 
       if (user.isModified()) await user.save();
       else return res.status(200).json({ message: 'Nothing has changed' });
+
+      if (user.fullName == '') {
+        await User.updateOne({ _id: req.user.id }, { $unset: { fullName: '' } });
+        user.fullName = undefined;
+      }
+      if (user.dob == null) {
+        await User.updateOne({ _id: req.user.id }, { $unset: { dob: '' } });
+        user.dob = undefined;
+      }
 
       return res.status(200).json({
         message: 'Updated profile successully',
