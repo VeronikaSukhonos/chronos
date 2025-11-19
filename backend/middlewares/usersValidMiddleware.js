@@ -26,11 +26,13 @@ const userParams = {
     .matches(/^[A-Za-z\s]*$/).withMessage('Full name must contain only letters and spaces').bail()
     .isLength({ max: 60 }).withMessage('Full name must be at most 60 characters'),
   dob: body('dob').optional().trim()
-    .isDate({ format: 'DD/MM/YYYY' }).withMessage('Date of birth must be in DD/MM/YYYY format').bail()
-    .custom((val) => new Date(val) <= Date.now()).withMessage('Date of birth must not be in the future')
+    .isDate({ format: 'YYYY-MM-DD' }).withMessage('Date of Birth must be in YYYY-MM-DD format').bail()
+    .custom((val) => new Date(val) <= Date.now()).withMessage('Date of Birth must not be in the future')
 };
 
-const register = [userParams.login, userParams.email, userParams.password, isValid];
+const register = [
+  userParams.login, userParams.email, userParams.password, isValid
+];
 
 const login = [
   body('login').notEmpty().withMessage('Login or Email is required'),
@@ -47,14 +49,52 @@ const emailConfirmation = [
   isValid
 ];
 
-const passwordReset = [body('email').notEmpty().withMessage('Email is required'), isValid];
+const passwordReset = [
+  body('email').notEmpty().withMessage('Email is required'), isValid
+];
 
 const confirmPasswordReset = [userParams.password, isValid];
+
+const updateUserProfile = [
+  body()
+    .custom((val) => {
+      if (!val) return false;
+      return !((val.login === undefined || val.login === null)
+        && (val.fullName === undefined || val.fullName === null)
+        && val.dob === undefined || val.dob === null);
+    }).withMessage('At least one of Login, Full Name or Date of Birth is required'),
+  body('login').optional().trim().toLowerCase()
+    .notEmpty().withMessage('Login cannot be empty.').bail()
+    .isAlphanumeric().withMessage('Login must contain only letters and digits').bail()
+    .matches(/^[a-z]/).withMessage('Login must start with a letter').bail()
+    .isLength({ min: 3, max: 30 }).withMessage('Login must be 3-30 characters'),
+  userParams.fullName, userParams.dob,
+  isValid
+];
+
+const deleteUserProfile = [
+  body('password').notEmpty().withMessage('Password is required'), isValid
+];
+
+const updateUserEmail = [
+  body('password').notEmpty().withMessage('Password is required'),
+  userParams.email, isValid
+];
+
+const updateUserPassword = [
+  body('curPassword').notEmpty().withMessage('Current Password is required'),
+  body('password').notEmpty().withMessage('Password is required'),
+  isValid
+];
 
 export default {
   register,
   login,
   emailConfirmation,
   passwordReset,
-  confirmPasswordReset
+  confirmPasswordReset,
+  updateUserProfile,
+  deleteUserProfile,
+  updateUserEmail,
+  updateUserPassword
 };

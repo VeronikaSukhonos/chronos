@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import fs from 'fs/promises';
+import path from 'path';
 
 const pendingEmailSchema = new Schema({
   email: {
@@ -85,6 +87,17 @@ userSchema.pre('save', async function(next) {
 
 userSchema.methods.checkPassword = async function(password) {
   return await bcrypt.compare(password, this.password);
+}
+
+userSchema.methods.deleteAvatar = async function() {
+  if (!this.avatar.includes('default')) {
+    await fs.rm(
+      path.join('db', 'avatars', this.avatar.substring(this.avatar.lastIndexOf('/') + 1)),
+      { force: true }
+    );
+    this.avatar = 'default.png';
+    await this.save();
+  }
 }
 
 userSchema.query.byLoginOrEmail = function(login) {

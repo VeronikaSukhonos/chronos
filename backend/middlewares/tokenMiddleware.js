@@ -17,7 +17,7 @@ export const isAuth = (req, res, next) => {
 
     if (err) return res.status(401).json({ message });
 
-    user = await User.findOne({ _id: user.id });
+    user = await User.findOne({ _id: user.id }).select('+email +password');
     if (!user) return res.status(401).json({ message });
 
     req.user = user;
@@ -56,8 +56,8 @@ export const checkConfirmToken = (req, res, next) => {
     if (err) return res.status(400).json({ message });
 
     user = await User.findOne({ _id: user.id }).select('+pendingEmail +passwordToken');
-    if ((req.path.includes('email') && (!user || user.pendingEmail?.token !== confirmToken))
-      || (req.path.includes('password') && (!user || user.passwordToken !== confirmToken)))
+    if ((req.path.includes('email-confirmation') && (!user || user.pendingEmail?.token !== confirmToken))
+      || (req.path.includes('password-reset') && (!user || user.passwordToken !== confirmToken)))
       return res.status(400).json({ message });
 
     req.user = user;
