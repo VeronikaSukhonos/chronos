@@ -62,7 +62,7 @@ All endpoints require authorization.
 1. `GET /api/users` - gets all users
 
 **Filtering**:
-* by login or email (`?login=choronosuser` or `?login=chronosuser@gmail.com`)
+* by login - can be partial, by email - must be exact (`?login=choronosuser` or `?login=chronosuser@gmail.com`)
 
 **Data**: array of users (`id`, `login`, `avatar`)
 
@@ -92,15 +92,11 @@ All endpoints require authorization.
 
 7. `PATCH /api/users/password` - updates a user password
 
-**Parameters**: `oldPassword`, `password`
+**Parameters**: `curPassword`, `password`
 
 8. `POST /api/users` - deletes a user profile
 
 **Parameter**: `password`
-
-9. `POST /api/users/:userId/birthday` - adds a user's birthday to an authorized user's calendar
-
-**Parameters**: optional `calendar` (default - holidays)
 
 # Calendars module
 
@@ -169,7 +165,7 @@ All endpoints require authorization.
 **Filtering**:
 * by calendars (`?calendar=main&&calendar=holidays`)
 * by types (`?type=arrangement&&type=task`)
-* by tags (`tag=work&&tag=uni`)
+* by tags (`?tag=work&&tag=uni`)
 * by year // TODO
 * by month // TODO
 * by day // TODO
@@ -224,4 +220,3 @@ All endpoints require authorization.
 **Parameter**: `title`
 
 4. `DELETE /api/tags/tagId` - deletes a tag
-

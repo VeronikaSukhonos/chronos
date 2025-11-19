@@ -38,7 +38,7 @@ docker compose build <app-dev/app-prod>
 
 Write `app-dev` to run the development build and `app-prod` to run the production build (PRODUCTION BUILD WAS NOT TESTED YET).
 
-In development build, you can change files both in `backend` and `frontend` directories (except Docker-related files like Dockerfile), and servers will be restarted automatically.
+In the development build, you can change files both in `backend` and `frontend` directories (except Docker-related files like Dockerfile), and servers will be restarted automatically.
 
 ### Run the app
 
