@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { selectAuthUser } from '../store/authSlice';
+import { selectAuthUser } from '../store/authSlice.js';
 
 function HomePage() {
   const navigate = useNavigate();

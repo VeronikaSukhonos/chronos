@@ -100,3 +100,89 @@
   font-size: 0.8rem;
   padding-left: 7px;
 }
+
+.react-datepicker-wrapper {
+  flex-grow: 1;
+}
+
+.react-datepicker__input-container input,
+.react-datepicker__input-container input:focus {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  caret-color: var(--accent-color);
+  color: var(--main-color);
+  outline: none;
+  width: 100%;
+}
+
+.react-datepicker__input-container input::placeholder {
+  color: var(--faded-accent-color);
+  font-size: 0.95rem;
+}
+
+.react-datepicker__input-container:focus-within,
+.react-datepicker__input-container:has(.react-datepicker-ignore-onclickoutside) {
+  border: none;
+  outline: none;
+}
+
+.react-datepicker {
+  color: var(--main-color);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 0 5px 1px var(--main-shadow-color);
+}
+
+.react-datepicker__triangle path {
+  fill: var(--lighter-main-bg-color) !important;
+  stroke: transparent !important;
+}
+
+.react-datepicker__header {
+  background: var(--accent-bg-color);
+  border-radius: 10px 10px 0 0;
+}
+
+.react-datepicker__current-month {
+  color: var(--accent-color);
+}
+
+.react-datepicker__navigation {
+  top: -1px;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: var(--accent-color);
+  transition: all ease-in-out 0.3s;
+}
+
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before,
+.react-datepicker__navigation-icon:hover::before {
+  border-color: var(--faded-accent-color);
+}
+
+.react-datepicker__day-names span {
+  color: var(--faded-accent-color);
+  font-weight: bold;
+}
+
+.react-datepicker__day {
+  color: var(--main-color);
+  transition: all ease-in-out 0.1s;
+}
+
+.react-datepicker__day--disabled {
+  color: var(--faded-accent-color);
+}
+
+.react-datepicker__day:not([aria-disabled=true]):hover {
+  background: var(--extra-accent-bg-color);
+  color: var(--main-color);
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected:not([aria-disabled=true]):hover {
+  background: var(--accent-color);
+  color: var(--lighter-main-bg-color);
+}

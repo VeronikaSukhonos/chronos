@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const useForm = (initialVals, validate) => {
+const useForm = (initialVals, validate, successClear = true) => {
   const [params, setParams] = useState(initialVals);
   const [load, setLoad] = useState(false);
   const [feedback, setFeedback] = useState({ msg: '', status: '' });
@@ -26,7 +26,7 @@ const useForm = (initialVals, validate) => {
   const setSuccess = (res) => {
     setLoad(false);
     setFeedback({ msg: res.message, status: 'ok' });
-    setParams(initialVals);
+    if (successClear) setParams(initialVals);
   };
 
   const setFailure = (err) => {

@@ -24,6 +24,12 @@
   transition: all ease-in-out 0.7s;
 }
 
+.main-button svg {
+  height: 27px;
+  width: 27px;
+  transition: all ease-in-out 0.5s;
+}
+
 .main-button.square {
   min-height: 45px;
   min-width: 45px;
@@ -31,16 +37,28 @@
   max-width: 45px;
 }
 
+.main-button.short {
+  width: auto;
+}
+
+.main-button.small {
+  border-radius: 10px;
+  min-height: 30px;
+  min-width: 30px;
+  max-height: 30px;
+  max-width: 30px;
+  padding: 6px;
+}
+
+.main-button.small svg {
+  height: 20px;
+  width: 20px;
+}
+
 .main-button:not(:disabled):hover {
   background-position: center bottom;
   box-shadow: 0 0 4px 1px var(--main-shadow-color);
   cursor: pointer;
-}
-
-.main-button svg {
-  height: 27px;
-  width: 27px;
-  transition: all ease-in-out 0.5s;
 }
 
 .main-button:not(:disabled):hover svg {

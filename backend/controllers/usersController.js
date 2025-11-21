@@ -39,7 +39,7 @@ class Users {
       const user = req.user;
 
       if (login) {
-        if (await User.findOne({ login, id: { $ne: user.id }})) {
+        if (await User.findOne({ login, _id: { $ne: user.id }})) {
           return res.status(409).json({
             message: 'Unavailable login',
             errors: [{ param: 'login', error: 'Unavailable login. Please try another' }]
@@ -64,7 +64,7 @@ class Users {
 
       return res.status(200).json({
         message: 'Updated profile successully',
-        data: { users: new UserDto(user) }
+        data: { user: new UserDto(user) }
       });
     } catch (err) {
       err.message = `Updating profile failed: ${err.message}`;
@@ -78,7 +78,10 @@ class Users {
       const user = req.user;
 
       if (!await user.checkPassword(password))
-        return res.status(401).json({ message: 'Invalid password' });
+        return res.status(401).json({
+          message: 'Invalid password',
+          errors: [{ param: 'password', error: 'Invalid password' }]
+        });
 
       await Calendar.deleteMany({ authorId: user.id });
       await Event.deleteMany({ authorId: user.id });
@@ -109,7 +112,7 @@ class Users {
       });
     } catch (err) {
       if (err instanceof CastError)
-        return res.status(404).json({ message: 'Invalid user ID' });
+        return res.status(404).json({ message: 'User is not found' });
       err.message = `Getting user data failed: ${err.message}`;
       throw err;
     }
@@ -157,7 +160,10 @@ class Users {
       const user = req.user;
 
       if (!await user.checkPassword(password))
-        return res.status(401).json({ message: 'Invalid password' });
+        return res.status(401).json({
+          message: 'Invalid password',
+          errors: [{ param: 'password', error: 'Invalid password' }]
+        });
       if (email === user.email)
         return res.status(200).json({ message: 'Nothing has changed' });
       if (await User.findOne().byEmailOrPendingEmail(email).and({ _id: { $ne: user.id } })) {
@@ -185,7 +191,10 @@ class Users {
       const user = req.user;
 
       if (!await user.checkPassword(curPassword))
-        return res.status(401).json({ message: 'Invalid current password' });
+        return res.status(401).json({
+          message: 'Invalid current password',
+          errors: [{ param: 'curPassword', error: 'Invalid current password' }]
+        });
 
       user.password = password;
       await user.save();

@@ -35,7 +35,7 @@ export const checkRefreshToken = (req, res, next) => {
 
     if (err) return res.status(401).json({ message });
 
-    user = await User.findOne({ _id: user.id }).select('+refreshToken');
+    user = await User.findOne({ _id: user.id }).select('+email +refreshToken');
     if (!user || user.refreshToken !== refreshToken) return res.status(401).json({ message });
 
     req.user = user;

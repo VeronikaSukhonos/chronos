@@ -25,7 +25,7 @@ const EmailConfirmationPage = () => {
     };
   });
 
-  const [load, setLoad] = useState(false);
+  const [load, setLoad] = useState(true);
   const [feedback, setFeedback] = useState({ msg: '', status: '' });
 
   const submitRequest = (e) => {
@@ -43,8 +43,6 @@ const EmailConfirmationPage = () => {
 
   useEffect(() => {
     if (confirmToken) {
-      setLoad(true);
-
       Auth.emailConfirmationConfirm(confirmToken)
         .then(({ data: res }) => {
           setLoad(false);
@@ -94,7 +92,7 @@ const EmailConfirmationPage = () => {
     </div>
   ) : (
     <div className="center-container">
-      <Logo />
+      {!auth && <Logo />}
       <h1 className="basic-form-title">Email Confirmation</h1>
 
       <div className="basic-form">

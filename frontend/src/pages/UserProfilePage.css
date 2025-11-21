@@ -1,0 +1,86 @@
+.profile-avatar {
+  border: 5px solid var(--accent-color);
+  border-radius: 30px;
+  max-width: 150px;
+  min-width: 100px;
+  width: 20vw;
+  object-fit: cover;
+  margin: 7px 0;
+  transition: all ease-in-out 0.5s;
+}
+
+.profile-avatar.self:not(.load):hover {
+  box-shadow: 0 0 5px 2px var(--main-shadow-color);
+  cursor: pointer;
+}
+
+.profile-avatar.self.load {
+  pointer-events: none;
+}
+
+.profile-avatar-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+}
+
+.profile-container .login,
+.profile-container .full-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.profile-container .line {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 0 7px 0;
+}
+
+.profile-container .line.dob {
+  gap: 10px;
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+.profile-container .line.dob svg {
+  height: 27px;
+  width: 24px;
+}
+
+.profile-container .email {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.profile-container .link-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  color: var(--faded-accent-color);
+  font-weight: bold;
+  transition: all ease-in-out 0.5s;
+}
+
+.profile-container .link-button svg {
+  height: 20px;
+  width: 20px;
+}
+
+.profile-container .link-button svg path {
+  fill: var(--faded-accent-color);
+  transition: all ease-in-out 0.5s;
+}
+
+.profile-container .link-button:hover {
+  color: var(--darker-accent-bg-color);
+}
+
+.profile-container .link-button:hover svg path {
+  fill: var(--darker-accent-bg-color);
+  transition: all ease-in-out 0.5s;
+}

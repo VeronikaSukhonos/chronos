@@ -1,6 +1,8 @@
-import { Logo } from '../assets';
+import { Logo, Spinner } from '../assets';
 
-const LoadPage = () => {
+const LoadPage = ({spinner = true}) => {
+  if (spinner)
+    return <div className="center-container"><Spinner className="spinner" /></div>;
   return <div className="center-container"><Logo /></div>;
 };
 

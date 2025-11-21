@@ -6,8 +6,13 @@
   background: var(--lighter-main-bg-color);
   border-radius: 20px;
   padding: 20px;
-  width: 450px;
+  width: 475px;
   max-width: 100%;
+}
+
+.basic-form.transparent {
+  background: transparent;
+  padding: 0 2px;
 }
 
 .basic-form-title {
@@ -25,12 +30,12 @@
 
 .basic-form-feedback,
 .basic-form-note {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   text-align: center;
 }
 
 .basic-form-feedback.ok {
-  color: var(--darker-accent-bg-color);
+  color: var(--darkest-accent-bg-color);
 }
 
 .basic-form-feedback.fail {

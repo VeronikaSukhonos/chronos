@@ -50,13 +50,37 @@ const passwordConfirmation = (params) => {
   let err = '';
 
   if (validator.isEmpty(val))
-    err = 'Password Confirmation is required';
+    err = 'Password confirmation is required';
   else if ((params.password || '').trim() !== val)
-    err = 'Password Confirmation must match Password';
+    err = 'Password confirmation must match Password';
+
+  return err;
+};
+
+const fullName = (params) => {
+  const val = (params.fullName || '').trim();
+  let err = '';
+
+  if (!validator.matches(val, /^[A-Za-z\s]*$/))
+    err = 'Full name must contain only letters and spaces';
+  else if (!validator.isLength(val, { max: 60 }))
+    err = 'Full name must be at most 60 characters';
+
+  return err;
+};
+
+const dob = (params) => {
+  const val = (params.dob || '').toString().trim().toLowerCase();
+  let err = '';
+
+  if (validator.isISO8601(val))
+    err = 'Date of birth must be a valid date';
+  else if (new Date(val) > Date.now())
+    err = 'Date of birth must not be in the future';
 
   return err;
 };
 
 export default {
-  login, email, password, passwordConfirmation
+  login, email, password, passwordConfirmation, fullName, dob
 };

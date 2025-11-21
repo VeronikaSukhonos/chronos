@@ -6,7 +6,9 @@ import Auth from '../api/authApi.js';
 import { selectAuthUser, setCredentials } from '../store/authSlice.js';
 import { MainButton } from '../components';
 import { useClickOutside } from '../hooks';
-import { Logo, SearchIcon, AddIcon, ProfileIcon, SettingsIcon, LogoutIcon } from '../assets';
+import {
+  Logo, SearchIcon, AddIcon, ProfileIcon, SettingsIcon, ArchiveIcon, LogoutIcon
+} from '../assets';
 import './Header.css';
 import './DropdownMenu.css';
 
@@ -15,6 +17,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   const auth = useSelector(selectAuthUser.user);
+  const avatarLoad = useSelector(selectAuthUser.avatarLoad);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [authMenuOpen, setAuthMenuOpen] = useState(false);
@@ -69,7 +72,11 @@ const Header = () => {
 
         <div className="dropdown-menu-container" ref={authContainerRef}>
           <div className="dropdown-menu-button" onClick={() => setAuthMenuOpen((open) => !open)}>
-            <img className="avatar" src={`${import.meta.env.VITE_API_URL}${auth.avatar}`} alt="My avatar" />
+            <img
+              className={"avatar" + (avatarLoad ? " load" : "")}
+              src={`${import.meta.env.VITE_API_URL}${auth.avatar}`}
+              alt="My avatar"
+            />
           </div>
           <ul className={authMenuOpen ? "open" : "close"}>
             <li className="dropdown-menu-important"><div>{auth.login}</div></li>
@@ -81,6 +88,11 @@ const Header = () => {
             <li>
               <NavLink to={"/settings"} onClick={() => setAuthMenuOpen(false)}>
                 <SettingsIcon /><div>Settings</div>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to={"/archive"} onClick={() => setAuthMenuOpen(false)}>
+                <ArchiveIcon /><div>Archive</div>
               </NavLink>
             </li>
             <li>

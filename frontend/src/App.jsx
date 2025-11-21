@@ -13,28 +13,38 @@ import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import EmailConfirmationPage from './pages/EmailConfirmationPage.jsx';
 import PasswordResetPage from './pages/PasswordResetPage.jsx';
+import UserProfilePage from './pages/UserProfilePage.jsx';
+import UserSettingsPage from './pages/UserSettingsPage.jsx';
+import ArchivePage from './pages/ArchivePage.jsx';
 import LoadPage from './pages/LoadPage.jsx';
+import ErrorPage from './pages/ErrorPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 const App = () => {
   const dispatch = useDispatch();
 
   const [load, setLoad] = useState(true);
+  const [feedback, setFeedback] = useState({ msg: '', status: '' });
 
   useEffect(() => {
     Auth.refresh()
       .then(({ data: res }) => {
         dispatch(setCredentials(res.data));
         setLoad(false);
+        setFeedback({ msg: res.message, status: 'ok' });
       })
       .catch((err) => {
         dispatch(setCredentials());
         setLoad(false);
-        console.log(err.message);
+        setFeedback({ msg: err.message, status: 'fail' });
       });
   }, []);
 
-  return load ? <LoadPage /> : (
+  if (load) return <LoadPage spinner={false} />
+  if (feedback.status === 'fail' && !feedback.msg.includes('token'))
+    return <ErrorPage error={feedback.msg} />
+
+  return (
     <>
       <Header />
 
@@ -48,6 +58,10 @@ const App = () => {
           <Route path="/email-confirmation/:confirmToken" element={<EmailConfirmationPage />} />
           <Route path="/password-reset" element={<PasswordResetPage />} />
           <Route path="/password-reset/:confirmToken" element={<PasswordResetPage />} />
+
+          <Route path="/users/:userId" element={<UserProfilePage />} />
+          <Route path="/settings" element={<UserSettingsPage />} />
+          <Route path="/archive" element={<ArchivePage />} />
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

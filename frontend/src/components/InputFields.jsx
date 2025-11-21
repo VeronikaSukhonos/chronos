@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import { PwCloseIcon, PwOpenIcon } from '../assets';
 import './InputFields.css';
@@ -39,6 +41,25 @@ export const PasswordField = (
         {pwOpen ? <PwCloseIcon onClick={() => setPwOpen(false)} />
           : <PwOpenIcon onClick={() => setPwOpen(true)} />}
       </div>
+      {err?.[id] && <div className="field-err">{err[id]}</div>}
+    </div>
+  );
+};
+
+export const DateField = ({ label, onChange, id, val, err, req = false, ac = "off" }) => {
+  return (
+    <div className="field">
+      <label className={"field-label " + (req ? "required" : "")} htmlFor={id}>{label}</label>
+      <div className="field-container">
+        <DatePicker
+          id={id} name={id}
+          onChange={(d) => onChange({ target: { name: id, value: d }})}
+          selected={val} autoComplete={ac}
+          placeholderText="dd/mm/yyyy" maxDate={new Date()}
+          dateFormat="dd/MM/yyyy" calendarStartDay={1}
+        />
+      </div>
+
       {err?.[id] && <div className="field-err">{err[id]}</div>}
     </div>
   );
