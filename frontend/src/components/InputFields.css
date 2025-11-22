@@ -8,17 +8,27 @@
 .field-container {
   display: flex;
   flex-direction: row;
-  gap: 5px;
   align-items: center;
   background: var(--main-bg-color);
   border: 1px solid transparent;
   border-radius: 15px;
   outline: 1px solid transparent;
-  padding: 3px 7px;
   min-height: 36px;
   transition:
     border ease-in-out 0.5s,
     outline ease-in-out 0.5s;
+}
+
+.field-container.lighter {
+  background: var(--lighter-main-bg-color);
+}
+
+.field-container.match-height {
+  height: 45px;
+}
+
+.field-container.match-height input {
+  height: 100%;
 }
 
 .field-container:focus-within {
@@ -63,6 +73,7 @@
   color: var(--main-color);
   outline: none;
   flex-grow: 1;
+  padding: 3px 7px;
 }
 
 .field-container textarea {
@@ -76,6 +87,10 @@
   transition: all ease-in-out 0.3s;
 }
 
+.field-container.match-height input::placeholder {
+  font-size: 1rem;
+}
+
 .field-container input:autofill,
 .field-container input:focus:autofill
 .field-container input:-webkit-autofill,
@@ -84,10 +99,18 @@
   -webkit-box-shadow: 0 0 0 1000px var(--main-bg-color) inset;
 }
 
+.field-container button {
+  display: flex;
+  background: none;
+  border: none;
+  height: 100%;
+  padding: 3px 7px 3px 0;
+  cursor: pointer;
+}
+
 .field-container svg {
   height: auto;
   width: 22px;
-  cursor: pointer;
 }
 
 .field-container svg path {

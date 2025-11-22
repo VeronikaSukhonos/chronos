@@ -9,20 +9,13 @@
   --accent-color: #573a74;
   --faded-accent-color: #9583a7;
   --main-shadow-color: #25224d33;
+  --lighter-shadow-color: #fafafa;
   --attention-color: #b60055;
-
-  --event-color-blue: #ade4ff;
-  --event-color-purple: #f8d1ff;
-  --event-color-pink: #ffcedc;
-  --event-color-orange: #ffdab4;
-  --event-color-yellow: #fced9a;
-  --event-color-green: #cff2c8;
 }
 
 * {
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-  line-height: 1;
   margin: 0;
   padding: 0;
 }
@@ -60,6 +53,10 @@ a {
 
 button {
   user-select: none;
+}
+
+ul {
+  list-style-type: none;
 }
 
 .center-container {
@@ -102,11 +99,10 @@ img.load {
 .warning {
   color: var(--attention-color);
   font-size: 0.85rem;
-  line-height: 1.2;
   text-align: center;
 }
 
-html, textarea {
+html, textarea, .search-results {
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) var(--main-bg-color);
 }

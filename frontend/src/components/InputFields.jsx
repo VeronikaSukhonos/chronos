@@ -8,7 +8,7 @@ import './InputFields.css';
 export const TextField = ({ label, onChange, id, val, err, req = false, ph = "", ac = "off" }) => {
   return (
     <div className="field">
-      <label className={"field-label " + (req ? "required" : "")} htmlFor={id}>{label}</label>
+      {label && <label className={"field-label " + (req ? "required" : "")} htmlFor={id}>{label}</label>}
       <div className="field-container">
         <input
           type="text"
@@ -30,7 +30,7 @@ export const PasswordField = (
 
   return (
     <div className="field">
-      <label className={"field-label " + (req ? "required" : "")} htmlFor={id}>{label}</label>
+      {label && <label className={"field-label " + (req ? "required" : "")} htmlFor={id}>{label}</label>}
       <div className="field-container">
         <input
           type={pwOpen ? "text" : "password"}
@@ -38,8 +38,8 @@ export const PasswordField = (
           onChange={onChange} value={val || ""}
           placeholder={ph} autoComplete={ac}
         />
-        {pwOpen ? <PwCloseIcon onClick={() => setPwOpen(false)} />
-          : <PwOpenIcon onClick={() => setPwOpen(true)} />}
+        <button type="button">{pwOpen ? <PwCloseIcon onClick={() => setPwOpen(false)} />
+          : <PwOpenIcon onClick={() => setPwOpen(true)} />}</button>
       </div>
       {err?.[id] && <div className="field-err">{err[id]}</div>}
     </div>
@@ -49,7 +49,7 @@ export const PasswordField = (
 export const DateField = ({ label, onChange, id, val, err, req = false, ac = "off" }) => {
   return (
     <div className="field">
-      <label className={"field-label " + (req ? "required" : "")} htmlFor={id}>{label}</label>
+      {label && <label className={"field-label " + (req ? "required" : "")} htmlFor={id}>{label}</label>}
       <div className="field-container">
         <DatePicker
           id={id} name={id}

@@ -4,7 +4,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 import Auth from '../api/authApi.js';
 import { selectAuthUser, setCredentials } from '../store/authSlice.js';
-import { MainButton } from '../components';
+import { MainButton, EventSearchForm } from '../components';
 import { useClickOutside } from '../hooks';
 import {
   Logo, SearchIcon, AddIcon, ProfileIcon, SettingsIcon, ArchiveIcon, LogoutIcon
@@ -19,12 +19,15 @@ const Header = () => {
   const auth = useSelector(selectAuthUser.user);
   const avatarLoad = useSelector(selectAuthUser.avatarLoad);
 
+  const [search, setSearch] = useState('');
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [authMenuOpen, setAuthMenuOpen] = useState(false);
   const searchContainerRef = useRef(null);
   const authContainerRef = useRef(null);
 
-  const doSearch = () => {
+  const doSearch = (e) => {
+    e.preventDefault();
     console.log('Searching...'); // TODO
   };
 
@@ -53,18 +56,16 @@ const Header = () => {
         </Link>
 
         <div className="search-container" ref={searchContainerRef}>
-          {/* <SearchForm
-            id='search' name='search'
-            cb={setSearch} val={search}
-            p='Search post titles...'
-            classes={searchOpen ? ['open'] : ['close']}
-            apply={applySearch}
-          /> */}
-          <div className="main-button square">
-            <SearchIcon
-              className={"search-icon " + (searchOpen ? 'open' : 'close')}
-              onClick={() => setSearchOpen(open => !open)}
-            />
+          <EventSearchForm
+            id="search"
+            onSubmit={doSearch}
+            search={search}
+            setSearch={setSearch}
+            searchOpen={searchOpen}
+            setSearchOpen={setSearchOpen}
+          />
+          <div className="main-button square search-icon-container" onClick={() => setSearchOpen(open => !open)}>
+            <SearchIcon className={"search-icon "}/>
           </div>
         </div>
 
