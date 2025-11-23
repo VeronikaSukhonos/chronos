@@ -9,7 +9,7 @@ import authRouter from './routes/authRouter.js';
 import usersRouter from './routes/usersRouter.js';
 // import calendarsRouter from './routes/calendarsRouter.js';
 // import eventsRouter from './routes/eventsRouter.js';
-// import tagsRouter from './routes/tagsRouter.js';
+import tagsRouter from './routes/tagsRouter.js';
 
 import { isAuth } from './middlewares/tokenMiddleware.js';
 import { notFoundError, serverError } from './middlewares/errorMiddleware.js';
@@ -30,7 +30,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', isAuth, usersRouter);
 // app.use('/api/calendars', isAuth, calendarsRouter);
 // app.use('/api/events', isAuth, eventsRouter);
-// app.use('/api/tags', isAuth, tagsRouter);
+app.use('/api/tags', isAuth, tagsRouter);
 
 app.use(notFoundError);
 app.use(serverError);
