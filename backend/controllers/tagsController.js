@@ -19,10 +19,16 @@ class Tags {
   async createOne(req, res) {
     try {
       const { title } = req.body;
-      const tag = await Tag.create({ authorId: req.user.id, title });
+      const tag = await Tag.findOne({ authorId: req.user.id, title });
+      if (tag) {
+        return res.status(400).json({
+          message: "The tag with this title already exists"
+        });
+      }
+      const newTag = await Tag.create({ authorId: req.user.id, title });
       return res.status(201).json({
         message: 'New tag created successfully',
-        data: { tag: new TagDto(tag) }
+        data: { tag: new TagDto(newTag) }
       });
     } catch (err) {
       err.message = `New tag creating failed: ${err.message}`;
