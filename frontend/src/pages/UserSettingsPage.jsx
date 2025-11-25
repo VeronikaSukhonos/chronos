@@ -40,6 +40,7 @@ const EmailUpdate = () => {
   return (
     <form className="basic-form transparent" onSubmit={submit}>
       <PasswordField
+        id="pw-email" name="password"
         label="Current Password"
         onChange={setParam}
         val={params.password}
@@ -100,6 +101,7 @@ const PasswordUpdate = () => {
         ac="current-password"
       />
       <PasswordField
+        id="pw-pw" name="password"
         onChange={setParam}
         val={params.password}
         err={errors}
@@ -149,6 +151,7 @@ const ProfileDelete = () => {
       <div className="warning">We are sad to see you go. If you are sure about deleting your profile, all data connected to it will be deleted permanently. You cannot undo this action.</div>
 
       <PasswordField
+        id="pw-delete" name="password"
         onChange={setParam}
         val={params.password}
         err={errors}

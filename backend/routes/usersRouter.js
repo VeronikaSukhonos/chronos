@@ -35,6 +35,7 @@ router.route('/avatar')
   .patch(upload.single('avatar'), Users.uploadUserAvatar)
   .delete(Users.deleteUserAvatar);
 
+router.get('/visibility-settings', Users.getUserVisibilitySettings);
 router.patch('/email', valid.updateUserEmail, Users.updateUserEmail);
 router.patch('/password', valid.updateUserPassword, Users.updateUserPassword);
 

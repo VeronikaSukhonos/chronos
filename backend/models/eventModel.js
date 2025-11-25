@@ -54,7 +54,7 @@ const eventSchema = new Schema({
   },
   type: {
     type: String,
-    enum: ["arrangement", "reminder", "task", "birthday"],
+    enum: ["arrangement", "reminder", "task", "holiday", "birthday"],
     required: [true, "Type is required"],
     immutable: true
   }

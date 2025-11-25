@@ -10,6 +10,7 @@ export { default as UploadIcon } from './upload.svg?react';
 export { default as DeleteIcon } from './delete.svg?react';
 export { default as ArrowIcon } from './arrow.svg?react';
 export { default as DotsIcon } from './dots.svg?react';
+export { default as LinesIcon } from './lines.svg?react';
 
 export { default as ProfileIcon } from './profile.svg?react';
 export { default as SettingsIcon } from './settings.svg?react';
@@ -19,4 +20,7 @@ export { default as LogoutIcon } from './logout.svg?react';
 export { default as ArrangementIcon } from './arrangement.svg?react';
 export { default as ReminderIcon } from './reminder.svg?react';
 export { default as TaskIcon } from './task.svg?react';
+export { default as HolidayIcon } from './holiday.svg?react';
 export { default as BirthdayIcon } from './birthday.svg?react';
+
+export { default as GlobeIcon } from './globe.svg?react';

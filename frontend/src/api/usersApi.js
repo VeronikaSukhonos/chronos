@@ -34,6 +34,10 @@ class Users {
   async updatePassword(params) {
     return await api.patch(`/users/password`, params);
   }
+
+  async fetchVisibilitySettings() {
+    return await api.get(`/users/visibility-settings`);
+  }
 }
 
 export default new Users;

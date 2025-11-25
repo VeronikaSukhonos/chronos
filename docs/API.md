@@ -98,6 +98,10 @@ All endpoints require authorization.
 
 **Parameter**: `password`
 
+9. `GET /api/users/visibility-settings` - gets an authorized user visibility settings for events to be displayed
+
+**Data**: visibility settings data (`calendars`, `eventTypes`, `tags`)
+
 # Calendars module
 
 All endpoints require authorization.
@@ -213,10 +217,10 @@ All endpoints require authorization.
 
 **Parameter**: `title`
 
-3. `PATCH /api/tags/tagId` - updates a tag title
+3. `PATCH /api/tags/:tagId` - updates a tag title
 
 **Data**: updated tag data (everything)
 
 **Parameter**: `title`
 
-4. `DELETE /api/tags/tagId` - deletes a tag
+4. `DELETE /api/tags/:tagId` - deletes a tag

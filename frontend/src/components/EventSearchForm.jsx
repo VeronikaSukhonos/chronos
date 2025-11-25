@@ -2,10 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import Events from '../api/eventsApi.js';
-import {
-  SearchIcon, ArrangementIcon, TaskIcon, ReminderIcon, BirthdayIcon
-} from '../assets';
+import { SearchIcon } from '../assets';
 import { fSearchedDate } from '../utils/formatDate.js';
+import { getEventIcon } from '../utils/getEventIcon.jsx';
 import './SearchForms.css';
 import './InputFields.css';
 
@@ -14,13 +13,7 @@ const SearchedEvent = ({event}) => {
     <Link className="searched-event" to={`events/${event.id}`}>
       <div className="searched-event-title">
         <div className="searched-event-name" style={{ background: event.color }}>
-          {
-            event.type === 'arrangement' ? <ArrangementIcon className="searched-event-type" />
-              : event.type === 'task' ? <TaskIcon className="searched-event-type" />
-              : event.type === 'reminder' ? <ReminderIcon className="searched-event-type" />
-              : event.type === 'birthday' ? <BirthdayIcon className="searched-event-type" /> : <></>
-          }
-          {event.name}
+          { getEventIcon(event.type, "searched-event-type") }{event.name}
         </div>
       </div>
       <div className="searched-event-calendar">

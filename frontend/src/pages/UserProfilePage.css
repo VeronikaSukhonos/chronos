@@ -3,7 +3,7 @@
   border-radius: 30px;
   max-width: 150px;
   min-width: 100px;
-  width: 20vw;
+  width: min(20vw, 20vh);
   object-fit: cover;
   margin: 7px 0;
   transition: all ease-in-out 0.5s;

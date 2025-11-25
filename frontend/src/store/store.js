@@ -3,10 +3,12 @@ import { configureStore } from '@reduxjs/toolkit';
 import { setGetToken, setDispatch } from '../api/api.js';
 
 import authReducer from './authSlice.js';
+import calendarReducer from './calendarSlice.js';
 
 const store = configureStore({
   reducer: {
-    auth: authReducer
+    auth: authReducer,
+    calendar: calendarReducer
   }
 });
 

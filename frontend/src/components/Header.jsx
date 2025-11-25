@@ -65,7 +65,7 @@ const Header = () => {
             setSearchOpen={setSearchOpen}
           />
           <div className="main-button square search-icon-container" onClick={() => setSearchOpen(open => !open)}>
-            <SearchIcon className={"search-icon "}/>
+            <SearchIcon className="search-icon" />
           </div>
         </div>
 

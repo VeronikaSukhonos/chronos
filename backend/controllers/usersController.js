@@ -82,11 +82,18 @@ class Users {
           message: 'Invalid password',
           errors: [{ param: 'password', error: 'Invalid password' }]
         });
+      const calendars = (await Calendar.find({ authorId: user.id }).select('_id')).map(c => c._id);
 
+      await Event.deleteMany({ $or: [{ authorId: user.id }, { calendarId: { $in: calendars } }]});;
       await Calendar.deleteMany({ authorId: user.id });
-      await Event.deleteMany({ authorId: user.id });
       await Tag.deleteMany({ authorId: user.id });
-      // TODO delete user from all participants and followers
+      await Event.updateMany(
+        { participants: user.id }, { $pull: { participants: user.id } }
+      );
+      await Calendar.updateMany(
+        { $or: [{ participants: user.id }, { followers: user.id }] },
+        { $pull: { participants: user.id, followers: user.id } }
+      );
       await user.deleteAvatar();
       await User.deleteOne({ _id: user.id });
 
@@ -202,6 +209,18 @@ class Users {
       return res.status(200).json({ message: 'Updated password successully' });
     } catch (err) {
       err.message = `Updating password failed: ${err.message}`;
+      throw err;
+    }
+  }
+
+  async getUserVisibilitySettings(req, res) {
+    try {
+      return res.status(200).json({
+        message: 'Fetched visibility settings successfully',
+        data: await User.findOne({ _id: req.user.id }).select('visibilitySettings')
+      });
+    } catch (err) {
+      err.message = `Getting visibility settings failed: ${err.message}`;
       throw err;
     }
   }

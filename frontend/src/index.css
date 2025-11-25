@@ -83,6 +83,11 @@ ul {
   to { transform: rotate(360deg); }
 }
 
+.spinner.small {
+  height: 30px;
+  width: 30px;
+}
+
 img.load {
   opacity: 0.65;
 }
@@ -102,9 +107,14 @@ img.load {
   text-align: center;
 }
 
-html, textarea, .search-results {
+html, textarea, .search-results, .side-panel .accordion-menu {
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) var(--main-bg-color);
+}
+
+.small-event-icon {
+  height: 16px;
+  width: 16px;
 }
 
 .Toastify__toast {

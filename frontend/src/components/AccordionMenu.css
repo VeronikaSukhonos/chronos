@@ -4,6 +4,7 @@
   justify-content: center;
   gap: 20px;
   width: auto;
+  max-width: 100%;
 }
 
 .accordion-item {
@@ -22,6 +23,11 @@
   transition: all ease-in-out 0.5s;
 }
 
+.accordion-item .accordion-title > h2 {
+  flex-grow: 1;
+  text-align: left;
+}
+
 .accordion-item .accordion-title svg.arrow {
   height: 22px;
   width: 22px;
@@ -33,7 +39,7 @@
 }
 
 .accordion-item .accordion-title:hover {
-  transform: scale(1.02);
+  transform: scale(1.01);
 }
 
 .accordion-item.open .accordion-title svg.arrow {

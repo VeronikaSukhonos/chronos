@@ -4,12 +4,13 @@ import { ArrowIcon } from '../assets';
 import './AccordionMenu.css';
 import './BasicForm.css';
 
-const AccordionItem = ({ title, content, itemOpen, onClick }) => {
+const AccordionItem = ({ title, content, itemOpen, onClick, button }) => {
   return (
     <div className={"accordion-item " + (itemOpen ? "open" : "close")}>
       <div className="accordion-title" onClick={onClick}>
         <ArrowIcon className="arrow" />
         <h2 className="basic-form-title small">{title}</h2>
+        {button || ''}
       </div>
       <div className="accordion-content">
         {content}
@@ -36,6 +37,7 @@ const AccordionMenu = ({ defaultOpenItems = [], items = [] }) => {
           key={i}
           itemOpen={openItems.includes(i)}
           onClick={() => openClose(i)}
+          button={item.button}
         />
       })}
     </div>

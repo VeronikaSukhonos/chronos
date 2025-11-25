@@ -1,6 +1,6 @@
 header {
   background: var(--main-bg-color);
-  box-shadow: 0 4px 13px 13px var(--main-bg-color);
+  box-shadow: 0 4px 7px 7px var(--main-bg-color);
   font-weight: bold;
   user-select: none;
   position: sticky;
@@ -18,7 +18,8 @@ header nav {
 
 header nav .logo svg {
   padding-top: 4px;
-  max-width: 175px;
+  max-width: 243px;
+  max-height: 40px;
   transition: all ease-in-out 0.3s;
 }
 
@@ -104,9 +105,9 @@ header nav .avatar {
   }
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 500px) {
   header nav .logo {
-    width: calc(100% * 0.8);
+    width: calc(100% * 0.4);
   }
 
   header nav .logo svg {

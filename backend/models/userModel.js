@@ -15,6 +15,18 @@ const pendingEmailSchema = new Schema({
   }
 }, { _id: false });
 
+const visibilitySettingsSchema = new Schema({
+  calendars: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Calendar' }]
+  },
+  eventTypes: {
+    type: [{ type: String, enum: ['arrangement', 'reminder', 'task', 'holiday', 'birthday'] }]
+  },
+  tags: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Tag' }]
+  }
+}, { _id: false });
+
 const userSchema = new Schema({
   login: {
     type: String,
@@ -73,6 +85,10 @@ const userSchema = new Schema({
   },
   refreshToken: {
     type: String,
+    select: false
+  },
+  visibilitySettings: {
+    type: visibilitySettingsSchema,
     select: false
   }
 });

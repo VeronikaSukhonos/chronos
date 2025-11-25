@@ -24,7 +24,7 @@ export const TextField = ({ label, onChange, id, val, err, req = false, ph = "",
 };
 
 export const PasswordField = (
-    { label = "Password", onChange, id = "password", val, err, req = false, ph = "", ac = "new-password" }
+    { label = "Password", onChange, id, name = "password", val, err, req = false, ph = "", ac = "new-password" }
   ) => {
   const [pwOpen, setPwOpen] = useState(false);
 
@@ -34,7 +34,7 @@ export const PasswordField = (
       <div className="field-container">
         <input
           type={pwOpen ? "text" : "password"}
-          id={id} name={id}
+          id={id || name} name={name}
           onChange={onChange} value={val || ""}
           placeholder={ph} autoComplete={ac}
         />
@@ -61,6 +61,26 @@ export const DateField = ({ label, onChange, id, val, err, req = false, ac = "of
       </div>
 
       {err?.[id] && <div className="field-err">{err[id]}</div>}
+    </div>
+  );
+};
+
+export const Checkbox = ({ label, id, name, checked, onChange, color = 'var(--accent-bg-color)', icon = '' }) => {
+  return (
+    <div className="checkbox-field-container">
+      <label className="checkbox-field-label" htmlFor={id}>
+        <input
+          type="checkbox"
+          id={id} name={name}
+          onChange={onChange}
+          checked={checked}
+        />
+        <div
+          className="checkbox-container"
+          style={checked ? { background: color } : {}}
+        ></div>
+        <span className="checkbox-field-label">{label}{icon}</span>
+      </label>
     </div>
   );
 };

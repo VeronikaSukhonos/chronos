@@ -8,6 +8,7 @@ const tagSchema = new Schema({
   title: {
     type: String,
     trim: true,
+    lowercase: true,
     required: [true, "Title is required"],
     maxLength: [30, "Title must be at most 30 characters"]
   }

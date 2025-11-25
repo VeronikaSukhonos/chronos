@@ -23,10 +23,15 @@ class Auth {
       }
       const user = await User.create({ login, email, password });
 
-      await Calendar.create([
+      const calendars = (await Calendar.create([
         { authorId: user.id, name: 'Main', type: 'main' },
         { authorId: user.id, name: 'Holidays', type: 'holidays' }
-      ]);
+      ])).map(c => c._id);
+
+      user.visibilitySettings = {
+        calendars, eventTypes: ['arrangement', 'reminder', 'task', 'holiday', 'birthday'], tags: []
+      };
+      await user.save();
       await sendEmailConfirmation(user, email);
 
       return res.status(201).json({

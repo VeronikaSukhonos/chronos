@@ -52,7 +52,7 @@ const UserProfilePage = () => {
     return <ErrorPage error={feedback.msg} entity="user" />
 
   return (
-    <div className="center-container">
+    <div className={(user?.publicCalendars?.length ? "horizontal " : "") + "center-container"}>
       <div className="basic-form profile-container">
         <img
           className={"profile-avatar" + (userId === auth.id ? " self" : "") + (avatarLoad ? " load" : "")}
