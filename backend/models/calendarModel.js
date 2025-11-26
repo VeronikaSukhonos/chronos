@@ -6,7 +6,16 @@ const calendarSchema = new Schema({
     ref: "User"
   },
   participants: {
-    type: [{ type: Schema.Types.ObjectId, ref: "User" }]
+    type: [{
+      participantId: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+      },
+      isConfirmed: {
+        type: Boolean,
+        default: false
+      }
+    }]
   },
   followers: {
     type: [{ type: Schema.Types.ObjectId, ref: "User" }]

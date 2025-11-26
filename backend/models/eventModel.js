@@ -30,16 +30,24 @@ const eventSchema = new Schema({
   link: {
     type: String
   },
-  isDone: {
-    type: Boolean,
-    default: false
+  doneDate: {
+    type: Date,
+    default: null
   },
   color: {
     type: String,
     // TODO here possibly should be a function for default value - takes the value from the calendar color 
   },
   repeat: {
-    type: Map // temporarily
+    type: {
+      frequency: {
+        type: String,
+        enum: ["day", "week", "month", "year"]
+      },
+      parameter: {
+        type: Number
+      }
+    }
   },
   participants: {
     type: [{ type: Schema.Types.ObjectId, ref: "User" }]

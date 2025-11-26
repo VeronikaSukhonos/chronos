@@ -7,8 +7,8 @@ import path from 'path';
 
 import authRouter from './routes/authRouter.js';
 import usersRouter from './routes/usersRouter.js';
-// import calendarsRouter from './routes/calendarsRouter.js';
-// import eventsRouter from './routes/eventsRouter.js';
+import calendarsRouter from './routes/calendarsRouter.js';
+import eventsRouter from './routes/eventsRouter.js';
 import tagsRouter from './routes/tagsRouter.js';
 
 import { isAuth } from './middlewares/tokenMiddleware.js';
@@ -28,8 +28,8 @@ app.use(morgan('common'));
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', isAuth, usersRouter);
-// app.use('/api/calendars', isAuth, calendarsRouter);
-// app.use('/api/events', isAuth, eventsRouter);
+app.use('/api/calendars', isAuth, calendarsRouter);
+app.use('/api/events', isAuth, eventsRouter);
 app.use('/api/tags', isAuth, tagsRouter);
 
 app.use(notFoundError);

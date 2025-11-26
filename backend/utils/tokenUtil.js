@@ -55,6 +55,21 @@ export const createConfirmToken = async (user, email) => {
   }
 };
 
+export const createParticipationToken = async (user, calendarId) => {
+  try {
+    const token = jwt.sign({
+      userId: user._id,
+      calendarId: calendarId
+    }, config.CONFIRM_TOKEN_SECRET, {
+      expiresIn: config.CONFIRM_TOKEN_EXP_TIME
+    });
+    return token;
+  } catch (err) {
+    err.message = `Creating participation token failed: ${err.message}`;
+    throw err;
+  }
+};
+
 export const getExpTime = (t) => {
   const time = parseInt(t), unit = t.at(-1);
 
