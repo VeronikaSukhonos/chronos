@@ -10,7 +10,7 @@ import { MainButton, AvatarMenu } from '../components';
 import { SettingsIcon, ArchiveIcon, BirthdayIcon, AddIcon } from '../assets';
 import { fBirthday } from '../utils/formatDate.js';
 import './UserProfilePage.css';
-import '../components/BasicForm.css';
+import '../components/Forms.css';
 
 const UserProfilePage = () => {
   const { userId } = useParams();

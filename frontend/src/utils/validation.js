@@ -81,6 +81,20 @@ const dob = (params) => {
   return err;
 };
 
+const tagTitle = (params) => {
+  const val = (params.title || '').trim();
+  let err = '';
+
+  if (validator.isEmpty(val))
+    err = 'Title is required';
+  else if (!validator.isLength(val, { max: 30 }))
+    err = 'Title must be at most 30 characters';
+
+  return err;
+};
+
 export default {
-  login, email, password, passwordConfirmation, fullName, dob
+  login, email, password, passwordConfirmation, fullName, dob,
+
+  tagTitle
 };

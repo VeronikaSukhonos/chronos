@@ -1,4 +1,4 @@
-import './BasicForm.css';
+import './Forms.css';
 
 const EventCreateForm = ({ expanded = false }) => {
   return (

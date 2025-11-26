@@ -63,3 +63,16 @@
   stroke: var(--attention-color);
   opacity: 0.75;
 }
+
+.confirm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 350px;
+}
+
+.confirm-form .buttons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}

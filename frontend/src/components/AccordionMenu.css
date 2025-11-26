@@ -59,3 +59,11 @@
   margin-top: 5px;
   opacity: 1;
 }
+
+.accordion-item:last-of-type:has(.dropdown-menu-container) {
+  margin-bottom: 18px;
+}
+
+.accordion-item.open:last-of-type .accordion-content:has(.dropdown-menu-container) {
+  overflow-y: visible;
+}

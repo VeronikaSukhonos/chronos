@@ -35,10 +35,17 @@ const useForm = (initialVals, validate, successClear = true) => {
     else setFeedback({ msg: err.message, status: 'fail' });
   };
 
+  const clearForm = () => {
+    setParams(initialVals);
+    setLoad(false);
+    setFeedback({ msg: '', status: '' });
+    setErrors({});
+  };
+
   return {
     params, setParam,
     load, feedback, errors,
-    resetForm, setSuccess, setFailure
+    resetForm, setSuccess, setFailure, clearForm
   };
 };
 

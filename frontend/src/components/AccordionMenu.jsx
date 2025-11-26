@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { ArrowIcon } from '../assets';
 import './AccordionMenu.css';
-import './BasicForm.css';
+import './Forms.css';
 
 const AccordionItem = ({ title, content, itemOpen, onClick, button }) => {
   return (

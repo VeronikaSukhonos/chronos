@@ -24,6 +24,12 @@
   transition: all ease-in-out 0.7s;
 }
 
+.main-button.simple {
+  background: var(--main-bg-color);
+  font-size: 1.1rem;
+  width: auto;
+}
+
 .main-button svg {
   height: 27px;
   width: 27px;
@@ -67,4 +73,35 @@
 
 .main-button:disabled {
   opacity: 0.65;
+}
+
+.menu-button {
+  display: flex;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 5px;
+  cursor: pointer;
+  transition: all ease-in-out 0.3s;
+}
+
+.menu-button svg {
+  height: 14px;
+}
+
+.menu-button svg path {
+  fill: transparent;
+  transition: all ease-in-out 0.3s;
+}
+
+:hover > .dropdown-menu-container .menu-button,
+.dropdown-menu-container ul.open + .menu-button,
+.menu-button:hover {
+  background: var(--lighter-shadow-color);
+}
+
+:hover > .dropdown-menu-container .menu-button svg path,
+.dropdown-menu-container ul.open + .menu-button svg path,
+.menu-button:hover svg path {
+  fill: var(--accent-color);
 }

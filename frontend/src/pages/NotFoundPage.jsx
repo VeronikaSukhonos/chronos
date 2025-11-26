@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { selectAuthUser } from '../store/authSlice.js';
 import { AttentionIcon } from '../assets';
-import '../components/MainButton.css';
+import '../components/Buttons.css';
 
 const NotFoundPage = ({ entity = "page" }) => {
   const auth = useSelector(selectAuthUser.user);

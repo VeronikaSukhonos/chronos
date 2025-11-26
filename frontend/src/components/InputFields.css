@@ -177,6 +177,7 @@
 
 .react-datepicker__navigation-icon::before {
   border-color: var(--accent-color);
+  top: -90px;
   transition: all ease-in-out 0.3s;
 }
 
@@ -214,6 +215,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  flex-grow: 1;
 }
 
 .checkbox-field-label {
@@ -221,6 +223,7 @@
   flex-direction: row;
   align-items: center;
   gap: 10px;
+  flex-grow: 1;
   color: var(--accent-color);
   font-weight: 600;
   cursor: pointer;

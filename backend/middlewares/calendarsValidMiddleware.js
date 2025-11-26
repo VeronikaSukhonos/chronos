@@ -11,10 +11,10 @@ const calendarParams = {
   color: body('color').optional()
     .matches(/^#[A-Fa-f\d]{6}$/).withMessage('Color must be in hex format'),
   participants: body('participants').optional()
-    .isArray().withMessage('Participants must be provided as array').bail()
+    .isArray().withMessage('Participants must be provided as an array').bail()
     .custom((value) => {
       if (!value.every(item => typeof item === 'string'))
-        throw new Error('Participants array must contain only Ids as strings');
+        throw new Error('Participants array must contain only IDs as strings');
       return true;
     })
 };

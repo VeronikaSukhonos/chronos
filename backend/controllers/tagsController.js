@@ -6,7 +6,7 @@ import { TagDto } from '../dtos/tagDto.js';
 class Tags {
   async getAll(req, res) {
     try {
-      const result = await Tag.find({ authorId: req.user.id });
+      const result = await Tag.find({ authorId: req.user.id }).sort('title');
 
       return res.status(200).json({
         message: 'Fetched tags successfully',
@@ -25,7 +25,8 @@ class Tags {
 
       if (tag) {
         return res.status(409).json({
-          message: "Tag with this title already exists"
+          message: 'Tag with this title already exists',
+          errors: [{ param: 'title', error: 'Tag with this title already exists' }]
         });
       }
       const newTag = await Tag.create({ authorId: req.user.id, title });
@@ -46,13 +47,14 @@ class Tags {
       const tag = await Tag.findById(req.params.tagId);
 
       if (!tag) return res.status(404).json({ message: 'Tag is not found' });
-      if (tag.authorId !== req.user.id)
+      if (tag.authorId != req.user.id)
         return res.status(403).json({ message: "Cannot update not your own tag" });
       if (tag.title === title)
         return res.status(200).json({ message: "Nothing has changed" });
       if (await Tag.findOne({ authorId: req.user.id, title })) {
         return res.status(409).json({
-          message: "Tag with this title already exists"
+          message: 'Tag with this title already exists',
+          errors: [{ param: 'title', error: 'Tag with this title already exists' }]
         });
       }
       tag.title = title;
@@ -73,7 +75,7 @@ class Tags {
       const tag = await Tag.findById(req.params.tagId);
 
       if (!tag) return res.status(404).json({ message: 'Tag is not found' });
-      if (tag.authorId !== req.user.id)
+      if (tag.authorId != req.user.id)
         return res.status(403).json({ message: "Cannot delete not your own tag" });
       await Event.updateMany({ tags: tag.id }, { $pull: { tags: tag.id } });
       await User.updateOne({ _id: req.user.id }, { $pull: { "visibilitySettings.tags": tag.id } });

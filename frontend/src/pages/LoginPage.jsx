@@ -6,7 +6,7 @@ import { selectAuthUser, setCredentials } from '../store/authSlice.js';
 import { TextField, PasswordField, MainButton } from '../components';
 import { useForm } from '../hooks';
 import { Logo } from '../assets';
-import '../components/BasicForm.css';
+import '../components/Forms.css';
 
 const LoginPage = () => {
   const dispatch = useDispatch();

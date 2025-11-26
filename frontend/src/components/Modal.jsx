@@ -1,17 +1,23 @@
-import './Modal.css';
-import './BasicForm.css';
+import { createPortal } from 'react-dom';
 
-const Modal = ({ modalOpen, setModalOpen, title, children }) => {
-  return (
+import './Modal.css';
+import './Forms.css';
+
+const Modal = ({ modalOpen, setModalOpen, title, children, onClose }) => {
+  return createPortal(
     <div
       className={"modal-container " + (modalOpen ? "open" : "close")}
-      onClick={() => setModalOpen(false)}
+      onClick={() => {
+        setModalOpen(false);
+        if (onClose) onClose();
+      }}
     >
       <div className="basic-form modal-content" onClick={(e) => e.stopPropagation()}>
         {title && <h1 className="basic-form-title">{ title }</h1>}
         {children}
       </div>
-    </div>
+    </div>,
+    document.getElementById('portal')
   );
 };
 

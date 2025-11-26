@@ -7,7 +7,7 @@ import { TextField, PasswordField, MainButton } from '../components';
 import { useForm } from '../hooks';
 import { Logo } from '../assets';
 import valid from '../utils/validation.js';
-import '../components/BasicForm.css';
+import '../components/Forms.css';
 
 const RegisterPage = () => {
   const auth = useSelector(selectAuthUser.user);

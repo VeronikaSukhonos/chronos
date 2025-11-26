@@ -31,10 +31,6 @@ const Header = () => {
     console.log('Searching...'); // TODO
   };
 
-  const openEventCreateForm = () => {
-    console.log('Event creation form opens...'); // TODO
-  };
-
   const logout = async () => {
     try {
       await Auth.logout();
@@ -69,7 +65,7 @@ const Header = () => {
           </div>
         </div>
 
-        <MainButton Icon={AddIcon} onClick={openEventCreateForm} type="button" square={true} />
+        <MainButton Icon={AddIcon} onClick={() => navigate('/events/create')} type="button" square={true} />
 
         <div className="dropdown-menu-container" ref={authContainerRef}>
           <div className="dropdown-menu-button" onClick={() => setAuthMenuOpen((open) => !open)}>
@@ -87,12 +83,12 @@ const Header = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/settings"} onClick={() => setAuthMenuOpen(false)}>
+              <NavLink to="/settings" onClick={() => setAuthMenuOpen(false)}>
                 <SettingsIcon /><div>Settings</div>
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/archive"} onClick={() => setAuthMenuOpen(false)}>
+              <NavLink to="/archive" onClick={() => setAuthMenuOpen(false)}>
                 <ArchiveIcon /><div>Archive</div>
               </NavLink>
             </li>

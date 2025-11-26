@@ -12,7 +12,7 @@ import {
 import { useForm } from '../hooks';
 import valid from '../utils/validation.js';
 import './UserProfilePage.css';
-import '../components/BasicForm.css';
+import '../components/Forms.css';
 
 const EmailUpdate = () => {
   const {
@@ -148,7 +148,7 @@ const ProfileDelete = () => {
 
   return (
     <form className="basic-form transparent" onSubmit={submit}>
-      <div className="warning">We are sad to see you go. If you are sure about deleting your profile, all data connected to it will be deleted permanently. You cannot undo this action.</div>
+      <div className="warning">We are sad to see you go. If you are sure about deleting your profile, all data associated with it will be deleted permanently. You cannot undo this action.</div>
 
       <PasswordField
         id="pw-delete" name="password"

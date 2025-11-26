@@ -8,7 +8,7 @@ import { TextField, MainButton } from '../components';
 import { useForm } from '../hooks';
 import { Logo, ConfirmIcon, AttentionIcon } from '../assets';
 import valid from '../utils/validation.js';
-import '../components/BasicForm.css';
+import '../components/Forms.css';
 
 const EmailConfirmationPage = () => {
   const dispatch = useDispatch();
@@ -25,7 +25,7 @@ const EmailConfirmationPage = () => {
     };
   });
 
-  const [load, setLoad] = useState(true);
+  const [_, setLoad] = useState(true);
   const [feedback, setFeedback] = useState({ msg: '', status: '' });
 
   const submitRequest = (e) => {

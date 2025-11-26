@@ -7,13 +7,16 @@ import Calendars from '../api/calendarsApi.js';
 import Tags from '../api/tagsApi.js';
 import { selectAuthUser } from '../store/authSlice.js';
 import {
-  selectCalendar, selectCalendarLoad, setCalendar, setVs, updateVs
+  selectCalendar, selectCalendarLoad, setCalendar, setVs,
+  selectCalendarCreateForm, selectTagCreateForm, setForm
 } from '../store/calendarSlice.js';
 import ErrorPage from './ErrorPage.jsx';
 import LoadPage from './LoadPage.jsx';
-import { AccordionMenu, Calendar, MainButton, Checkbox } from '../components';
+import {
+  AccordionMenu, Calendar, SidePanelItem, MainButton,
+  CalendarCreateForm, TagCreateForm, ConfirmDeleteForm
+} from '../components';
 import { AddIcon, LinesIcon } from '../assets';
-import { getEventIcon } from '../utils/getEventIcon.jsx';
 import './HomePage.css';
 
 function HomePage() {
@@ -31,14 +34,19 @@ function HomePage() {
   const vsLoad = useSelector(selectCalendarLoad.vs);
   const loadError = useSelector(selectCalendarLoad.error);
 
+  const calendarCreateForm = useSelector(selectCalendarCreateForm);
+  const tagCreateForm = useSelector(selectTagCreateForm);
+
   const [sidePanelOpen, setSidePanelOpen] = useState(false);
 
-  const openCalendarCreateForm = () => {
-    console.log('Calendar creation form opens...'); // TODO
+  const openCalendarCreateForm = (e) => {
+    e.stopPropagation();
+    dispatch(setForm({ form: 'calendarCreateForm', params: { open: true } }));
   };
 
   const openTagCreateForm = (e) => {
-    e.stopPropagation(); // TODO
+    e.stopPropagation();
+    dispatch(setForm({ form: 'tagCreateForm', params: { open: true } }));
   };
 
   useEffect(() => {
@@ -101,30 +109,16 @@ function HomePage() {
               title: "My Calendars",
               content:
                 <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small="true" /></li> : myCalendars.map((c, i) => <li key={c.id}>
-                    <Checkbox
-                      id={c.id} name="myCalendars"
-                      label={c.name}
-                      checked={c.visible || false}
-                      onChange={() => dispatch(updateVs({ group: 'myCalendars', id: c.id }))}
-                      color={c.color}
-                    />
-                  </li>)}
+                  {vsLoad ? <li><LoadPage small="true" /></li>
+                    : myCalendars.map(c => <SidePanelItem key={c.id} item={c} group="myCalendars" />)}
                 </ul>
             },
             {
               title: "Other Calendars",
               content:
                 <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small="true" /></li> : (otherCalendars.length ? otherCalendars.map((c, i) => <li key={c.id}>
-                    <Checkbox
-                      id={c.id} name="otherCalendars"
-                      label={c.name}
-                      checked={c.visible || false}
-                      onChange={() => dispatch(updateVs({ group: 'otherCalendars', id: c.id }))}
-                      color={c.color}
-                    />
-                  </li>)
+                  {vsLoad ? <li><LoadPage small="true" /></li>
+                    : (otherCalendars.length ? otherCalendars.map(c => <SidePanelItem key={c.id} item={c} group="otherCalendars" />)
                     : <li className="side-panel-group-no-content" key="no-calendars">You do not have other calendars. Find one!</li>)}
                 </ul>
             },
@@ -132,29 +126,16 @@ function HomePage() {
               title: "Event Types",
               content:
                 <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small="true" /></li> : eventTypes.map((et, i) => <li key={et.type}>
-                    <Checkbox
-                      id={et.type} name="eventTypes"
-                      label={et.type}
-                      checked={et.visible || false}
-                      onChange={() => dispatch(updateVs({ group: 'eventTypes', id: et.type }))}
-                      icon={getEventIcon(et.type, "small-event-icon")}
-                    />
-                  </li>)}
+                  {vsLoad ? <li><LoadPage small="true" /></li>
+                    : eventTypes.map(et => <SidePanelItem key={et.type} item={et} group="eventTypes" />)}
                 </ul>
             },
             {
               title: "Event Tags",
               content:
                 <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small="true" /></li> : (tags.length ? tags.map((t, i) => <li key={t.id}>
-                    <Checkbox
-                      id={t.id} name="tags"
-                      label={t.name}
-                      checked={t.visible || false}
-                      onChange={() => dispatch(updateVs({ group: 'tags', id: t.id }))}
-                    />
-                  </li>)
+                  {vsLoad ? <li><LoadPage small="true" /></li>
+                    : (tags.length ? tags.map(t => <SidePanelItem key={t.id} item={t} group="tags" />)
                     : <li className="side-panel-group-no-content" key="no-tags">You do not have tags. Create one!</li>)}
                 </ul>,
               button: <MainButton Icon={AddIcon} small={true} onClick={openTagCreateForm} type="button" />
@@ -170,6 +151,9 @@ function HomePage() {
         </div>
         <Calendar />
       </div>
+      <CalendarCreateForm />
+      <TagCreateForm />
+      <ConfirmDeleteForm />
     </div>
   );
 }
