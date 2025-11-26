@@ -7,7 +7,7 @@ import config from '../config.js';
 const APP_URL = `http://localhost:${process.env.APP_PORT}`;
 
 const transporter = nodemailer.createTransport({
-  host: config.EMAIL_HOST, port: config.EMAIL_PORT, secure: true,
+  host: 'smtp.gmail.com', port: 465, secure: true,
   auth: { user: config.EMAIL_USER, pass: config.EMAIL_PASSWORD }
 });
 
@@ -64,7 +64,6 @@ export const sendCalendarParticipation = async (user, calendar) => {
 };
 
 const send = (user, subject, content) => {
-  console.log(user, user.email);
   transporter.sendMail({
     from: `"Chronos" <${config.EMAIL_USER}>`,
     to: user.email,
