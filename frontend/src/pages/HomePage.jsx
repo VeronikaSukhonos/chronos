@@ -7,8 +7,7 @@ import Calendars from '../api/calendarsApi.js';
 import Tags from '../api/tagsApi.js';
 import { selectAuthUser } from '../store/authSlice.js';
 import {
-  selectCalendar, selectCalendarLoad, setCalendar, setVs,
-  selectCalendarCreateForm, selectTagCreateForm, setForm
+  selectCalendar, selectCalendarLoad, setCalendar, setVs, setForm
 } from '../store/calendarSlice.js';
 import ErrorPage from './ErrorPage.jsx';
 import LoadPage from './LoadPage.jsx';
@@ -33,9 +32,6 @@ function HomePage() {
   const tagsLoad = useSelector(selectCalendarLoad.tags);
   const vsLoad = useSelector(selectCalendarLoad.vs);
   const loadError = useSelector(selectCalendarLoad.error);
-
-  const calendarCreateForm = useSelector(selectCalendarCreateForm);
-  const tagCreateForm = useSelector(selectTagCreateForm);
 
   const [sidePanelOpen, setSidePanelOpen] = useState(false);
 

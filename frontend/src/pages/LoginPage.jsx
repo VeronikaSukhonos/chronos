@@ -41,7 +41,7 @@ const LoginPage = () => {
   return !auth ? (
     <div className="center-container">
       <h1 className="basic-form-title">Log in to</h1>
-      <Logo />
+      <Link to="/"><Logo /></Link>
 
       <form className="basic-form" onSubmit={submit}>
         <TextField

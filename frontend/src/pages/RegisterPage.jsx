@@ -39,7 +39,7 @@ const RegisterPage = () => {
   return !auth ? (
     <div className="center-container">
       <div className="basic-form-title">Register to</div>
-      <Logo />
+      <Link to="/"><Logo /></Link>
       <div className="basic-form-title small">make every day count</div>
 
       <form className="basic-form" onSubmit={submit}>

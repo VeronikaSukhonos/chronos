@@ -70,7 +70,7 @@ All endpoints require authorization.
 
 2. `GET /api/users/:userId` - gets specified user data
 
-**Data**: user data (`login`, `email` (only visible to profile owners), `fullName`, `dob`, `registerDate`)
+**Data**: user data (`login`, `email` (only visible to profile owners), `fullName`, `dob`)
 
 3. `PATCH /api/users/avatar` - uploads a user avatar
 
@@ -111,7 +111,7 @@ All endpoints require authorization.
 **Filtering**:
 * by hidden (`?hidden=true`)
 
-**Data**: array of calendars (`id`, `name`, `color`)
+**Data**: array of calendars (`id`, `name`, `color`, `authorId`, `type`)
 
 **Important**: only the first value of a parameter is used if multiple provided, hidden calendars can be seen only by authors
 
@@ -123,9 +123,9 @@ All endpoints require authorization.
 
 3. `POST /api/calendars` - creates a new calendar
 
-**Parameters**: `name`, optional `description`, `color` (default `#ade4ff`), `participants`
+**Parameters**: `name`, optional `description`, `color` (default `#ade4ff`), `participants` (array of IDs), `isPublic` (true or "true")
 
-**Data**: created calendar data (everything)
+**Data**: created calendar data (without participants and followers)
 
 4. `POST /api/calendars/:calendarId/events` - creates a new event in a calendar
 
@@ -139,7 +139,7 @@ All endpoints require authorization.
 
 5. `PATCH /api/calendars/:calendarId` - updates a calendar
 
-**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants`
+**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants` (array of IDs), `followers` (array of IDs), `isHidden` (true or "true"), `isPublic` (true or "true")
 
 **Data**: updated calendar data (everything)
 
@@ -156,7 +156,7 @@ if user accepts, we remove token from db and add user to participants array
 if user rejects, we just remove token from db,
 if no token provided, add user to followers array if this user is not already in participants)
 
-7. `DELETE /api/calendars/calendarId` - deletes a calendar
+7. `DELETE /api/calendars/:calendarId` - deletes a calendar
 
 **Important**: if an authorized user is an author of the calendar, it is deleted completely, if an autorized user is a participant/follower, the calendar is deleted only for them
 

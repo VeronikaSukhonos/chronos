@@ -223,7 +223,7 @@ const UserSettingsPage = () => {
     }
   }, [auth?.id]);
 
-  if (!auth) return <Navigate to="/" />
+  if (!auth) return <Navigate to="/login" />
   if (initLoad) return <LoadPage />
   if (initFeedback.status === 'fail')
     return <ErrorPage error={initFeedback.msg} />

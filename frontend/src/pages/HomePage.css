@@ -1,3 +1,38 @@
+.welcome-page.center-container {
+  gap: 30px;
+  text-align: center;
+}
+
+.welcome-page .welcome-statement {
+  color: var(--accent-color);
+  font: bold 2rem 'Unbounded', sans-serif;
+}
+
+.welcome-page .welcome-message {
+  color: var(--main-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+  max-width: 600px;
+  padding: 20px;
+}
+
+.welcome-page .buttons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 25px;
+}
+
+.welcome-page .buttons-container .main-button {
+  max-width: 175px;
+  min-width: 140px;
+}
+
+@media screen and (max-width: 400px) {
+  .welcome-page .buttons-container {
+    flex-direction: column;
+  }
+}
+
 .home-page-container {
   display: flex;
   flex-direction: row;

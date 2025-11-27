@@ -15,10 +15,12 @@ const calendarSchema = new Schema({
         type: Boolean,
         default: false
       }
-    }]
+    }],
+    default: []
   },
   followers: {
-    type: [{ type: Schema.Types.ObjectId, ref: "User" }]
+    type: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    default: []
   },
   name: {
     type: String,

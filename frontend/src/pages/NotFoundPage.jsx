@@ -1,22 +1,14 @@
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { selectAuthUser } from '../store/authSlice.js';
 import { AttentionIcon } from '../assets';
 import '../components/Buttons.css';
 
 const NotFoundPage = ({ entity = "page" }) => {
-  const auth = useSelector(selectAuthUser.user);
-
   return (
     <div className="center-container">
       <AttentionIcon />
       <p className="error-page-description">We searched through past, present and future... but this {entity} doesn't exist :(</p>
-      {
-        auth
-          ? <Link className="main-button short" to="/">Back to Home</Link>
-          : <Link className="main-button short" to="/login">Back to Login</Link>
-      }
+      <Link className="main-button short" to="/">Back to Home</Link>
     </div>
   )
 }

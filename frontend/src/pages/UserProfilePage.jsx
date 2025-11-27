@@ -46,7 +46,7 @@ const UserProfilePage = () => {
     }
   }, [userId]);
 
-  if (!auth) return <Navigate to="/" />
+  if (!auth) return <Navigate to="/login" />
   if (load) return <LoadPage />
   if (feedback.status === 'fail')
     return <ErrorPage error={feedback.msg} entity="user" />

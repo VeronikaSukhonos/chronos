@@ -8,7 +8,7 @@ import { getEventIcon } from '../utils/getEventIcon.jsx';
 import './SearchForms.css';
 import './InputFields.css';
 
-const SearchedEvent = ({event}) => {
+const SearchedEvent = ({ event }) => {
   return (
     <Link className="searched-event" to={`events/${event.id}`}>
       <div className="searched-event-title">
@@ -28,7 +28,7 @@ const SearchedEvent = ({event}) => {
 };
 
 const EventSearchForm = ({ label, id, onSubmit, search, setSearch, searchOpen, setSearchOpen }) => {
-  const [load, setLoad] = useState(false);
+  const [_, setLoad] = useState(false);
   const [feedback, setFeedback] = useState({ msg: '', status: '' });
   const [events, setEvents] = useState([]);
 

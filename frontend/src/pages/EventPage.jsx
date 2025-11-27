@@ -1,6 +1,6 @@
 const EventPage = () => {
   return (
-    <div>EventPage</div>
+    <div>EventPage TODO</div>
   );
 };
 
