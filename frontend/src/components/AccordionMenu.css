@@ -64,6 +64,6 @@
   margin-bottom: 18px;
 }
 
-.accordion-item.open:last-of-type .accordion-content:has(.dropdown-menu-container) {
+.accordion-item.open .accordion-content:has(.dropdown-menu-container) {
   overflow-y: visible;
 }

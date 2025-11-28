@@ -70,7 +70,7 @@ const RegisterPage = () => {
         <PasswordField
           label="Password Confirmation"
           onChange={setParam}
-          id="passwordConfirmation"
+          id="passwordConfirmation" name="passwordConfirmation"
           val={params.passwordConfirmation}
           err={errors}
           req={true}

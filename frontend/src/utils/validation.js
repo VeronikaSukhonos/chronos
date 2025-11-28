@@ -93,8 +93,30 @@ const tagTitle = (params) => {
   return err;
 };
 
+const calendarName = (params) => {
+  const val = (params.name || '').trim();
+  let err = '';
+
+  if (validator.isEmpty(val))
+    err = 'Name is required';
+  else if (!validator.isLength(val, { max: 30 }))
+    err = 'Name must be at most 30 characters';
+
+  return err;
+};
+
+const calendarDescription = (params) => {
+  const val = (params.description || '').trim();
+  let err = '';
+
+  if (!validator.isLength(val, { max: 250 }))
+    err = 'Description must be at most 250 characters';
+
+  return err;
+};
+
 export default {
   login, email, password, passwordConfirmation, fullName, dob,
-
+  calendarName, calendarDescription,
   tagTitle
 };

@@ -94,7 +94,7 @@ const PasswordUpdate = () => {
       <PasswordField
         label="Current Password"
         onChange={setParam}
-        id="curPassword"
+        id="curPassword" name="curPassword"
         val={params.curPassword}
         err={errors}
         req={true}
@@ -110,7 +110,7 @@ const PasswordUpdate = () => {
       <PasswordField
         label="Password Confirmation"
         onChange={setParam}
-        id="passwordConfirmation"
+        id="passwordConfirmation" name="passwordConfirmation"
         val={params.passwordConfirmation}
         err={errors}
         req={true}

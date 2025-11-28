@@ -92,7 +92,7 @@ const PasswordResetPage = () => {
         <PasswordField
           label="Password Confirmation"
           onChange={confirmPwR.setParam}
-          id="passwordConfirmation"
+          id="passwordConfirmation" name="passwordConfirmation"
           val={confirmPwR.params.passwordConfirmation}
           err={confirmPwR.errors}
           req={true}

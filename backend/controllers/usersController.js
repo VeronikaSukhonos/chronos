@@ -91,7 +91,7 @@ class Users {
         { participants: user.id }, { $pull: { participants: user.id } }
       );
       await Calendar.updateMany(
-        { $or: [{ participants: user.id }, { followers: user.id }] },
+        { $or: [{ participants: user._id }, { followers: user._id }] },
         { $pull: { participants: user.id, followers: user.id } }
       );
       await user.deleteAvatar();

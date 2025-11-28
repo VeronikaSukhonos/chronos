@@ -109,12 +109,16 @@ img.load {
 
 html, textarea, .search-results, .side-panel .accordion-menu {
   scrollbar-width: thin;
-  scrollbar-color: var(--accent-color) var(--main-bg-color);
+  scrollbar-color: var(--accent-color) transparent;
 }
 
-.small-event-icon {
+.small-icon {
   height: 16px;
   width: 16px;
+}
+
+.small-icon path {
+  fill: var(--faded-accent-color);
 }
 
 .Toastify__toast {

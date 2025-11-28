@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: center;
   background: var(--main-shadow-color);
-  padding: 20px;
+  padding: 10px calc(10px + 2vw);
   height: 100vh;
   width: 100vw;
   min-width: 333px;

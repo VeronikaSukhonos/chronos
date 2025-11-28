@@ -4,11 +4,12 @@ export { default as Spinner } from './spinner.svg?react';
 export { default as AttentionIcon } from './attention.svg?react';
 export { default as ConfirmIcon } from './confirm.svg?react';
 
-export { default as PwCloseIcon } from './eye-close.svg?react';
-export { default as PwOpenIcon } from './eye-open.svg?react';
+export { default as EyeCloseIcon } from './eye-close.svg?react';
+export { default as EyeOpenIcon } from './eye-open.svg?react';
 
 export { default as SearchIcon } from './search.svg?react';
 export { default as AddIcon } from './add.svg?react';
+export { default as ColorIcon } from './color.svg?react';
 export { default as UploadIcon } from './upload.svg?react';
 export { default as UpdateIcon } from './update.svg?react';
 export { default as DeleteIcon } from './delete.svg?react';
