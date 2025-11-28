@@ -110,11 +110,11 @@ All endpoints require authorization.
 
 **Filtering**:
 * by name (`?name=Chronos`) - gets public calendars with this name
-* by login (`?login=chronosuser`) - gets public calendars with this author
+* by author (`?author=chronosuser`) - gets public calendars with this author
 * by limit (`?limit=10`) - how many items returns at most
 
 **Sorting:**
-* always sorts in alphabetical order (main and holidays are first)
+* always sorts in an alphabetical order (main and holidays are first)
 
 **Data**: array of calendars (`id`, `name`, `color`, `authorId`, `type`, `role` (role of an authorized user in the calendar), `isPublic`)
 
@@ -123,15 +123,15 @@ All endpoints require authorization.
 2. `GET /api/calendars/hidden` - gets all hidden calendars of an authorized user
 
 **Sorting:**
-* always sorts in alphabetical order (main and holidays are first)
+* always sorts in alphabetical order
 
 **Data**: array of calendars (`id`, `name`, `color`, `isPublic`, `eventsCount`, `participantsCount`, `followersCount`)
 
 3. `GET /api/calendars/:calendarId` - gets information about the specified calendar
 
-**Data**: calendar data (everything, participants and followers are arrays (`id`, `login`, `avatar`, for participants - `isConfirmed`))
+**Data**: calendar data (everything, including role, participants and followers are arrays (`id`, `login`, `avatar`, for participants - `isConfirmed`))
 
-**Important**: works if an authorized user has access to the calendar, not authours do not see unconfirmed participants
+**Important**: works if an authorized user has access to the calendar, not authours cannot see unconfirmed participants
 
 4. `POST /api/calendars` - creates a new calendar
 
@@ -139,9 +139,11 @@ All endpoints require authorization.
 
 **Data**: created calendar data (without participants and followers)
 
+**Important**: adding a participant sends a single-use confirmation link to them
+
 5. `PATCH /api/calendars/:calendarId` - updates the specified calendar
 
-**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants` (array of IDs), `followers` (array of IDs), `isHidden` (true or "true"), `isPublic` (true or "true")
+**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants` (array of IDs), `followers` (array of IDs), `isPublic` (true or "true")
 
 **Data**: updated calendar data (without participants and followers)
 
@@ -157,15 +159,15 @@ All endpoints require authorization.
 
 8. `POST /api/calendars/:calendarId/confirm/:confirmToken` - confirms an authorized user's participation in the calendar
 
-7. `POST /api/calendars/:calendarId/follow` - adds a follower to the calendar
+9. `POST /api/calendars/:calendarId/follow` - adds a follower to the calendar
 
-8. `POST /api/calendars/:calendarId/unfollow` - removes a follower from the calendar
+10. `DELETE /api/calendars/:calendarId/follow` - removes a follower from the calendar
 
-9. `DELETE /api/calendars/:calendarId` - deletes a calendar
+11. `DELETE /api/calendars/:calendarId` - deletes a calendar
 
 **Important**: if an authorized user is an author of the calendar, it is deleted completely, if an autorized user is a participant/follower, the calendar is deleted only for them; main and holidays calendars cannot be deleted
 
-10. `POST /api/calendars/:calendarId/events` - creates a new event in the calendar
+12. `POST /api/calendars/:calendarId/events` - creates a new event in the calendar
 
 **Parameters**: `name`, `type`, `startDate`, optional `description`, `color` (default - color of calendar), `participants` (default - author, all calendar participants), `repeat`, `tags`, optional for arrangements `endDate` (default is `startDate` + 1 hour), `link`
 
@@ -239,3 +241,4 @@ All endpoints require authorization.
 **Parameter**: `title`
 
 4. `DELETE /api/tags/:tagId` - deletes a tag
+
