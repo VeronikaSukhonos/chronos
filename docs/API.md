@@ -109,56 +109,71 @@ All endpoints require authorization.
 1. `GET /api/calendars` - gets all calendars an authorized user owns or has access to
 
 **Filtering**:
-* by hidden (`?hidden=true`)
+* by name (`?name=Chronos`) - gets public calendars with this name
+* by login (`?login=chronosuser`) - gets public calendars with this author
+* by limit (`?limit=10`) - how many items returns at most
 
-**Data**: array of calendars (`id`, `name`, `color`, `authorId`, `type`)
+**Sorting:**
+* always sorts in alphabetical order (main and holidays are first)
+
+**Data**: array of calendars (`id`, `name`, `color`, `authorId`, `type`, `role` (role of an authorized user in the calendar), `isPublic`)
 
 **Important**: only the first value of a parameter is used if multiple provided, hidden calendars can be seen only by authors
 
-2. `GET /api/calendars/:calendarId` - gets information about specified calendar
+2. `GET /api/calendars/hidden` - gets all hidden calendars of an authorized user
 
-**Data**: calendar data (everything) // TODO think if regular users can see participants, or only author can, maybe participants should be another endpoint???
+**Sorting:**
+* always sorts in alphabetical order (main and holidays are first)
 
-**Important:** works if an authorized user has access to the calendar
+**Data**: array of calendars (`id`, `name`, `color`, `isPublic`, `eventsCount`, `participantsCount`, `followersCount`)
 
-3. `POST /api/calendars` - creates a new calendar
+3. `GET /api/calendars/:calendarId` - gets information about the specified calendar
+
+**Data**: calendar data (everything, participants and followers are arrays (`id`, `login`, `avatar`, for participants - `isConfirmed`))
+
+**Important**: works if an authorized user has access to the calendar, not authours do not see unconfirmed participants
+
+4. `POST /api/calendars` - creates a new calendar
 
 **Parameters**: `name`, optional `description`, `color` (default `#ade4ff`), `participants` (array of IDs), `isPublic` (true or "true")
 
 **Data**: created calendar data (without participants and followers)
 
-4. `POST /api/calendars/:calendarId/events` - creates a new event in a calendar
+5. `PATCH /api/calendars/:calendarId` - updates the specified calendar
+
+**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants` (array of IDs), `followers` (array of IDs), `isHidden` (true or "true"), `isPublic` (true or "true")
+
+**Data**: updated calendar data (without participants and followers)
+
+**Important**: works if an authorized user is an author of a calendar; adding a participant sends a single-use confirmation link to them; main and holidays calendars can be changed in no way, except color
+
+6. `POST /api/calendars/:calendarId/archive` - archives the specified calendar
+
+**Important**: works if an authorized user is an author of a calendar
+
+7. `DELETE /api/calendars/:calendarId/archive` - dearchives the specified calendar
+
+**Important**: works if an authorized user is an author of a calendar
+
+8. `POST /api/calendars/:calendarId/confirm/:confirmToken` - confirms an authorized user's participation in the calendar
+
+7. `POST /api/calendars/:calendarId/follow` - adds a follower to the calendar
+
+8. `POST /api/calendars/:calendarId/unfollow` - removes a follower from the calendar
+
+9. `DELETE /api/calendars/:calendarId` - deletes a calendar
+
+**Important**: if an authorized user is an author of the calendar, it is deleted completely, if an autorized user is a participant/follower, the calendar is deleted only for them; main and holidays calendars cannot be deleted
+
+10. `POST /api/calendars/:calendarId/events` - creates a new event in the calendar
 
 **Parameters**: `name`, `type`, `startDate`, optional `description`, `color` (default - color of calendar), `participants` (default - author, all calendar participants), `repeat`, `tags`, optional for arrangements `endDate` (default is `startDate` + 1 hour), `link`
 
-**Data**: created event data (everything)
+**Data**: created event data (???)
 
 **Important**: works if an authorized user is an author or participant of a calendar
 
 // TODO can select event participants only from calendar participants or from all users (in this case a user is added as calendar participant)???
-
-5. `PATCH /api/calendars/:calendarId` - updates a calendar
-
-**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants` (array of IDs), `followers` (array of IDs), `isHidden` (true or "true"), `isPublic` (true or "true")
-
-**Data**: updated calendar data (everything)
-
-**Important**: works if an authorized user is an author of a calendar
-
-6. `POST /api/calendars/:calendarId/confirm` - confirms adding a calendar
-
-**Important**: works only for participant or follower // TODO (how we will know if user is a participant or follower if we update participants array on this stage???)
-
-(Possible solution:
-when author adds participant to calendar,
-we write token to participants array (or another field in db), and send link /api/calendars/:calendarId/confirm/:confirmToken,
-if user accepts, we remove token from db and add user to participants array
-if user rejects, we just remove token from db,
-if no token provided, add user to followers array if this user is not already in participants)
-
-7. `DELETE /api/calendars/:calendarId` - deletes a calendar
-
-**Important**: if an authorized user is an author of the calendar, it is deleted completely, if an autorized user is a participant/follower, the calendar is deleted only for them
 
 # Events module
 
