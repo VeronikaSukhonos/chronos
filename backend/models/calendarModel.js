@@ -12,8 +12,8 @@ const calendarSchema = new Schema({
         ref: "User"
       },
       isConfirmed: {
-        type: Boolean,
-        default: false
+        type: String,
+        default: null
       }
     }],
     default: []

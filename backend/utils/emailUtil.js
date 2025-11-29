@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import path from 'path';
 
-import { createConfirmToken, createParticipationToken } from './tokenUtil.js';
+import { createConfirmToken } from './tokenUtil.js';
 import config from '../config.js';
 
 const APP_URL = `http://localhost:${process.env.APP_PORT}`;
@@ -46,12 +46,12 @@ export const sendPasswordReset = async (user) => {
   }
 };
 
-export const sendCalendarParticipation = async (user, calendar) => {
+export const sendCalendarParticipation = async (user, calendar, token) => {
   try {
     send(user, 'Confirm your participation in the calendar',
 `
 <div>You have been invited to be a participant of the calendar ${calendar.name}. To confirm your participation, please click on the following
-  <b><a href="${APP_URL}/participation-confirmation/${await createParticipationToken(user, calendar.id)}" style="color: #94c255; text-decoration: none;">link</a></b>.
+  <b><a href="${APP_URL}/participation-confirmation/${token}" style="color: #94c255; text-decoration: none;">link</a></b>.
   It will <b style="color: #9583a7;">expire soon</b> and can only be <b style="color: #9583a7;">used once</b>.
 </div><br>
 <div>If you did not expect this invitation, please ignore it.</div>
