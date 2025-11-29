@@ -27,7 +27,8 @@ class Calendars {
               $in: [req.user._id]
             }
           }
-        ]
+        ],
+        isHidden: false
       };
       if (req.query.name) {
         if (req.body.name instanceof Array)
@@ -67,7 +68,6 @@ class Calendars {
                                       })
                                       .limit(Number(req?.query?.limit));
       let calendarsDtos = calendars.map(calendar => new CalendarDto(calendar));
-      calendarsDtos = calendarsDtos.filter(calendar => !(calendar.authorId.toString() !== req.user._id.toString() && calendar.isHidden));
       calendarsDtos[0].id = calendarsDtos[0].id.toString();
       calendarsDtos[1].id = calendarsDtos[1].id.toString();
       calendarsDtos[0].authorId = calendarsDtos[0].authorId.toString();
@@ -591,3 +591,4 @@ class Calendars {
 }
 
 export default new Calendars;
+
