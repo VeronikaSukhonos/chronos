@@ -163,18 +163,20 @@ class Calendars {
           calendarDto.role = "participant";
         if (calendarDto.authorId.toString() !== req.user._id.toString())
           calendarDto.participants = calendarDto.participants.filter(participant => participant.isConfirmed === null);
+        const formattedParticipants = [];
         for (let i = 0; i < calendarDto.participants.length; i += 1) {
           const user = await User.findOne({
             _id: calendarDto.participants[i].participantId
           });
           if (user)
-            calendarDto.participants[i] = {
+            formattedParticipants.push({
               id: user._id,
               login: user.login,
               avatar: user.avatar,
               isConfirmed: calendarDto.participants[i].isConfirmed
-            };
+            });
         }
+        calendarDto.participants = formattedParticipants;
         let formattedFollowers = [];
         for (let i = 0; i < calendarDto.followers.length; i += 1) {
           const user = await User.findOne({
@@ -484,12 +486,15 @@ class Calendars {
         }
         if (req.body.name && calendar.type === "other")
           calendar.name = req.body.name;
-        if (req.body.description && calendar.type === "other")
+        if (req.body.description !== undefined && calendar.type === "other")
           calendar.description = req.body.description;
         if (req.body.color)
           calendar.color = req.body.color;
-        if (req.body.isPublic && calendar.type === "other")
+        if (req.body.isPublic !== undefined && calendar.type === "other") {
           calendar.isPublic = req.body.isPublic;
+          if (!calendar.isPublic)
+            calendar.followers = [];
+        }
         if (calendar.isModified()) {
           await calendar.save();
           let calendarDto = new CalendarDto(calendar);

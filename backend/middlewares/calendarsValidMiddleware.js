@@ -32,12 +32,13 @@ const update = [
       return !((val.name === undefined || val.name === null)
         && (val.description === undefined || val.description === null)
         && (val.color === undefined || val.color === null)
-        && (val.participants === undefined || val.participants === null));
-    }).withMessage('At least one of name, description, color or participants is required'),
+        && (val.participants === undefined || val.participants === null)
+        && (val.isPublic === undefined || val.isPublic === null));
+    }).withMessage('At least one of name, description, color, participants or publicity is required'),
   body('name').optional().trim()
     .notEmpty().withMessage('Name is required').bail()
     .isLength({ max: 30 }).withMessage('Name must be at most 30 characters'),
-  calendarParams.description, calendarParams.color, calendarParams.participants, isValid
+  calendarParams.description, calendarParams.color, calendarParams.participants, calendarParams.isPublic, isValid
 ];
 
 export default {
