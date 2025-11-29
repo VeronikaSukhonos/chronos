@@ -495,7 +495,7 @@ class Calendars {
           delete calendarDto.followers;
           return res.status(200).json({
             message: "Calendar updated successfully",
-            data: calendarDto
+            data: { calendar: calendarDto }
           });
         } else
           return res.status(200).json({
@@ -591,4 +591,5 @@ class Calendars {
 }
 
 export default new Calendars;
+
 
