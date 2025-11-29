@@ -197,6 +197,8 @@ class Calendars {
           message: "You do not have access to the calendar"
         });
     } catch (err) {
+      if (err instanceof CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `Getting calendar failed: ${err.message}`;
       throw err;
     }
@@ -591,5 +593,6 @@ class Calendars {
 }
 
 export default new Calendars;
+
 
 
