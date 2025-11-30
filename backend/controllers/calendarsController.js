@@ -89,7 +89,7 @@ class Calendars {
           });
       }
       const calendars = await Calendar.find(parameters)
-                                      .select("id name color authorId type isPublic followers")
+                                      .select("id name color authorId type isPublic followers participants")
                                       .sort({
                                         type: 1,
                                         name: 1
@@ -114,8 +114,17 @@ class Calendars {
           calendarsDtos[i].role = "author";
         else if (calendarsDtos[i].followers.includes(req.user._id))
           calendarsDtos[i].role = "follower";
-        else
-          calendarsDtos[i].role = "participant";
+        else {
+          let isParticipant = false;
+          for (let j = 0; j < calendarsDtos[i].participants.length; j += 1) {
+            if (calendarsDtos[i].participants[j].participantId.toString() === req.user._id.toString()) {
+              isParticipant = true;
+              break;
+            }
+          }
+          calendarsDtos[i].role = isParticipant ? "participant":"guest";
+        }
+        delete calendarsDtos[i].participants;
         delete calendarsDtos[i].followers;
       }
       return res.status(200).json({
