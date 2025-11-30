@@ -129,7 +129,7 @@ All endpoints require authorization.
 
 3. `GET /api/calendars/:calendarId` - gets information about the specified calendar
 
-**Data**: calendar data (everything, including role, participants and followers are arrays (`id`, `login`, `avatar`, for participants - `isConfirmed`))
+**Data**: calendar data (everything, including role, participants and followers are arrays (`id`, `login`, `avatar`, for participants - `isConfirmed`), author is an object (`id`, `login`, `avatar`))
 
 **Important**: works if an authorized user has access to the calendar, not authours cannot see unconfirmed participants
 
@@ -157,11 +157,13 @@ All endpoints require authorization.
 
 **Important**: works if an authorized user is an author of a calendar
 
-8. `POST /api/calendars/:calendarId/confirm/:confirmToken` - confirms an authorized user's participation in the calendar
+8. `POST /api/calendars/:calendarId/confirm` - (re)sends a calendar participation link to the user
 
-9. `POST /api/calendars/:calendarId/follow` - adds a follower to the calendar
+**Parameters**: `userId`
 
-10. `DELETE /api/calendars/:calendarId/follow` - removes a follower from the calendar
+9. `POST /api/calendars/:calendarId/confirm/:confirmToken` - confirms an authorized user's participation in the calendar
+
+10. `POST /api/calendars/:calendarId/follow` - adds a follower to the calendar
 
 11. `DELETE /api/calendars/:calendarId` - deletes a calendar
 
@@ -241,4 +243,3 @@ All endpoints require authorization.
 **Parameter**: `title`
 
 4. `DELETE /api/tags/:tagId` - deletes a tag
-

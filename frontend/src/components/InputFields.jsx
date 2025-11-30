@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { EyeCloseIcon, EyeOpenIcon } from '../assets';
+import { EyeCloseIcon, EyeOpenIcon, ArrowIcon } from '../assets';
+import { useClickOutside } from '../hooks';
 import './InputFields.css';
 
 const COLORS = ['#ade4ff', '#f8d1ff', '#ffcedc', '#ffdab4', '#fced9a', '#cff2c8'];
@@ -94,7 +95,7 @@ export const Checkbox = (
         <input
           type="checkbox"
           id={id} name={name}
-          onChange={onChange}
+          onChange={(e) => onChange({ target: { name, value: e.target.checked } })}
           checked={checked}
           disabled={dis}
         />
@@ -109,7 +110,7 @@ export const Checkbox = (
 };
 
 export const ColorField = (
-  { label, name, checked, onChange, req = false, err, dis = false, colors = COLORS }
+  { label, name, checked, onChange, err, req = false, dis = false, colors = COLORS }
 ) => {
   return (
     <div className="field">
@@ -121,7 +122,7 @@ export const ColorField = (
               <input
                 type="radio"
                 id={c} name={name}
-                onChange={onChange}
+                onChange={() => onChange({ target: { name, value: c } })}
                 checked={c === checked}
                 disabled={dis}
               />
@@ -129,6 +130,45 @@ export const ColorField = (
             </label>
           )
         }
+        {err?.[name] && <div className="field-err">{err[name]}</div>}
+      </div>
+    </div>
+  );
+};
+
+export const SelectField = (
+  { label, name, options = [], selected, onChange, err, req = false, dis = false, nav = false }
+) => {
+  const [selectOpen, setSelectOpen] = useState(false);
+  const sel = options.find(opt => opt.value === selected) || options[0];
+
+  const selectRef = useRef(null);
+
+  useClickOutside([selectRef], () => { if (selectOpen) setSelectOpen(false); });
+  useEffect(() => { if (dis) setSelectOpen(false); }, [dis]);
+
+  return (
+    <div className="field">
+      {label && <span className={"field-label" + (req ? " required" : "")}>{label}</span>}
+      <div ref={selectRef} className={
+        "select-field-container " + (dis ? "disabled close" : (selectOpen ? "open" : "close")) + (nav ? " nav" : "")
+      }>
+        <button className="select-field-button" disabled={dis} onClick={() => { if (!dis) setSelectOpen(open => !open); }}>
+          {sel?.label}<ArrowIcon />
+        </button>
+        <div className="select-field-options-container">
+          {options.map(opt => <div className="select-field-option" key={"opt" + opt.value}>
+              <input
+                type="radio"
+                id={opt.value} name={name}
+                onChange={() => { setSelectOpen(false); onChange({ target: { name: name, value: opt.value } }); }}
+                checked={opt.value === sel?.value}
+                disabled={dis}
+              />
+              <label htmlFor={opt.value}>{opt.label}</label>
+            </div>
+          )}
+        </div>
         {err?.[name] && <div className="field-err">{err[name]}</div>}
       </div>
     </div>

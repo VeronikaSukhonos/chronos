@@ -7,8 +7,6 @@ import Event from '../models/eventModel.js';
 import Tag from '../models/tagModel.js';
 import { sendEmailConfirmation } from '../utils/emailUtil.js';
 
-const limit = 10;
-
 class Users {
   async getAllUsers(req, res) {
     try {
@@ -16,16 +14,18 @@ class Users {
 
       filter.login = ((Array.isArray(req.query.login)
         ? req.query.login[0] : req.query.login) || '').trim().toLowerCase();
+      filter.limit = Math.abs(parseInt(Array.isArray(req.query.limit)
+        ? req.query.limit[0] : req.query.limit));
 
       const user = await User.findOne({ email: filter.login }).select('+email');
       const users = user ? [user]
         : await User.find(
             filter.login ? { login: { $regex: filter.login.replace(/[^a-z0-9]/g, '') }}: {})
-          .limit(limit);
+          .sort('login').limit(filter.limit);
 
       return res.status(200).json({
         message: users.length !== 0 ? 'Fetched users successfully' : 'No users found',
-        data: { users, limit, filter}
+        data: { users, filter}
       });
     } catch (err) {
       err.message = `Getting users failed: ${err.message}`;

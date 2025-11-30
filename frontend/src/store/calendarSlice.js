@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialCalendarCreateForm = {
   calendar: null,
   open: false,
-  onlyColor: false
+  onlyColor: false,
+  findMode: false
 };
 
 const initialTagCreateForm = {
@@ -29,6 +30,11 @@ const initialState = {
     { type: 'birthday' }
   ],
   tags: [],
+
+  view: 'month',
+  events: [],
+
+  archived: [],
 
   calendarsLoad: true,
   tagsLoad: true,
@@ -123,7 +129,12 @@ export const selectCalendar = {
   myCalendars: (state) => state.calendar.myCalendars,
   otherCalendars: (state) => state.calendar.otherCalendars,
   eventTypes: (state) => state.calendar.eventTypes,
-  tags: (state) => state.calendar.tags
+  tags: (state) => state.calendar.tags,
+
+  view: (state) => state.calendar.view,
+  events: (state) => state.calendar.events,
+
+  archived: (state) => state.calendar.archived
 };
 
 export const selectCalendarLoad = {

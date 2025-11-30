@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Events from '../api/eventsApi.js';
 import { SearchIcon } from '../assets';
 import { fSearchedDate } from '../utils/formatDate.js';
-import { getEventIcon } from '../utils/getEventIcon.jsx';
+import { getEventIcon } from '../utils/getIcon.jsx';
 import './SearchForms.css';
 import './InputFields.css';
 
@@ -96,7 +96,7 @@ const EventSearchForm = ({ label, id, onSubmit, search, setSearch, searchOpen, s
         feedback.msg && <ul className="search-results">
         {
           events.length > 0
-            ? <>{events.map(e => <li key={e.id}><SearchedEvent event={e} /></li>)}</>
+            ? <>{events.map(e => <li key={`searchedevent${e.id}`}><SearchedEvent event={e} /></li>)}</>
             : <li className="search-message">{feedback.msg}</li>
         }
         </ul>

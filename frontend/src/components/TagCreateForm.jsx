@@ -29,7 +29,8 @@ const TagCreateForm = () => {
       Tags.updateTag(f.tag?.id, params)
         .then(({ data: res }) => {
           if (res.data?.tag) dispatch(updateInCalendar({ group: 'tags', item: res.data.tag }));
-          dispatch(setForm({ form: 'tagCreateForm', params: { tag: res.data.tag } }));
+          dispatch(setForm({ form: 'tagCreateForm',
+            params: { tag: { id: f.tag?.id, ...params }}}));
           dispatch(closeForm('tagCreateForm'));
           toast(res.message);
         })

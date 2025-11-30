@@ -33,17 +33,21 @@ body {
   padding: 10px calc(10px + 2vw);
   height: 100vh;
   width: 100%;
-  min-width: 333px;
+  min-width: 388px;
   overflow-wrap: anywhere;
 }
 
 #root, main {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
   width: 100%;
   height: auto;
   flex-grow: 1;
+}
+
+main {
+  gap: 20px;
 }
 
 a {
@@ -107,7 +111,8 @@ img.load {
   text-align: center;
 }
 
-html, textarea, .search-results, .side-panel .accordion-menu {
+html, textarea, .modal-content,
+.side-panel .accordion-menu, .search-results {
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) transparent;
 }

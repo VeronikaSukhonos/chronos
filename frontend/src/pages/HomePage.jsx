@@ -57,19 +57,24 @@ function HomePage() {
       .catch((err) => {
         dispatch(setCalendar({ loadError: err.message }));
       });
-    Tags.fetchTags()
-      .then(({ data: res }) => {
-        dispatch(setCalendar({ tags: res.data.tags, tagsLoad: false }));
-      })
-      .catch((err) => {
-        dispatch(setCalendar({ loadError: err.message }));
-      });
 
     return () => dispatch(setCalendar())
   }, []);
 
   useEffect(() => {
-    if (!calendarsLoad && !tagsLoad) {
+    if (!calendarsLoad) {
+      Tags.fetchTags()
+        .then(({ data: res }) => {
+          dispatch(setCalendar({ tags: res.data.tags, tagsLoad: false }));
+        })
+        .catch((err) => {
+          dispatch(setCalendar({ loadError: err.message }));
+        });
+    }
+  }, [calendarsLoad]);
+
+  useEffect(() => {
+    if (!tagsLoad) {
       Users.fetchVisibilitySettings()
         .then(({ data: res }) => {
           dispatch(setCalendar({ vsLoad: false }));
@@ -79,19 +84,18 @@ function HomePage() {
           dispatch(setCalendar({ loadError: err.message }));
         });
     }
-  }, [calendarsLoad, tagsLoad]);
+  }, [tagsLoad]);
 
   if (!auth) return <Navigate to="login" />
-  if (loadError)
-    return <ErrorPage error={loadError} />
+  if (loadError) return <ErrorPage error={loadError} />
 
   return (
-    <div className="home-page-container">
+    <div className={"home-page-container " + (sidePanelOpen ? "open" : "close")}>
       <div className={"side-panel " + (sidePanelOpen ? "open" : "close")}>
         <div className="side-panel-buttons-container">
-          {sidePanelOpen && <div className="main-button square" onClick={() => setSidePanelOpen(false)}>
+          {sidePanelOpen && <button className="main-button square" onClick={() => setSidePanelOpen(false)}>
             <LinesIcon className="side-panel-icon" />
-          </div>}
+          </button>}
           <MainButton
             title="New Calendar"
             onClick={openCalendarCreateForm}
@@ -105,16 +109,17 @@ function HomePage() {
               title: "My Calendars",
               content:
                 <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small="true" /></li>
-                    : myCalendars.map(c => <SidePanelItem key={c.id} item={c} group="myCalendars" />)}
+                  {vsLoad ? <li><LoadPage small={true} /></li>
+                    : myCalendars.map(c => <SidePanelItem key={`calendar${c.id}`} item={c} group="myCalendars" />)}
                 </ul>
             },
             {
               title: "Other Calendars",
               content:
                 <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small="true" /></li>
-                    : (otherCalendars.length ? otherCalendars.map(c => <SidePanelItem key={c.id} item={c} group="otherCalendars" />)
+                  {vsLoad ? <li><LoadPage small={true} /></li>
+                    : (otherCalendars.length ?
+                      otherCalendars.map(c => <SidePanelItem key={`calendar${c.id}`} item={c} group="otherCalendars" />)
                     : <li className="side-panel-group-no-content" key="no-calendars">You do not have other calendars. Find one!</li>)}
                 </ul>
             },
@@ -122,7 +127,7 @@ function HomePage() {
               title: "Event Types",
               content:
                 <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small="true" /></li>
+                  {vsLoad ? <li><LoadPage small={true} /></li>
                     : eventTypes.map(et => <SidePanelItem key={et.type} item={et} group="eventTypes" />)}
                 </ul>
             },
@@ -130,8 +135,8 @@ function HomePage() {
               title: "Event Tags",
               content:
                 <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small="true" /></li>
-                    : (tags.length ? tags.map(t => <SidePanelItem key={t.id} item={t} group="tags" />)
+                  {vsLoad ? <li><LoadPage small={true} /></li>
+                    : (tags.length ? tags.map(t => <SidePanelItem key={`tag${t.id}`} item={t} group="tags" />)
                     : <li className="side-panel-group-no-content" key="no-tags">You do not have tags. Create one!</li>)}
                 </ul>,
               button: <MainButton Icon={AddIcon} small={true} onClick={openTagCreateForm} type="button" />
@@ -140,12 +145,11 @@ function HomePage() {
         />
       </div>
       <div className="main-panel">
-        <div className="calendar-navigation">
-          {!sidePanelOpen && <div className="main-button square" onClick={() => setSidePanelOpen(true)}>
+        <Calendar
+          addToNavigation={!sidePanelOpen && <button className="main-button square" onClick={() => setSidePanelOpen(true)}>
             <LinesIcon className="side-panel-icon" />
-          </div>}
-        </div>
-        <Calendar />
+          </button>}
+        />
       </div>
       <CalendarCreateForm />
       <TagCreateForm />

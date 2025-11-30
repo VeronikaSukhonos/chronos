@@ -312,3 +312,125 @@
     justify-content: space-between;
   }
 }
+
+.user-search-form-add-container {
+  position: relative;
+  width: 100%;
+}
+
+.user-search-form-add-container input {
+  width: 100%;
+}
+
+.select-field-container {
+  position: relative;
+}
+
+.select-field-container.disabled {
+  opacity: 0.8;
+}
+
+.select-field-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 15px;
+  color: var(--main-color);
+  font-size: 1.1rem;
+  padding: 3px 7px;
+  flex-grow: 1;
+  width: 100%;
+  min-width: 110px;
+  transition: all ease-in-out 0.5s;
+}
+
+.select-field-container.open .select-field-button,
+.select-field-button:not(:disabled):hover {
+  font-size: 1.13rem;
+  cursor: pointer;
+}
+
+.select-field-button svg {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  justify-items: center;
+  height: 22px;
+  width: 22px;
+  transform: rotate(90deg);
+  transition: all ease-in-out 0.5s;
+}
+
+.select-field-container.open .select-field-button svg,
+.select-field-button:not(:disabled):hover svg {
+  transform: rotate(90deg) scale(1.05);
+}
+
+.select-field-options-container {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  background: var(--lighter-main-bg-color);
+  box-shadow: 0 0 5px 1px var(--main-shadow-color);
+  border-radius: 15px;
+  width: 100%;
+  position: absolute;
+  top: 120%;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  transform: translateY(-10px);
+  transition: all ease-in-out 0.3s;
+}
+
+.select-field-container.open .select-field-options-container {
+  opacity: 1;
+  pointer-events: all;
+  z-index: 101;
+  transform: translateY(0);
+}
+
+.select-field-option {
+  display: flex;
+  border-radius: 15px;
+  transition: all ease-in-out 0.3s;
+}
+
+.select-field-option:hover {
+  background: var(--lighter-shadow-color);
+}
+
+.select-field-option input {
+  display: none;
+}
+
+.select-field-option label {
+  flex-grow: 1;
+  padding: 1px 10px;
+  cursor: pointer;
+  transition: all ease-in-out 0.3s;
+}
+
+.select-field-option label:hover {
+  transform: scale(1.02);
+}
+
+.select-field-container.nav .select-field-button {
+  background: var(--lighter-main-bg-color);
+  color: var(--accent-color);
+  font: bold 0.9rem 'Unbounded', sans-serif;
+  height: 45px;
+  padding: 7px 10px;
+}
+
+.select-field-container.nav .select-field-button:hover {
+  font-size: 0.92rem;
+}
+
+.select-field-container.nav .select-field-option label {
+  color: var(--accent-color);
+}

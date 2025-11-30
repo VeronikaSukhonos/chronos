@@ -17,6 +17,7 @@ import PasswordResetPage from './pages/PasswordResetPage.jsx';
 import UserProfilePage from './pages/UserProfilePage.jsx';
 import UserSettingsPage from './pages/UserSettingsPage.jsx';
 import ArchivePage from './pages/ArchivePage.jsx';
+import CalendarPage from './pages/CalendarPage.jsx';
 import EventCreatePage from './pages/EventCreatePage.jsx';
 import EventPage from './pages/EventPage.jsx';
 import LoadPage from './pages/LoadPage.jsx';
@@ -67,6 +68,7 @@ const App = () => {
           <Route path="/users/:userId" element={<UserProfilePage />} />
           <Route path="/settings" element={<UserSettingsPage />} />
           <Route path="/archive" element={<ArchivePage />} />
+          <Route path="/calendars/:calendarId" element={<CalendarPage />} />
 
           <Route path="/events/create" element={<EventCreatePage />} />
           <Route path="/events/:eventId" element={<EventPage />} />

@@ -36,7 +36,12 @@
 .home-page-container {
   display: flex;
   flex-direction: row;
+  flex-grow: 1;
   position: relative;
+}
+
+.home-page-container.open {
+  gap: 13px;
 }
 
 .side-panel {
@@ -45,6 +50,7 @@
   gap: 20px;
   background: var(--main-bg-color);
   border-radius: 0 15px 15px 0;
+  height: 100%;
   opacity: 0;
   max-width: 0;
   overflow-x: hidden;
@@ -58,17 +64,19 @@
 .side-panel-buttons-container {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 15px;
   height: 45px;
+  margin: 2px;
+  margin-bottom: 0;
+}
+
+.side-panel .main-button {
+  font-size: 1.1rem;
 }
 
 svg.side-panel-icon {
   height: 23px;
   width: 23px;
-}
-
-.side-panel .main-button {
-  font-size: 1.1rem;
 }
 
 .side-panel .accordion-menu {
@@ -105,7 +113,7 @@ svg.side-panel-icon {
     top: 0;
     left: 0;
     width: 100%;
-    max-width: 243px;
+    max-width: 241px;
     z-index: -1;
     opacity: 0;
     pointer-events: none;
@@ -122,4 +130,10 @@ svg.side-panel-icon {
     opacity: 1;
     pointer-events: all;
   }
+}
+
+.main-panel {
+  margin: 2px;
+  margin-bottom: 0;
+  flex-grow: 1;
 }

@@ -3,8 +3,8 @@ import './Buttons.css';
 
 export const MainButton = (
   {
-    title, Icon, onClick, type = "submit", dis = false,
-    square = false, small = false, short = false, simple = false
+    title = '', Icon, onClick, type = "submit", dis = false,
+    square = false, small = false, short = false, simple = false, nav = false
   }
 ) => {
   return (
@@ -13,12 +13,13 @@ export const MainButton = (
         `main-button${square ? " square" : ""}
         ${small ? " small" : ""}
         ${short ? " short" : ""}
-        ${simple ? " simple" : ""}`
+        ${simple ? " simple" : ""}
+        ${nav ? " nav" : ""}`
       }
       type={type}
       onClick={onClick}
       disabled={dis}
-    >{title || <Icon />}</button>
+    >{Icon ? <Icon /> : title}</button>
   );
 };
 

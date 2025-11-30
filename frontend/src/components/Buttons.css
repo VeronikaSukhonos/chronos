@@ -24,6 +24,18 @@
   transition: all ease-in-out 0.7s;
 }
 
+.main-button.nav {
+  background: var(--lighter-main-bg-color);
+  font-size: 0.9rem;
+  min-width: 60px;
+  padding: 2px;
+}
+
+.main-button.nav svg {
+  height: 22px;
+  width: 22px;
+}
+
 .main-button.simple {
   background: var(--main-bg-color);
   font-size: 1.1rem;
@@ -73,6 +85,15 @@
 
 .main-button:disabled {
   opacity: 0.65;
+}
+
+.main-button.nav:not(:disabled):hover {
+  box-shadow: none;
+  font-size: 0.95rem;
+}
+
+.main-button.nav:not(:disabled):hover svg {
+  transform: scale(1.07);
 }
 
 .menu-button {

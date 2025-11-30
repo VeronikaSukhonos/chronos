@@ -9,11 +9,13 @@ export { default as EyeOpenIcon } from './eye-open.svg?react';
 
 export { default as SearchIcon } from './search.svg?react';
 export { default as AddIcon } from './add.svg?react';
+export { default as AboutIcon } from './about.svg?react';
 export { default as ColorIcon } from './color.svg?react';
 export { default as UploadIcon } from './upload.svg?react';
 export { default as UpdateIcon } from './update.svg?react';
 export { default as DeleteIcon } from './delete.svg?react';
 export { default as ArrowIcon } from './arrow.svg?react';
+export { default as ArrowLeftIcon } from './arrow-left.svg?react';
 export { default as DotsIcon } from './dots.svg?react';
 export { default as LinesIcon } from './lines.svg?react';
 

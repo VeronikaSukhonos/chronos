@@ -42,14 +42,17 @@
   color: var(--attention-color);
 }
 
-.basic-form-note a {
+.basic-form-note a,
+.basic-form-note .link {
   color: var(--faded-accent-color);
   font-weight: bold;
   transition: all ease-in-out 0.5s;
 }
 
-.basic-form-note a:hover {
+.basic-form-note a:hover,
+.basic-form-note .link:hover {
   color: var(--darker-accent-bg-color);
+  cursor: pointer;
 }
 
 .basic-form-result-icon.ok path {

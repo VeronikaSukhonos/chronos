@@ -24,6 +24,8 @@
 }
 
 .modal-container .modal-content {
+  max-height: 600px;
+  overflow-y: auto;
   width: auto;
   transform: scale(0);
   transition: all ease-in-out 0.5s;

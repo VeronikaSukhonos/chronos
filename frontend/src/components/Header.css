@@ -11,9 +11,13 @@ header {
 header nav {
   display: flex;
   flex-direction: row;
-  gap: 15px;
   justify-content: space-between;
+  gap: 15px;
   align-items: center;
+}
+
+header nav .logo {
+  width: 243px;
 }
 
 header nav .logo svg {

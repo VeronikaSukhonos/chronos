@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import Calendars from '../api/calendarsApi.js';
 import Tags from '../api/tagsApi.js';
 import {
   updateVs, deleteFromCalendar,
@@ -9,13 +11,86 @@ import {
 } from '../store/calendarSlice.js';
 import { Checkbox, MenuButton } from '../components';
 import { useClickOutside } from '../hooks';
-import { UpdateIcon, DeleteIcon } from '../assets';
-import { getEventIcon } from '../utils/getEventIcon.jsx';
+import {
+  AboutIcon, ColorIcon, UpdateIcon, ArchiveIcon, DeleteIcon
+} from '../assets';
+import { getCalendarIcon, getEventIcon } from '../utils/getIcon.jsx';
 import '../pages/HomePage.css';
 import './DropdownMenu.css';
 
 const CalendarMenu = ({ calendar, menuOpen, setLoad, my }) => {
+  const dispatch = useDispatch();
 
+  const confirmDeleteForm = useSelector(selectConfirmDeleteForm);
+
+  const archiveCalendar = () => {
+    setLoad(true);
+
+    Calendars.archiveCalendar(calendar.id)
+      .then(({ data: res }) => {
+        dispatch(deleteFromCalendar({ group: 'myCalendars', id: calendar.id }));
+        setLoad(false);
+        toast(res.message);
+      })
+      .catch((err) => {
+        setLoad(false);
+        toast(err.message);
+      });
+  };
+
+  useEffect(() => {
+    if (['myCalendars', 'otherCalendars'].includes(confirmDeleteForm.group)
+      && confirmDeleteForm.id === calendar.id && confirmDeleteForm.result === true) {
+      dispatch(closeForm('confirmDeleteForm'));
+      setLoad(true);
+
+      Calendars.deleteCalendar(calendar.id)
+        .then(({ data: res }) => {
+          dispatch(deleteFromCalendar({ group: confirmDeleteForm.group, id: calendar.id }));
+          setLoad(false);
+          toast(res.message);
+        })
+        .catch((err) => {
+          setLoad(false);
+          toast(err.message);
+        });
+      }
+  }, [confirmDeleteForm.id, confirmDeleteForm.group, confirmDeleteForm.result]);
+
+  const about = <li><Link to={`/calendars/${calendar.id}`}><AboutIcon />About</Link></li>
+
+  const color =
+    <li onClick={() => dispatch(setForm({
+        form: 'calendarCreateForm', params: { calendar, open: true, onlyColor: true }}
+      ))}>
+      <button><ColorIcon /><div>Set color</div></button>
+    </li>
+
+  const archive =
+    my ? <li onClick={archiveCalendar}>
+      <button><ArchiveIcon /><div>Archive</div></button>
+    </li> : <></>
+
+  const update =
+    my ? <li onClick={() => dispatch(setForm({
+        form: 'calendarCreateForm', params: { calendar, open: true }}
+      ))}>
+      <button><UpdateIcon /><div>Update</div></button>
+    </li> : <></>
+
+  const del =
+    <li onClick={() => dispatch(setForm({ form: 'confirmDeleteForm', params: {
+        id: calendar.id, group: (my ? 'myCalendars' : 'otherCalendars'), open: true }}
+      ))}>
+      <button><DeleteIcon /><div>Delete</div></button>
+    </li>
+
+  return (
+    <ul className={menuOpen ? 'open' : 'close'}>
+      { ["main", "holidays"].includes(calendar.type)
+        ? <>{about}{color}</> : <>{about}{update}{archive}{del}</> }
+    </ul>
+  );
 };
 
 const TagMenu = ({ tag, menuOpen, setLoad }) => {
@@ -26,12 +101,12 @@ const TagMenu = ({ tag, menuOpen, setLoad }) => {
   useEffect(() => {
     if (confirmDeleteForm.group === 'tags' && confirmDeleteForm.id === tag.id
       && confirmDeleteForm.result === true) {
-        dispatch(closeForm('confirmDeleteForm'));
-        setLoad(true);
+      dispatch(closeForm('confirmDeleteForm'));
+      setLoad(true);
 
       Tags.deleteTag(tag.id)
         .then(({ data: res }) => {
-          dispatch(deleteFromCalendar({ group: 'tags', id: tag.id }));
+          dispatch(deleteFromCalendar({ group: confirmDeleteForm.group, id: tag.id }));
           setLoad(false);
           toast(res.message);
         })
@@ -75,7 +150,10 @@ const SidePanelItem = ({ item, group }) => {
         checked={item.visible || false}
         onChange={() => dispatch(updateVs({ group, id: (item.id || item.type) }))}
         color={item.color}
-        icon={ group === 'eventTypes' ? getEventIcon(item.type, "small-event-icon") : undefined }
+        icon={
+          group === 'eventTypes' ? getEventIcon(item.type, "small-icon")
+          : (['myCalendars', 'otherCalendars'].includes(group) && getCalendarIcon(item, "small-icon"))
+        }
       />
       {group !== 'eventTypes' && <div className="dropdown-menu-container small" ref={menuRef}>
         {

@@ -60,9 +60,9 @@ const Header = () => {
             searchOpen={searchOpen}
             setSearchOpen={setSearchOpen}
           />
-          <div className="main-button square search-icon-container" onClick={() => setSearchOpen(open => !open)}>
+          <button className="main-button square search-icon-container" onClick={() => setSearchOpen(open => !open)}>
             <SearchIcon className="search-icon" />
-          </div>
+          </button>
         </div>
 
         <MainButton Icon={AddIcon} onClick={() => navigate('/events/create')} type="button" square={true} />
