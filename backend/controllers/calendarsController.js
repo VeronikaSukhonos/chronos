@@ -11,54 +11,82 @@ import { createParticipationToken } from '../utils/tokenUtil.js';
 class Calendars {
   async getAll(req, res) {
     try {
-      let parameters = {
-        $or: [
-          { authorId: req.user._id },
-          {
-            participants: {
+      let parameters = {};
+      if (req.query.name || req.query.author || req.query.limit)
+        parameters = {
+          isHidden: false,
+          isPublic: true,
+          authorId: {
+            $not: {
+              $eq: req.user._id
+            }
+          },
+          participants: {
+            $not: {
               $elemMatch: {
                 participantId: req.user._id,
                 isConfirmed: null
               }
             }
           },
-          {
-            followers: {
+          followers: {
+            $not: {
               $in: [req.user._id]
             }
           }
-        ],
-        isHidden: false
-      };
+        };
+      else
+        parameters = {
+          $or: [
+            { authorId: req.user._id },
+            {
+              participants: {
+                $elemMatch: {
+                  participantId: req.user._id,
+                  isConfirmed: null
+                }
+              }
+            },
+            {
+              followers: {
+                $in: [req.user._id]
+              }
+            }
+          ],
+          isHidden: false
+        };
       if (req.query.name) {
-        if (req.body.name instanceof Array)
-          parameters.name = {
-            $in: req.query.name
-          };
+        if (req.query.name instanceof Array)
+          return res.status(400).json({
+            message: "You can provide only one name to the query"
+          });
         else
-          parameters.name = req.query.name;
+          parameters.name = {
+            $regex: req.query.name
+          };
       }
       if (req.query.author) {
-        if (req.query.author instanceof Array) {
-          let authors = [];
-          for (let i of req.query.author) {
-            const author = await User.findOne({
-              login: req.query.author[i]
-            });
-            if (author)
-              authors.push(author._id);
-          }
-          if (authors.length !== 0)
-            parameters.authorId = {
-              $in: authors
-            };
-        } else {
+        if (req.query.author instanceof Array)
+          return res.status(400).json({
+            message: "You can provide only one author's login to the query"
+          })
+        else {
           const author = await User.findOne({
             login: req.query.author
           });
           if (author)
             parameters.authorId = author._id;
         }
+      }
+      if (req.query.limit) {
+        if (req.query.limit instanceof Array)
+          return res.status(400).json({
+            message: "You can provide only one limit to the query"
+          });
+        if (/\D/.test(req.query.limit) || req.query.limit === "0")
+          return res.status(400).json({
+            message: "Limit must be a positive integer"
+          });
       }
       const calendars = await Calendar.find(parameters)
                                       .select("id name color authorId type isPublic followers")
@@ -68,17 +96,19 @@ class Calendars {
                                       })
                                       .limit(Number(req?.query?.limit));
       let calendarsDtos = calendars.map(calendar => new CalendarDto(calendar));
-      calendarsDtos[0].id = calendarsDtos[0].id.toString();
-      calendarsDtos[1].id = calendarsDtos[1].id.toString();
-      calendarsDtos[0].authorId = calendarsDtos[0].authorId.toString();
-      calendarsDtos[1].authorId = calendarsDtos[1].authorId.toString();
-      const buffer = JSON.parse(JSON.stringify(calendarsDtos[0]));
-      calendarsDtos[0] = JSON.parse(JSON.stringify(calendarsDtos[1]));
-      calendarsDtos[1] = JSON.parse(JSON.stringify(buffer));
-      calendarsDtos[0].id = new mongoose.Types.ObjectId(calendarsDtos[0].id);
-      calendarsDtos[1].id = new mongoose.Types.ObjectId(calendarsDtos[1].id);
-      calendarsDtos[0].authorId = new mongoose.Types.ObjectId(calendarsDtos[0].authorId);
-      calendarsDtos[1].authorId = new mongoose.Types.ObjectId(calendarsDtos[1].authorId);
+      if (!req.query.name && !req.query.author && !req.query.limit) {
+        calendarsDtos[0].id = calendarsDtos[0].id.toString();
+        calendarsDtos[1].id = calendarsDtos[1].id.toString();
+        calendarsDtos[0].authorId = calendarsDtos[0].authorId.toString();
+        calendarsDtos[1].authorId = calendarsDtos[1].authorId.toString();
+        const buffer = JSON.parse(JSON.stringify(calendarsDtos[0]));
+        calendarsDtos[0] = JSON.parse(JSON.stringify(calendarsDtos[1]));
+        calendarsDtos[1] = JSON.parse(JSON.stringify(buffer));
+        calendarsDtos[0].id = new mongoose.Types.ObjectId(calendarsDtos[0].id);
+        calendarsDtos[1].id = new mongoose.Types.ObjectId(calendarsDtos[1].id);
+        calendarsDtos[0].authorId = new mongoose.Types.ObjectId(calendarsDtos[0].authorId);
+        calendarsDtos[1].authorId = new mongoose.Types.ObjectId(calendarsDtos[1].authorId);
+      }
       for (let i = 0; i < calendarsDtos.length; i += 1) {
         if (calendarsDtos[i].authorId.toString() === req.user._id.toString())
           calendarsDtos[i].role = "author";
@@ -199,7 +229,7 @@ class Calendars {
           message: "You do not have access to the calendar"
         });
     } catch (err) {
-      if (err instanceof CastError)
+      if (err instanceof mongoose.CastError)
         return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `Getting calendar failed: ${err.message}`;
       throw err;
@@ -215,6 +245,14 @@ class Calendars {
             participantId: new mongoose.Types.ObjectId(i)
           });
       }
+      const calendar = await Calendar.findOne({
+        authorId: req.user._id,
+        name: req.body.name
+      });
+      if (calendar)
+        return res.status(400).json({
+          message: "Calendar with such name already exists"
+        });
       const newCalendar = await Calendar.create({
         authorId: req.user._id,
         participants: participants,
@@ -281,6 +319,8 @@ class Calendars {
         message: "You are not a participant of the calendar"
       });
     } catch (err) {
+      if (err instanceof mongoose.CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `Mail sending failed: ${err.message}`;
       throw err;
     }
@@ -319,6 +359,8 @@ class Calendars {
         message: "You are not a participant of the calendar"
       });
     } catch (err) {
+      if (err instanceof mongoose.CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `Participation confirmation failed: ${err.message}`;
       throw err;
     }
@@ -372,6 +414,8 @@ class Calendars {
         message: "You do not have rights to create events in the calendar"
       });
     } catch (err) {
+      if (err instanceof mongoose.CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `New event creating failed: ${err.message}`;
       throw err;
     }
@@ -416,6 +460,8 @@ class Calendars {
         }
       }
     } catch (err) {
+      if (err instanceof mongoose.CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `Calendar following failed: ${err.message}`;
       throw err;
     }
@@ -434,6 +480,10 @@ class Calendars {
         return res.status(403).json({
           message: "You are not an author of the calendar"
         });
+      if (calendar.type !== "other")
+        return res.status(400).json({
+          message: "You cannot archive your main calendar or one with holidays"
+        });
       if (calendar.isHidden)
         return res.status(400).json({
           message: "Calendar is already archived"
@@ -446,6 +496,8 @@ class Calendars {
         });
       }
     } catch (err) {
+      if (err instanceof mongoose.CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `Calendar archiving failed: ${err.message}`;
       throw err;
     }
@@ -461,6 +513,10 @@ class Calendars {
           message: "Calendar is not found"
         });
       if (calendar.authorId.toString() === req.user._id.toString()) {
+        if (calendar.isHidden)
+          return res.status(400).json({
+            message: "Calendar is hidden"
+          });
         if (req.body.participants && calendar.type === "other") {
           for (let i of req.body.participants) {
             let present = false;
@@ -484,8 +540,20 @@ class Calendars {
             }
           }
         }
-        if (req.body.name && calendar.type === "other")
-          calendar.name = req.body.name;
+        if (req.body.name && calendar.type === "other") {
+          if (req.body.name !== calendar.name) {
+            const newCalendar = await Calendar.findOne({
+              authorId: calendar.authorId,
+              name: req.body.name
+            });
+            if (newCalendar)
+              return res.status(400).json({
+                message: "Calendar with such name already exists"
+              });
+            else
+              calendar.name = req.body.name;
+          }
+        }
         if (req.body.description !== undefined && calendar.type === "other")
           calendar.description = req.body.description;
         if (req.body.color)
@@ -513,6 +581,8 @@ class Calendars {
           message: "You are not an author of the calendar"
         });
     } catch (err) {
+      if (err instanceof mongoose.CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `Calendar editing failed: ${err.message}`;
       throw err;
     }
@@ -560,6 +630,8 @@ class Calendars {
         });
       }
     } catch (err) {
+      if (err instanceof mongoose.CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `Calendar deleting failed: ${err.message}`;
       throw err;
     }
@@ -590,6 +662,8 @@ class Calendars {
         });
       }
     } catch (err) {
+      if (err instanceof mongoose.CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
       err.message = `Calendar dearchiving failed: ${err.message}`;
       throw err;
     }
