@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { checkParticipationToken } from '../middlewares/tokenMiddleware.js';
 
 import Calendars from '../controllers/calendarsController.js';
 import calendarsValidation from '../middlewares/calendarsValidMiddleware.js';
@@ -18,7 +19,7 @@ router.post('/:calendarId/events', eventsValidation.create, Calendars.createEven
 router.post('/:calendarId/confirm', Calendars.sendParticipationMail);
 router.post('/:calendarId/follow', Calendars.follow);
 router.post('/:calendarId/archive', Calendars.archive);
-router.post('/:calendarId/confirm/:confirmToken', Calendars.confirmParticipation);
+router.post('/:calendarId/confirm/:confirmToken', checkParticipationToken, Calendars.confirmParticipation);
 router.delete('/:calendarId/archive', Calendars.dearchive);
 
 export default router;

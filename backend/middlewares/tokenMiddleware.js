@@ -64,3 +64,23 @@ export const checkConfirmToken = (req, res, next) => {
     next();
   });
 };
+
+export const checkParticipationToken = (req, res, next) => {
+  const { confirmToken } = req.params;
+
+  if (!confirmToken)
+    return res.status(400).json({
+      message: 'Confirm token is missing. Please use the link sent to your email'
+    });
+  jwt.verify(confirmToken, config.CONFIRM_TOKEN_SECRET, async (err, user) => {
+    const message = 'Invalid or expired confirm token. Please request a new one';
+
+    if (err) return res.status(400).json({ message });
+
+    if ((req.path.includes('confirm') && (!user || req.user._id.toString() !== user.userId.toString()))) {
+      return res.status(400).json({ message });
+    }
+
+    next();
+  });
+};
