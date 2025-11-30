@@ -110,6 +110,15 @@ class Calendars {
         calendarsDtos[1].authorId = new mongoose.Types.ObjectId(calendarsDtos[1].authorId);
       }
       for (let i = 0; i < calendarsDtos.length; i += 1) {
+        const author = await User.findOne({
+          _id: calendarsDtos[i].authorId
+        });
+        if (author)
+          calendarsDtos[i].author = {
+            id: author._id,
+            login: author.login,
+            avatar: author.avatar
+          };
         if (calendarsDtos[i].authorId.toString() === req.user._id.toString())
           calendarsDtos[i].role = "author";
         else if (calendarsDtos[i].followers.includes(req.user._id))
@@ -126,6 +135,7 @@ class Calendars {
         }
         delete calendarsDtos[i].participants;
         delete calendarsDtos[i].followers;
+        delete calendarsDtos[i].authorId;
       }
       return res.status(200).json({
         message: 'Fetched calendars successfully',
@@ -194,6 +204,15 @@ class Calendars {
       }
       if (hasAccess) {
         let calendarDto = new CalendarDto(calendar);
+        const author = await User.findOne({
+          _id: calendarDto.authorId
+        });
+        if (author)
+          calendarDto.author = {
+            id: author._id,
+            login: author.login,
+            avatar: author.avatar
+          };
         if (calendarDto.authorId.toString() === req.user._id.toString())
           calendarDto.role = "author";
         else if (calendarDto.followers.includes(req.user._id))
@@ -237,6 +256,7 @@ class Calendars {
             });
         }
         calendarDto.followers = formattedFollowers;
+        delete calendarDto.authorId;
         return res.status(200).json({
           message: 'Fetched calendar successfully',
           data: { calendar: calendarDto }
@@ -294,6 +314,16 @@ class Calendars {
         }
       }
       let calendarDto = new CalendarDto(newCalendar);
+      const author = await User.findOne({
+        _id: calendarDto.authorId
+      });
+      if (author)
+        calendarDto.author = {
+          id: author._id,
+          login: author.login,
+          avatar: author.avatar
+        };
+      delete calendarDto.authorId;
       delete calendarDto.participants;
       delete calendarDto.followers;
       return res.status(201).json({
@@ -583,6 +613,16 @@ class Calendars {
         if (calendar.isModified()) {
           await calendar.save();
           let calendarDto = new CalendarDto(calendar);
+          const author = await User.findOne({
+            _id: calendarDto.authorId
+          });
+          if (author)
+            calendarDto.author = {
+              id: author._id,
+              login: author.login,
+              avatar: author.avatar
+            };
+          delete calendarDto.authorId;
           delete calendarDto.participants;
           delete calendarDto.followers;
           return res.status(200).json({
