@@ -182,7 +182,7 @@ class Calendars {
         });
       let hasAccess = false;
       if (calendar.authorId.toString() === req.user._id.toString()
-          || calendar.followers.includes(req.user._id))
+          || calendar.followers.includes(req.user._id) || calendar.isPublic)
         hasAccess = true;
       else {
         for (let i of calendar.participants) {
@@ -198,8 +198,16 @@ class Calendars {
           calendarDto.role = "author";
         else if (calendarDto.followers.includes(req.user._id))
           calendarDto.role = "follower";
-        else
-          calendarDto.role = "participant";
+        else {
+          let isParticipant = false;
+          for (let i = 0; i < calendarDto.participants.length; i += 1) {
+            if (calendarDto.participants[i].participantId.toString() === req.user._id.toString()) {
+              isParticipant = true;
+              break;
+            }
+          }
+          calendarDto.role = isParticipant ? "participant":"guest";
+        }
         if (calendarDto.authorId.toString() !== req.user._id.toString())
           calendarDto.participants = calendarDto.participants.filter(participant => participant.isConfirmed === null);
         const formattedParticipants = [];
@@ -681,6 +689,7 @@ class Calendars {
 }
 
 export default new Calendars;
+
 
 
 
