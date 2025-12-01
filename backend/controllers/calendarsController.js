@@ -159,10 +159,9 @@ class Calendars {
       });
       const calendarsDtos = calendars.map(calendar => new CalendarDto(calendar));
       for (let i = 0; i < calendarsDtos.length; i += 1) {
-        let events = await Event.find({
+        const events = await Event.find({
           calendarId: calendarsDtos[i].id
         });
-        events = events.map(event => new EventDto(event));
         calendarsDtos[i].eventsCount = events.length;
         calendarsDtos[i].participantsCount = calendarsDtos[i].participants.length;
         calendarsDtos[i].followersCount = calendarsDtos[i].followers.length;
@@ -239,7 +238,7 @@ class Calendars {
               id: user._id,
               login: user.login,
               avatar: user.avatar,
-              isConfirmed: calendarDto.participants[i].isConfirmed
+              isConfirmed: calendarDto.participants[i].isConfirmed === null ? true:false
             });
         }
         calendarDto.participants = formattedParticipants;
@@ -265,6 +264,42 @@ class Calendars {
         return res.status(403).json({
           message: "You do not have access to the calendar"
         });
+    } catch (err) {
+      if (err instanceof mongoose.CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
+      err.message = `Getting calendar failed: ${err.message}`;
+      throw err;
+    }
+  }
+
+  async viewParticipation(req, res) {
+    try {
+      const calendar = await Calendar.findOne({
+        _id: req.calendarId
+      }).select("name authorId");
+      if (!calendar)
+        return res.status(404).json({
+          message: "Calendar is not found"
+        });
+      let calendarDto = new CalendarDto(calendar);
+      const author = await User.findOne({
+        _id: calendarDto.authorId
+      });
+      if (!author)
+        return res.status(404).json({
+          message: "Author of the calendar is not found"
+        });
+      calendarDto.author = {
+        id: author._id,
+        login: author.login
+      };
+      delete calendarDto.authorId;
+      return res.status(200).json({
+        message: "Fetched calendar successfully",
+        data: {
+          calendar: calendarDto
+        }
+      });
     } catch (err) {
       if (err instanceof mongoose.CastError)
         return res.status(404).json({ message: 'Calendar is not found' });
@@ -376,7 +411,7 @@ class Calendars {
   async confirmParticipation(req, res) {
     try {
       const calendar = await Calendar.findOne({
-        _id: req.params.calendarId
+        _id: req.calendarId
       });
       if (!calendar)
         return res.status(404).json({
@@ -565,6 +600,18 @@ class Calendars {
             message: "Calendar is hidden"
           });
         if (req.body.participants && calendar.type === "other") {
+          let participantsToDelete = [];
+          if (req.body.participants.length === 0) {
+            for (let i = 0; i < calendar.participants.length; i += 1)
+              participantsToDelete.push(calendar.participants[i]);
+          } else {
+            for (let i = 0; i < calendar.participants.length; i += 1) {
+              if (!req.body.participants.includes(calendar.participants[i].participantId.toString()))
+                participantsToDelete.push(calendar.participants[i]);
+            }
+          }
+          for (let i = 0; i < participantsToDelete.length; i += 1)
+            calendar.participants.pop(participantsToDelete[i]);
           for (let i of req.body.participants) {
             let present = false;
             for (let j of calendar.participants) {

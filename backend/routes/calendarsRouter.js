@@ -15,11 +15,12 @@ router.route('/:calendarId')
   .get(Calendars.getOne)
   .patch(calendarsValidation.update, Calendars.editOne)
   .delete(Calendars.deleteOne);
+router.get('/confirm/:confirmToken', checkParticipationToken, Calendars.viewParticipation);
+router.post('/confirm/:confirmToken', checkParticipationToken, Calendars.confirmParticipation);
 router.post('/:calendarId/events', eventsValidation.create, Calendars.createEvent);
 router.post('/:calendarId/confirm', Calendars.sendParticipationMail);
 router.post('/:calendarId/follow', Calendars.follow);
 router.post('/:calendarId/archive', Calendars.archive);
-router.post('/:calendarId/confirm/:confirmToken', checkParticipationToken, Calendars.confirmParticipation);
 router.delete('/:calendarId/archive', Calendars.dearchive);
 
 export default router;
