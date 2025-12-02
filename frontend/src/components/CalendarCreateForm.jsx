@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 
@@ -30,6 +30,8 @@ const CalendarCreateForm = () => {
   } = useForm(initialVals, () => {
     return { name: valid.calendarName(params), description: valid.calendarDescription(params) };
   });
+
+  const [initLoad, setInitLoad] = useState(false);
 
   const submit = (e) => {
     e.preventDefault();
@@ -67,14 +69,17 @@ const CalendarCreateForm = () => {
 
   useEffect(() => {
     if (f.calendar?.id) {
+      setInitLoad(true);
       Calendars.fetchCalendar(f.calendar?.id)
         .then(({ data: res }) => {
           for (const [prop, val] of Object.entries(initialVals))
             setParam({ target: { name: prop, value: res.data.calendar[prop] || val } });
+          setInitLoad(false);
         })
         .catch((err) => {
           for (const [prop, val] of Object.entries(initialVals))
             setParam({ target: { name: prop, value: val } });
+          setInitLoad(false);
           dispatch(closeForm('calendarCreateForm'));
           toast(err.message);
         })
@@ -84,85 +89,39 @@ const CalendarCreateForm = () => {
     }
   }, [f.calendar]);
 
-  const create =
-    <>
-      <TextField
-        label="Name"
-        onChange={setParam}
-        id="name"
-        val={params.name}
-        err={errors}
-        req={true}
-        />
-      <TextAreaField
-        label="Description"
-        onChange={setParam}
-        id="description"
-        val={params.description}
-        err={errors}
-      />
-      <ColorField
-        label="Default Event Color" name="color"
-        checked={params.color}
-        onChange={setParam}
-        err={errors}
-      />
-      <UserSearchForm
-        label="Participants"
-        chosen={params.participants}
-        author={f.calendar?.author}
-        resend={Calendars.resendParticipation}
-        entityId={f.calendar?.id}
-        setChosen={(users) => setParam(
-          { target: { name: 'participants', value: users } }
-        )}
-        del={Calendars.updateCalendar}
-        name="participants"
-        err={errors}
-        fOpen={formOpenRef.current}
-        removeFollower={f.calendar?.id && f.calendar?.isPublic
-          ? (id) => setParam({ target: {
-            name: 'followers', value: params.followers.filter(f => f.id !== id)
-          }}) : undefined}
-      />
-      {f.calendar?.id && f.calendar?.isPublic &&
-        <UserSearchForm
-          label="Followers"
-          chosen={params.followers}
-          author={f.calendar?.author}
-          setChosen={(users) => setParam(
-            { target: { name: 'followers', value: users } }
-          )}
-          del={Calendars.updateCalendar}
-          name="followers"
-          err={errors}
-      />}
-      <Checkbox
-        label="Make this calendar public?"
-        id="isPublic" name="isPublic"
-        checked={params.isPublic}
-        onChange={setParam}
-        short={false}
-      />
-    </>
-
   return (
     <Modal
       modalOpen={f.open}
-      setModalOpen={(_) => { if (!load) dispatch(closeForm('calendarCreateForm')); }}
+      setModalOpen={(_) => { if (!load && !initLoad) dispatch(closeForm('calendarCreateForm')); }}
       title={f.calendar?.id ? "Update Calendar"
         : (f.findMode ? "Find Calendar" : "Create Calendar")}
     >
       <form className="basic-form transparent" onSubmit={submit}>
-        {
-          f.onlyColor ?
+        {!f.calendar?.id && <div className="basic-form-note">
+            <div className="link" onClick={() => {
+              if (!load && !initLoad)
+                dispatch(setForm({form: 'calendarCreateForm', params: { findMode: !f.findMode }}))
+            }}>
+              {f.findMode ? 'Want to create your own calendar instead?'
+                : 'Want to find a public calendar instead?'}
+            </div>
+          </div>}
+        {!f.findMode &&
           <>
             <TextField
               label="Name"
               onChange={setParam}
               id="name"
               val={params.name}
-              req={true} dis={true}
+              err={errors}
+              req={true} dis={f.onlyColor}
+              />
+            <TextAreaField
+              label="Description"
+              onChange={setParam}
+              id="description"
+              val={params.description}
+              err={errors} dis={f.onlyColor}
             />
             <ColorField
               label="Default Event Color" name="color"
@@ -170,23 +129,44 @@ const CalendarCreateForm = () => {
               onChange={setParam}
               err={errors}
             />
-          </> :
-          <>
-            {!f.calendar?.id && <div className="basic-form-note">
-              <div className="link" onClick={() => dispatch(setForm({
-                form: 'calendarCreateForm', params: { findMode: !f.findMode }}
-              ))}>
-                {f.findMode ? 'Want to create your own calendar instead?'
-                  : 'Want to find a public calendar instead?'}
-              </div>
-            </div>}
-            {f.findMode ? <CalendarSearchForm fOpen={formOpenRef.current} findMode={f.findMode} /> : create}
           </>
         }
+        {!f.onlyColor && !f.findMode &&
+          <>
+            <UserSearchForm
+              label="Participants" name="participants" err={errors}
+              chosen={params.participants} setChosen={setParam}
+              author={f.calendar?.author}
+              resend={Calendars.resendParticipation}
+              entityId={f.calendar?.id}
+              del={Calendars.updateCalendar}
+              fOpen={formOpenRef.current}
+              removeFollower={f.calendar?.id && f.calendar?.isPublic
+                ? (id) => setParam({ target: {
+                  name: 'followers', value: params.followers.filter(f => f.id !== id)
+                }}) : undefined}
+            />
+            {f.calendar?.id && f.calendar?.isPublic &&
+              <UserSearchForm
+                label="Participants" name="participants" err={errors}
+                chosen={params.followers} setChosen={setParam}
+                author={f.calendar?.author}
+                del={Calendars.updateCalendar}
+              />}
+            <Checkbox
+              label="Make this calendar public?"
+              id="isPublic" name="isPublic"
+              checked={params.isPublic}
+              onChange={setParam}
+              short={false}
+            />
+          </>
+        }
+        {f.findMode && <CalendarSearchForm fOpen={formOpenRef.current} findMode={f.findMode} />}
 
         {feedback && <p className={"basic-form-feedback " + (feedback.status)}>{feedback.msg}</p>}
 
-        <MainButton title={f.calendar?.id ? "Update" : (f.findMode ? "Find" : "Create")} dis={load} />
+        <MainButton title={f.calendar?.id ? "Update" : (f.findMode ? "Find" : "Create")} dis={load || initLoad} />
       </form>
     </Modal>
   );

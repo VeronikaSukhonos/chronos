@@ -35,8 +35,7 @@ const CalendarMenu = ({ calendar, setCalendar, menuOpen, setMenuOpen, setLoad })
       });
   };
 
-  const updateColor = () => { navigate(`/calendars${calendar.id}/update`); };
-  const updateCalendar = () => { navigate(`/calendars${calendar.id}/update`); };
+  const updateCalendar = () => { navigate(`/calendars/${calendar.id}/update`); };
 
   const archiveCalendar = () => {
     const endpoint = !calendar.isHidden ? Calendars.archiveCalendar : Calendars.dearchiveCalendar;
@@ -86,7 +85,7 @@ const CalendarMenu = ({ calendar, setCalendar, menuOpen, setMenuOpen, setLoad })
         <button><EyeOpenIcon /><div>Follow</div></button>
       </li>}
       {calendar.role == 'author' && ['main', 'holidays'].includes(calendar.type)
-        && <li onClick={updateColor}>
+        && <li onClick={updateCalendar}>
         <button><ColorIcon /><div>Set color</div></button>
       </li>}
       {calendar.role == 'author' && !['main', 'holidays'].includes(calendar.type)
@@ -142,6 +141,7 @@ const CalendarPage = () => {
   useClickOutside([menuRef], () => setMenuOpen(false));
 
   if (!auth) return <Navigate to="/login" />
+  if (!calendarId) return <Navigate to="/" />
   if (initLoad) return <LoadPage />
   if (initFeedback.status === 'fail')
     return <ErrorPage error={initFeedback.msg} entity="calendar" />

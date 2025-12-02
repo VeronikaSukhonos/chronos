@@ -19,7 +19,7 @@ const SearchedUser = ({ user, onClick }) => {
 };
 
 const UserSearchForm = (
-  { label, chosen = [], setChosen, notDeletable = [],
+  { label, name, chosen = [], author, setChosen, notDeletable = [],
     req = false, resend, entityId, del, err, fOpen, removeFollower }
 ) => {
   const auth = useSelector(selectAuthUser.user);
@@ -73,13 +73,14 @@ const UserSearchForm = (
       {label && <span className={"field-label" + (req ? " required" : "")}>{label}</span>}
       <div className="field-container vertical">
         <UserList
-          users={chosen} setUsers={setChosen} resend={resend} entityId={entityId}
+          users={chosen} setUsers={(users) => setChosen({ target: { name, value: users } })}
+          author={author} resend={resend} entityId={entityId}
           del={del} notDeletable={notDeletable}
         />
 
         {resend && <div className="user-search-form-add-container">
           <input
-            type="text"
+            type="text" name={name}
             onChange={(e) => setSearch(e.target.value)} value={search || ""}
             onBlur={() => {
               clearTimeout(blurTimeoutRef.current);
@@ -96,7 +97,9 @@ const UserSearchForm = (
                 ? <>{users.map(u => <li key={`searcheduser${u.id}`}>
                     <SearchedUser user={u} onClick={() => {
                       inputRef.current?.focus();
-                      setChosen([...chosen, {...u, isConfirmed: 'new'}]);
+                      setChosen({ target: {
+                        name, value: [...chosen, {...u, isConfirmed: 'new'}]
+                      }});
                       if (removeFollower) removeFollower(u.id);
                       setSearch('')}
                     } /></li>)}

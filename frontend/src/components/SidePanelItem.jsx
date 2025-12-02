@@ -18,12 +18,13 @@ import { getCalendarIcon, getEventIcon } from '../utils/getIcon.jsx';
 import '../pages/HomePage.css';
 import './DropdownMenu.css';
 
-const CalendarMenu = ({ calendar, menuOpen, setLoad, my }) => {
+const CalendarMenu = ({ calendar, menuOpen, setMenuOpen, setLoad, my }) => {
   const dispatch = useDispatch();
 
   const confirmDeleteForm = useSelector(selectConfirmDeleteForm);
 
   const archiveCalendar = () => {
+    setMenuOpen(false);
     setLoad(true);
 
     Calendars.archiveCalendar(calendar.id)
@@ -60,9 +61,9 @@ const CalendarMenu = ({ calendar, menuOpen, setLoad, my }) => {
   const about = <li><Link to={`/calendars/${calendar.id}`}><AboutIcon />About</Link></li>
 
   const color =
-    <li onClick={() => dispatch(setForm({
+    <li onClick={() => {setMenuOpen(false); dispatch(setForm({
         form: 'calendarCreateForm', params: { calendar, open: true, onlyColor: true }}
-      ))}>
+      ))}}>
       <button><ColorIcon /><div>Set color</div></button>
     </li>
 
@@ -72,16 +73,17 @@ const CalendarMenu = ({ calendar, menuOpen, setLoad, my }) => {
     </li> : <></>
 
   const update =
-    my ? <li onClick={() => dispatch(setForm({
+    my ? <li onClick={() => {setMenuOpen(false); dispatch(setForm({
         form: 'calendarCreateForm', params: { calendar, open: true }}
-      ))}>
+      ))}}>
       <button><UpdateIcon /><div>Update</div></button>
     </li> : <></>
 
   const del =
-    <li onClick={() => dispatch(setForm({ form: 'confirmDeleteForm', params: {
-        id: calendar.id, group: (my ? 'myCalendars' : 'otherCalendars'), open: true }}
-      ))}>
+    <li onClick={() => {setMenuOpen(false); dispatch(setForm({
+        form: 'confirmDeleteForm', params: {
+          id: calendar.id, group: (my ? 'myCalendars' : 'otherCalendars'), open: true }}
+      ))}}>
       <button><DeleteIcon /><div>Delete</div></button>
     </li>
 
@@ -93,7 +95,7 @@ const CalendarMenu = ({ calendar, menuOpen, setLoad, my }) => {
   );
 };
 
-const TagMenu = ({ tag, menuOpen, setLoad }) => {
+const TagMenu = ({ tag, menuOpen, setMenuOpen, setLoad }) => {
   const dispatch = useDispatch();
 
   const confirmDeleteForm = useSelector(selectConfirmDeleteForm);
@@ -119,14 +121,14 @@ const TagMenu = ({ tag, menuOpen, setLoad }) => {
 
   return (
     <ul className={menuOpen ? 'open' : 'close'}>
-      <li onClick={() => dispatch(setForm(
+      <li onClick={() => {setMenuOpen(false); dispatch(setForm(
         { form: 'tagCreateForm', params: { tag, open: true }}
-      ))}>
+      ))}}>
         <button><UpdateIcon /><div>Update</div></button>
       </li>
-      <li onClick={() => dispatch(setForm(
+      <li onClick={() => {setMenuOpen(false); dispatch(setForm(
         { form: 'confirmDeleteForm', params: { id: tag.id, group: 'tags', open: true }}
-      ))}>
+      ))}}>
         <button><DeleteIcon /><div>Delete</div></button>
       </li>
     </ul>
@@ -158,11 +160,11 @@ const SidePanelItem = ({ item, group }) => {
       {group !== 'eventTypes' && <div className="dropdown-menu-container small" ref={menuRef}>
         {
           group === 'myCalendars' ?
-            <CalendarMenu calendar={item} menuOpen={menuOpen} setLoad={setLoad} my={true} />
+            <CalendarMenu calendar={item} menuOpen={menuOpen} setMenuOpen={setMenuOpen} setLoad={setLoad} my={true} />
           : (group === 'otherCalendars' ?
-            <CalendarMenu calendar={item} menuOpen={menuOpen} setLoad={setLoad} my={false} />
+            <CalendarMenu calendar={item} menuOpen={menuOpen} setMenuOpen={setMenuOpen} setLoad={setLoad} my={false} />
           : group === 'tags' ?
-            <TagMenu tag={item} menuOpen={menuOpen} setLoad={setLoad} />
+            <TagMenu tag={item} menuOpen={menuOpen} setMenuOpen={setMenuOpen} setLoad={setLoad} />
           : <></>)
         }
         <MenuButton onClick={() => {

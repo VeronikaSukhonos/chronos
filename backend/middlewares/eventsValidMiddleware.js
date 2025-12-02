@@ -25,22 +25,22 @@ const get = [
     })
     .customSanitizer(value => typeof value === 'string' ? value.trim():value.map(el => el.trim())),
   body('year').optional()
-    .isInt().withMessage('Year nust be an integer').bail()
+    .isInt().withMessage('Year must be an integer').bail()
     .toInt()
     .isInt({ min: new Date().getUTCFullYear() - 50, max: new Date().getUTCFullYear() + 50 })
     .withMessage('Year must be greater than current year - 50 and less than current year + 50'),
   body('month').optional()
-    .isInt().withMessage('Month nust be an integer').bail()
+    .isInt().withMessage('Month must be an integer').bail()
     .toInt()
-    .isInt({ min: 0 }).withMessage('Month nust be a not-negative number'),
+    .isInt({ min: 0 }).withMessage('Month must be a not-negative number'),
   body('week').optional()
-    .isInt().withMessage('Week nust be an integer').bail()
+    .isInt().withMessage('Week must be an integer').bail()
     .toInt()
-    .isInt({ gt: 0 }).withMessage('Week nust be a positive number'),
+    .isInt({ gt: 0 }).withMessage('Week must be a positive number'),
   body('day').optional()
-    .isInt().withMessage('Day nust be an integer').bail()
+    .isInt().withMessage('Day must be an integer').bail()
     .toInt()
-    .isInt({ gt: 0 }).withMessage('Day nust be a positive number'),
+    .isInt({ gt: 0 }).withMessage('Day must be a positive number'),
   body('search').optional().trim()
     .isString().withMessage('Search must be a string'),
   body('limit').if((value, { req }) => req.body.search !== undefined).optional()
