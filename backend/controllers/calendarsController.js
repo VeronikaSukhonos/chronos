@@ -7,7 +7,7 @@ import Tag from '../models/tagModel.js';
 import { UserDto } from '../dtos/userDto.js';
 import { CalendarDto } from '../dtos/calendarDto.js';
 import { EventDto } from '../dtos/eventDto.js';
-import { sendCalendarParticipation } from '../utils/emailUtil.js';
+import { sendCalendarParticipation, sendEventParticipation } from '../utils/emailUtil.js';
 import { createParticipationToken } from '../utils/tokenUtil.js';
 
 class Calendars {
@@ -375,6 +375,10 @@ class Calendars {
 
   async sendParticipationMail(req, res) {
     try {
+      if (!req.body)
+        return res.status(400).json({
+          message: "Body is not provided"
+        });
       const calendar = await Calendar.findOne({
         _id: req.params.calendarId
       });
@@ -428,6 +432,10 @@ class Calendars {
           else {
             if (calendar.participants[i].isConfirmed === req.params.confirmToken) {
               calendar.participants[i].isConfirmed = null;
+              for (let j = calendar.followers.length - 1; j >= 0; j -=1) {
+                if (calendar.followers[j].toString() === calendar.participants[i].participantId.toString())
+                  calendar.followers.splice(j, 1);
+              }
               await calendar.save();
               return res.status(200).json({
                 message: "Confirmed participation in the calendar successfully"
@@ -502,6 +510,17 @@ class Calendars {
               req.body.tags.splice(i, 1);
           }
         }
+        let participants = [];
+        for (let i of req.body.participants) {
+          const user = await User.findOne({
+            _id: new mongoose.Types.ObjectId(i)
+          });
+          if (user) {
+            participants.push({
+              participantId: user._id
+            });
+          }
+        }
         const newEvent = await Event.create({
           authorId: req.user._id,
           calendarId: calendar._id,
@@ -512,11 +531,43 @@ class Calendars {
           link: req.body.link,
           color: req.body.color,
           repeat: req.body.repeat,
-          participants: req.body.participants,
+          participants: participants,
           tags: req.body.tags,
           type: req.body.type,
           visibleForAll: calendar.type == 'main' || calendar.type == 'holidays' ? false:req.body.visibleForAll
         });
+        if (participants.length !== 0) {
+          for (let i = 0; i < newEvent.participants.length; i += 1) {
+            const user = await User.findOne({
+              _id: newEvent.participants[i].participantId
+            }).select("+email");
+            if (!user) {
+              return res.status(404).json({
+                message: 'Participant is not found'
+              });
+            }
+            if (newEvent.participants[i].participantId.toString() !== req.user._id.toString() && newEvent.participants[i].participantId.toString() !== calendar.authorId.toString()) {
+              let calendarParticipant = false;
+              for (let j of calendar.participants) {
+                if (j.participantId.toString() === newEvent.participants[i].participantId.toString() && j.isConfirmed === null) {
+                  calendarParticipant = true;
+                  break;
+                }
+              }
+              if (!calendarParticipant) {
+                calendar.participants.push({
+                  participantId: user._id,
+                  isConfirmed: await createParticipationToken(user, calendar.id)
+                });
+                await calendar.save();
+                await sendCalendarParticipation(user, calendar, calendar.participants[calendar.participants.length - 1].isConfirmed);
+              }
+              newEvent.participants[i].isConfirmed = await createParticipationToken(user, undefined, newEvent.id);
+              await newEvent.save();
+              await sendEventParticipation(user, newEvent, newEvent.participants[i].isConfirmed);
+            }
+          }
+        }
         const result = await newEvent.populate('tags');
         result.author = new UserDto(await User.findOne({ _id: req.user._id }).select('id login avatar'));
         return res.status(201).json({
@@ -547,6 +598,14 @@ class Calendars {
       if (!calendar.isPublic)
         return res.status(403).json({
           message: "Calendar is not public"
+        });
+      if (calendar.isHidden)
+        return res.status(403).json({
+          message: "Calendar is hidden"
+        });
+      if (calendar.authorId.toString() === req.user._id.toString())
+        return res.status(403).json({
+          message: "Authors of calendars cannot follow them"
         });
       for (let i of calendar.participants) {
         if (i.participantId.toString() === req.user._id.toString())
@@ -642,8 +701,10 @@ class Calendars {
                 participantsToDelete.push(calendar.participants[i]);
             }
           }
-          for (let i = 0; i < participantsToDelete.length; i += 1)
-            calendar.participants.pop(participantsToDelete[i]);
+          for (let i = calendar.participants.length - 1; i >= 0; i -= 1) {
+            if (participantsToDelete.includes(calendar.participants[i]))
+              calendar.participants.splice(i, 1);
+          }
           for (let i of req.body.participants) {
             let present = false;
             for (let j of calendar.participants) {
@@ -663,6 +724,53 @@ class Calendars {
                 });
                 await sendCalendarParticipation(user, calendar, calendar.participants[calendar.participants.length - 1].isConfirmed);
               }
+            }
+          }
+          for (let i of calendar.participants) {
+            if (calendar.followers.includes(i.participantId)) {
+              for (let j = calendar.followers.length - 1; j >= 0; j -= 1) {
+                if (calendar.followers[j].toString() === i.participantId.toString())
+                  calendar.followers.splice(j, 1);
+              }
+            }
+          }
+        }
+        if (req.body.followers && calendar.type === "other") {
+          let followersToDelete = [];
+          if (req.body.followers.length === 0) {
+            for (let i = 0; i < calendar.followers.length; i += 1)
+              followersToDelete.push(calendar.followers[i]);
+          } else {
+            for (let i = 0; i < calendar.followers.length; i += 1) {
+              if (!req.body.followers.includes(calendar.followers[i].toString()))
+                followersToDelete.push(calendar.followers[i]);
+            }
+          }
+          for (let i = calendar.followers.length - 1; i >= 0; i -= 1) {
+            if (followersToDelete.includes(calendar.followers[i]))
+              calendar.followers.splice(i, 1);
+          }
+          for (let i of req.body.followers) {
+            let present = false;
+            let isParticipant = false;
+            for (let j of calendar.followers) {
+              if (i === j.toString()) {
+                present = true;
+                break;
+              }
+            }
+            for (let j of calendar.participants) {
+              if (i === j.participantId.toString()) {
+                isParticipant = true;
+                break;
+              }
+            }
+            if (!present && !isParticipant) {
+              const user = await User.findOne({
+                _id: new mongoose.Types.ObjectId(i)
+              });
+              if (user)
+                calendar.followers.push(user._id);
             }
           }
         }
@@ -748,15 +856,20 @@ class Calendars {
           message: "Calendar deleted successfully"
         });
       } else if (calendar.followers.includes(req.user._id)) {
-        calendar.followers.pop(req.user._id);
+        for (let i = calendar.followers.length - 1; i >= 0; i -= 1) {
+          if (calendar.followers[i].toString() === req.user._id.toString()) {
+            calendar.followers.splice(i, 1);
+            break;
+          }
+        }
         await calendar.save();
         return res.status(200).json({
           message: "Successfully unfollowed the calendar"
         });
       } else {
-        for (let i of calendar.participants) {
-          if (i.participantId.toString() === req.user._id.toString()) {
-            calendar.participants.pop(i);
+        for (let i = calendar.participants.length - 1; i >= 0; i -= 1) {
+          if (calendar.participants[i].participantId.toString() === req.user._id.toString()) {
+            calendar.participants.splice(i, 1);
             break;
           }
         }

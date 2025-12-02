@@ -50,7 +50,17 @@ const eventSchema = new Schema({
     }
   },
   participants: {
-    type: [{ type: Schema.Types.ObjectId, ref: "User" }]
+    type: [{
+      participantId: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+      },
+      isConfirmed: {
+        type: String,
+        default: null
+      }
+    }],
+    default: []
   },
   tags: {
     type: [{ type: Schema.Types.ObjectId, ref: "Tag" }]

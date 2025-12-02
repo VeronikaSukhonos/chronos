@@ -8,6 +8,8 @@ import { UserDto } from '../dtos/userDto.js';
 import Calendar from '../models/calendarModel.js';
 import Tag from '../models/tagModel.js';
 import config from '../config.js';
+import { sendCalendarParticipation, sendEventParticipation } from '../utils/emailUtil.js';
+import { createParticipationToken } from '../utils/tokenUtil.js';
 
 class Events {
   async getAll(req, res) {
@@ -318,18 +320,17 @@ class Events {
       event.author = new UserDto(await User.findOne({ _id: event.authorId }).select('id login avatar'));
 
       const result = new EventDto(event);
-      //if (event.author.id.toString() !== req.user._id.toString())
-        //event.participants = event.participants.filter(participant => participant.isConfirmed === null);
+      if (event.author.id.toString() !== req.user._id.toString())
+        event.participants = event.participants.filter(participant => participant.isConfirmed === null);
       result.participants = [];
       for (let i of event.participants) {
-        const user = await User.findOne({ _id: i._id });
+        const user = await User.findOne({ _id: i.participantId });
         if (user)
-          console.log("j");
           result.participants.push({
             id: user._id,
             login: user.login,
             avatar: user.avatar,
-            isConfirmed: i.isConfirmed
+            isConfirmed: i.isConfirmed === null ? true:false
           });
       }
 
@@ -341,6 +342,175 @@ class Events {
       if (err instanceof CastError)
         return res.status(404).json({ message: 'Invalid event ID' });
       err.message = `Getting event data failed: ${err.message}`;
+      throw err;
+    }
+  }
+
+  async viewParticipation(req, res) {
+    try {
+      const event = await Event.findOne({
+        _id: req.eventId
+      }).select("name calendarId authorId");
+      if (!event)
+        return res.status(404).json({
+          message: "Event is not found"
+        });
+      const calendar = await Calendar.findOne({
+        _id: event.calendarId
+      }).select("name authorId");
+      if (!calendar)
+        return res.status(404).json({
+          message: "Calendar is not found"
+        });
+      const author = await User.findOne({
+        _id: event.authorId
+      });
+      if (!author)
+        return res.status(404).json({
+          message: "Author of the event is not found"
+        });
+      let eventDto = new EventDto(event);
+      eventDto.author = {
+        id: author._id,
+        login: author.login
+      };
+      eventDto.calendar = {
+        id: calendar._id,
+        name: calendar.name
+      };
+      delete eventDto.calendarId;
+      delete eventDto.tags;
+      return res.status(200).json({
+        message: "Fetched event successfully",
+        data: {
+          event: eventDto
+        }
+      });
+    } catch (err) {
+      if (err instanceof CastError)
+        return res.status(404).json({ message: 'Event is not found' });
+      err.message = `Getting event failed: ${err.message}`;
+      throw err;
+    }
+  }
+
+  async sendParticipationMail(req, res) {
+    try {
+      if (!req.body)
+        return res.status(400).json({
+          message: "Body is not provided"
+        });
+      const event = await Event.findOne({
+        _id: req.params.eventId
+      });
+      if (!event)
+        return res.status(404).json({
+          message: "Event is not found"
+        });
+      const calendar = await Calendar.findOne({
+        _id: event.calendarId
+      });
+      if (!calendar)
+        return res.status(404).json({
+          message: "Calendar is not found"
+        });
+      const user = await User.findOne({
+        _id: req.body?.participantId
+      }).select("+email");
+      if (!user)
+        return res.status(404).json({
+          message: "Participant is not found"
+        });
+      for (let i = 0; i < event.participants.length; i += 1) {
+        if (event.participants[i].participantId.toString() === user._id.toString()) {
+          let calendarParticipant = false;
+          for (let j of calendar.participants) {
+            if (j.participantId.toString() === newEvent.participants[i].participantId.toString() && j.isConfirmed === null) {
+              calendarParticipant = true;
+              break;
+            }
+          }
+          if (!calendarParticipant) {
+            calendar.participants.push({
+              participantId: user._id,
+              isConfirmed: await createParticipationToken(user, calendar.id)
+            });
+            await calendar.save();
+            await sendCalendarParticipation(user, calendar, calendar.participants[calendar.participants.length - 1].isConfirmed);
+          }
+          event.participants[i].isConfirmed = await createParticipationToken(user, undefined, event.id);
+          await event.save();
+          await sendEventParticipation(user, event, event.participants[i].isConfirmed);
+          return res.status(200).json({
+            message: "Participation link has been sent to the user's email address"
+          });
+        }
+      }
+      return res.status(403).json({
+        message: "You are not a participant of the event"
+      });
+    } catch (err) {
+      if (err instanceof CastError)
+        return res.status(404).json({ message: 'Event is not found' });
+      err.message = `Participation mail sending failed: ${err.message}`;
+      throw err;
+    }
+  }
+  
+  async confirmParticipation(req, res) {
+    try {
+      const event = await Event.findOne({
+        _id: req.eventId
+      });
+      if (!event)
+        return res.status(404).json({
+          message: "Event is not found"
+        });
+      const calendar = await Calendar.findOne({
+        _id: event.calendarId
+      });
+      if (!calendar)
+        return res.status(404).json({
+          message: "Calendar is not found"
+        });
+      let calendarParticipant = false;
+      for (let j of calendar.participants) {
+        if (j.participantId.toString() === req.user._id.toString() && j.isConfirmed === null) {
+          calendarParticipant = true;
+          break;
+        }
+      }
+      if (!calendarParticipant)
+        return res.status(403).json({
+          message: "You are not a participant of the calendar"
+        });
+      for (let i = 0; i < event.participants.length; i += 1) {
+        if (event.participants[i].participantId.toString() === req.user._id.toString()) {
+          if (event.participants[i].isConfirmed === null)
+            return res.status(400).json({
+              message: "Your participation in the event has already been confirmed"
+            });
+          else {
+            if (event.participants[i].isConfirmed === req.params.confirmToken) {
+              event.participants[i].isConfirmed = null;
+              await event.save();
+              return res.status(200).json({
+                message: "Confirmed participation in the event successfully"
+              });
+            } else
+              return res.status(400).json({
+                message: "Invalid or expired participation token. Please use the link from the latest email"
+              });
+          }
+        }
+      }
+      return res.status(403).json({
+        message: "You are not a participant of the event"
+      });
+    } catch (err) {
+      if (err instanceof CastError)
+        return res.status(404).json({ message: 'Event is not found' });
+      err.message = `Participation confirmation failed: ${err.message}`;
       throw err;
     }
   }
@@ -384,6 +554,43 @@ class Events {
               || await User.findOne({ _id: filteredParticipants[i] }))
               || filteredParticipants.indexOf(filteredParticipants[i]) < i)
               filteredParticipants.splice(i, 1);
+            else {
+              let present = false;
+              for (let j of event.participants) {
+                if (j.participantId.toString() === filteredParticipants[i]) {
+                  filteredParticipants[i] = j;
+                  present = true;
+                  break;
+                }
+              }
+              if (!present) {
+                const user = await User.findOne({
+                  _id: filteredParticipants[i]
+                }).select("+email");
+                if (user) {
+                  let calendarParticipant = false;
+                  for (let j of calendar.participants) {
+                    if (j.participantId.toString() === filteredParticipants[i] && j.isConfirmed === null) {
+                      calendarParticipant = true;
+                      break;
+                    }
+                  }
+                  if (!calendarParticipant) {
+                    calendar.participants.push({
+                      participantId: user._id,
+                      isConfirmed: await createParticipationToken(user, calendar.id)
+                    });
+                    await calendar.save();
+                    await sendCalendarParticipation(user, calendar, calendar.participants[calendar.participants.length - 1].isConfirmed);
+                  }
+                  filteredParticipants[i] = {
+                    participantId: user._id,
+                    isConfirmed: await createParticipationToken(user, undefined, event.id)
+                  };
+                  await sendEventParticipation(user, event, filteredParticipants[i].isConfirmed);
+                }
+              }
+            }
           }
           event.participants = filteredParticipants;
         }

@@ -55,11 +55,12 @@ export const createConfirmToken = async (user, email) => {
   }
 };
 
-export const createParticipationToken = async (user, calendarId) => {
+export const createParticipationToken = async (user, calendarId, eventId) => {
   try {
     const token = jwt.sign({
       userId: user._id,
-      calendarId: calendarId
+      calendarId: calendarId,
+      eventId: eventId
     }, config.CONFIRM_TOKEN_SECRET, {
       expiresIn: config.CONFIRM_TOKEN_EXP_TIME
     });

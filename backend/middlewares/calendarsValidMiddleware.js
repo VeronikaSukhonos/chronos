@@ -17,6 +17,13 @@ const calendarParams = {
         throw new Error('Participants array must contain only IDs as strings');
       return true;
     }),
+  followers: body('followers').optional()
+    .isArray().withMessage('Followers must be provided as an array').bail()
+    .custom((value) => {
+      if (!value.every(item => typeof item === 'string'))
+        throw new Error('Followers array must contain only IDs as strings');
+      return true;
+    }),
   isPublic: body('isPublic').optional().customSanitizer(val => val === true || val === 'true')
 };
 
@@ -33,12 +40,13 @@ const update = [
         && (val.description === undefined || val.description === null)
         && (val.color === undefined || val.color === null)
         && (val.participants === undefined || val.participants === null)
+        && (val.followers === undefined || val.followers === null)
         && (val.isPublic === undefined || val.isPublic === null));
-    }).withMessage('At least one of name, description, color, participants or publicity is required'),
+    }).withMessage('At least one of name, description, color, participants, followers or publicity is required'),
   body('name').optional().trim()
     .notEmpty().withMessage('Name is required').bail()
     .isLength({ max: 30 }).withMessage('Name must be at most 30 characters'),
-  calendarParams.description, calendarParams.color, calendarParams.participants, calendarParams.isPublic, isValid
+  calendarParams.description, calendarParams.color, calendarParams.participants, calendarParams.followers, calendarParams.isPublic, isValid
 ];
 
 export default {

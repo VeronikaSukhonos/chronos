@@ -63,6 +63,23 @@ export const sendCalendarParticipation = async (user, calendar, token) => {
   }
 };
 
+export const sendEventParticipation = async (user, event, token) => {
+  try {
+    send(user, 'Confirm your participation in the event',
+`
+<div>You have been invited to be a participant of the event <b>${event.name}</b>. To confirm your participation, please click on the following
+  <b><a href="${APP_URL}/participation-confirmation/${token}?entity=event" style="color: #94c255; text-decoration: none;">link</a></b>.
+  It will <b style="color: #9583a7;">expire soon</b> and can only be <b style="color: #9583a7;">used once</b>.
+</div><br>
+<div>If you did not expect this invitation, please ignore or cancel it.</div>
+`
+    );
+  } catch (err) {
+    err.message = `Email sending failed: ${err.message}`;
+    throw err;
+  }
+};
+
 const send = (user, subject, content) => {
   transporter.sendMail({
     from: `"Chronos" <${config.EMAIL_USER}>`,

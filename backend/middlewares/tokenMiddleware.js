@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 import User from '../models/userModel.js';
 import Calendar from '../models/calendarModel.js';
-// import Event from '../models/eventModel.js';
+import Event from '../models/eventModel.js';
 import config from '../config.js';
 
 export const isAuth = (req, res, next) => {
@@ -90,9 +90,12 @@ export const checkParticipationToken = (req, res, next) => {
       participants: { $elemMatch: { participantId: req.user._id, isConfirmed: confirmToken }}
     }))) return res.status(400).json({ message });
     
-    // if (!calendar && await Event.find)...
+    if (!calendar && !(await Event.findOne({
+      participants: { $elemMatch: { participantId: req.user._id, isConfirmed: confirmToken }}
+    }))) return res.status(400).json({ message });
 
     req.calendarId = data.calendarId;
+    req.eventId = data.eventId;
     next();
   });
 };
