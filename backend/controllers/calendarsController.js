@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import Calendar from '../models/calendarModel.js';
 import User from '../models/userModel.js';
 import Event from '../models/eventModel.js';
+import Tag from '../models/tagModel.js';
+import { UserDto } from '../dtos/userDto.js';
 import { CalendarDto } from '../dtos/calendarDto.js';
 import { EventDto } from '../dtos/eventDto.js';
 import { sendCalendarParticipation } from '../utils/emailUtil.js';
@@ -468,11 +470,38 @@ class Calendars {
           }
         }
       }
-      let eventParticipants = [];
-      eventParticipants.push(calendar.authorId);
-      for (let i of calendar.participants)
-        eventParticipants.push(i.participantId);
       if (hasRights) {
+        if (req.body.type == 'arrangement' && !req.body.endDate)
+          req.body.endDate = new Date(new Date(req.body.startDate).getTime() + 3600000).toISOString();
+        if (!req.body.color)
+          req.body.color = calendar.color;
+        if (req.body.type == 'birthday' || req.body.type == 'holiday') {
+          req.body.repeat = { frequency: 'year', repeat: 1 };
+        }
+        if (req.body.visibleForAll || calendar.type == 'main' || calendar.type == 'holidays') {
+          req.body.participants = [];
+        } else {
+          if (!req.body.participants)
+            req.body.participants = [];
+          if (!req.body.participants.includes(calendar.authorId.toString()))
+            req.body.participants.splice(0, 0, calendar.authorId.toString())
+          if (!req.body.participants.includes(req.user._id.toString()))
+            req.body.participants.splice(0, 0, req.user._id.toString())
+          for (let i = req.body.participants.length - 1; i >= 0; --i) {
+            if (!(req.body.participants[i] === req.user._id.toString()
+              || req.body.participants[i] === calendar.authorId.toString()
+              || await User.findOne({ _id: req.body.participants[i] }))
+              || req.body.participants.indexOf(req.body.participants[i]) < i)
+              req.body.participants.splice(i, 1);
+          }
+        }
+        if (req.body.tags) {
+          for (let i = req.body.tags.length - 1; i >= 0; --i) {
+            if (!(await Tag.findOne({ _id: req.body.tags[i] }))
+              || req.body.tags.indexOf(req.body.tags[i]) < i)
+              req.body.tags.splice(i, 1);
+          }
+        }
         const newEvent = await Event.create({
           authorId: req.user._id,
           calendarId: calendar._id,
@@ -483,13 +512,16 @@ class Calendars {
           link: req.body.link,
           color: req.body.color,
           repeat: req.body.repeat,
-          participants: req.body.participants ? req.body.participants:eventParticipants,
+          participants: req.body.participants,
           tags: req.body.tags,
-          type: req.body.type
+          type: req.body.type,
+          visibleForAll: calendar.type == 'main' || calendar.type == 'holidays' ? false:req.body.visibleForAll
         });
+        const result = await newEvent.populate('tags');
+        result.author = new UserDto(await User.findOne({ _id: req.user._id }).select('id login avatar'));
         return res.status(201).json({
           message: 'New event created successfully',
-          data: { event: new EventDto(newEvent) }
+          data: { event: new EventDto(result) }
         });
       } else
         return res.status(403).json({

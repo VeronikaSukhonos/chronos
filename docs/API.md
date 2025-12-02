@@ -171,42 +171,46 @@ All endpoints require authorization.
 
 12. `POST /api/calendars/:calendarId/events` - creates a new event in the calendar
 
-**Parameters**: `name`, `type`, `startDate`, optional `description`, `color` (default - color of calendar), `participants` (default - author, all calendar participants), `repeat`, `tags`, optional for arrangements `endDate` (default is `startDate` + 1 hour), `link`
+**Parameters**: `name`, `type`, `startDate`, optional `description`, `color` (default - color of calendar), `participants` (if isn't visible for all, default - author, calendar's author), `repeat`, `tags`, optional for arrangements `endDate` (default is `startDate` + 1 hour), `link`, `visibleForAll` (default - false)
 
-**Data**: created event data (???)
+**Data**: created event data (everything except participants, author is an object (`id`, `login`, `avatar`))
 
 **Important**: works if an authorized user is an author or participant of a calendar
 
-// TODO can select event participants only from calendar participants or from all users (in this case a user is added as calendar participant)???
+// TODO can select event participants from all users, in this case a user is added as calendar participant
 
 # Events module
 
 All endpoints require authorization.
 
-1. `GET /api/events` - gets all events an authorized user can see
+1. `POST /api/events` - gets all events an authorized user can see
 
 **Filtering**:
-* by calendars (`?calendar=main&&calendar=holidays`)
-* by types (`?type=arrangement&&type=task`)
-* by tags (`?tag=work&&tag=uni`)
-* by year // TODO
-* by month // TODO
-* by day // TODO
-* by name (`?search=Dancing`)
+* by calendars (`"calendar": "calendarId"` or `"calendar": ["Id1", "Id2"]`) - gets events from calendars with these Ids
+* by types (`"type": "arrangement"` or `"type": ["arrangement", "task"]`) - gets events of these types
+* by tags (`"tag": "work"` or `"tag": ["work", "uni"]`) - gets events with these tags
+* by year (`"year": 2026`) - gets events of this year or current year if nothing is provided, must be greater than current year - 50 and less than current year + 50 (it seems such way)
+* by week (`"week": 2`) - gets events of this week of the year (for example, week 2 of year 2026 starts from January 5th), must be a positive number, if provided - `month` and `day` aren't taken into account
+* by month (`"month": 1`) - gets events of this month or current month if nothing is provided, must be a not-negative number
+* by day (`"day": 15`) - gets events of this day or current day if nothing is provided, must be a positive number
+* by name (`"search": "Dancing"`) - gets events with this name
+* by limit (`"limit": 10`) - how many items returns at most if `name` is provided
 
-**Data**: array of events (everything except participants)
+**Data**: array of events (everything except participants, author is an object (`id`, `login`, `avatar`))
+
+**Important**: if search is performed, first come future events sorted from late to recent, then past events sorted from recent to late, and every event is unique (no event's clones if it has `repeat` parameter); otherwice events are sorted from late to recent and event's repetitions of this time range are included
 
 2. `GET /api/events/:eventId` - gets information about a specified event
 
-**Data**: event data (everything) // TODO think if regular users can see participants, or only author can, maybe participants should be another endpoint???
+**Data**: event data (everything, participants are arrays (only `id`, `login`, and `avatar` for this time), author is an object (`id`, `login`, `avatar`))
 
 **Important:** works if an authorized user has access to the event
 
 3. `PATCH /api/events/:eventId` - updates an event
 
-**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants`, `tags`, `repeat`, `link` (if an arrangement)
+**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants` (if it's an event not from Main or Holidays calendars), `tags`, `repeat` (if an arrangement or reminder), `link` (if an arrangement), `visibleForAll` (if it's an event not from Main or Holidays calendars)
 
-**Data**: updated event data (everything)
+**Data**: updated event data (everything except participants, author is an object (`id`, `login`, `avatar`))
 
 **Important**: works if an authorized user is an author of a event
 

@@ -65,6 +65,10 @@ const eventSchema = new Schema({
     enum: ["arrangement", "reminder", "task", "holiday", "birthday"],
     required: [true, "Type is required"],
     immutable: true
+  },
+  visibleForAll: {
+    type: Boolean,
+    default: false
   }
 });
 

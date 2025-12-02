@@ -11,7 +11,7 @@ COPY backend/ .
 CMD ["npm", "run", "dev"]
 
 # production stage
-FROM node:25-alpine AS prod
+FROM node:lts-alpine AS prod
 
 WORKDIR /app
 

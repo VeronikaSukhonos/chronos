@@ -5,12 +5,11 @@ import valid from '../middlewares/eventsValidMiddleware.js';
 
 const router = Router();
 
-router.get('/', Events.getAll)
+router.post('/', valid.get, Events.getAll)
 router.route('/:eventId')
   .get(Events.getOne)
-  .patch(valid.update, Events.updateOne)
+  .patch(valid.update, Events.editOne)
   .delete(Events.deleteOne);
-router.get('/:eventId/participants', Events.getParticipants)
 router.route('/:eventId/done')
   .post(Events.markDone)
   .delete(Events.markUndone);

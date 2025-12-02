@@ -26,7 +26,8 @@ git clone https://github.com/VeronikaSukhonos/chronos.git
 cd chronos
 ```
 
-// TODO here you will write sth about configuring .env
+Create `.env` file with variables specified in `.env.example` file.     
+To get `IP_API_KEY`, register [here](https://ipinfo.io/).
 
 ### Build the project
 
@@ -36,7 +37,7 @@ Launch the Docker Desktop, and, in the same directory where `docker-compose.yml`
 docker compose build <app-dev/app-prod>
 ```
 
-Write `app-dev` to run the development build and `app-prod` to run the production build (PRODUCTION BUILD WAS NOT TESTED YET).
+Write `app-dev` to run the development build and `app-prod` to run the production build.
 
 In the development build, you can change files both in `backend` and `frontend` directories (except Docker-related files like Dockerfile), and servers will be restarted automatically.
 

@@ -7,7 +7,7 @@ import config from '../config.js';
 const APP_URL = `http://localhost:${process.env.APP_PORT}`;
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com', port: 465, secure: true,
+  host: config.EMAIL_HOST, port: config.EMAIL_PORT, secure: true,
   auth: { user: config.EMAIL_USER, pass: config.EMAIL_PASSWORD }
 });
 
@@ -50,7 +50,7 @@ export const sendCalendarParticipation = async (user, calendar, token) => {
   try {
     send(user, 'Confirm your participation in the calendar',
 `
-<div>You have been invited to be a participant of the calendar <b>${calendar.name}</b>. To confirm your participation, please click on the following
+<div>You have been invited to be a participant of the calendar <b>${calendar.name}<b>. To confirm your participation, please click on the following
   <b><a href="${APP_URL}/participation-confirmation/${token}?entity=calendar" style="color: #94c255; text-decoration: none;">link</a></b>.
   It will <b style="color: #9583a7;">expire soon</b> and can only be <b style="color: #9583a7;">used once</b>.
 </div><br>

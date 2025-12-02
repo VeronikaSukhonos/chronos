@@ -1,13 +1,46 @@
-// Temporary file that should be later replaced with .env
+// import fsPromises from 'fs/promises';
+// import path from 'path';
+
+const keys = [
+  'EMAIL_HOST',
+  'EMAIL_PORT',
+  'EMAIL_USER',
+  'EMAIL_PASSWORD',
+  'ACCESS_TOKEN_SECRET',
+  'ACCESS_TOKEN_EXP_TIME',
+  'REFRESH_TOKEN_SECRET',
+  'REFRESH_TOKEN_EXP_TIME',
+  'CONFIRM_TOKEN_SECRET',
+  'CONFIRM_TOKEN_EXP_TIME',
+  'IP_API_KEY',
+  // 'HOLIDAYS_API_KEY'
+];
+
+const config = {};
+
+for (let key of keys) {
+  //if (process.env.NODE_ENV == 'development')
+    config[key] = process.env[key];
+  // else if (process.env.NODE_ENV == 'production') {
+  //   const secretPath = path.join('run', 'secrets', key);
+  //   fsPromises.readFile(secretPath, { encoding: 'utf8' })
+  //     .then(value => {config[key] = value;})
+  //     .catch(err => {console.error(`Cannot get secret value ${key}:\n`, err)});
+  // }
+}
 
 export default {
-  EMAIL_USER: 'vsukhonos.test@gmail.com',
-  EMAIL_PASSWORD: 'lhmy yinw vyhi kbak',
+  EMAIL_HOST: config.EMAIL_HOST || 'smtp.gmail.com',
+  EMAIL_PORT: config.EMAIL_PORT || 465,
+  EMAIL_USER: config.EMAIL_USER || 'yourmail@gmail.com',
+  EMAIL_PASSWORD: config.EMAIL_PASSWORD || 'yourpassword',
 
-  ACCESS_TOKEN_SECRET: '5eafb1868f8670c811c6a7db0894c218c943fb66ea23c6e8454e65b6da4f9fcde576bd5c5a918c2d952cad20b481329d9d7c0ba12d2a1824990c91d076dd687f',
-  ACCESS_TOKEN_EXP_TIME: '15m',
-  REFRESH_TOKEN_SECRET: '11a0eb28c1324948c2d2534a8253270137a560982742b0dd149efe86552c49aa1b5006c6303e013c98d105c97c5ecd4f0a8bd907c63fbfff7a642c05d20c2435',
-  REFRESH_TOKEN_EXP_TIME: '30d',
-  CONFIRM_TOKEN_SECRET: '22a3c3b35fc7eb26363bece95bb4fc35de2f3a52422776685d265823dd6b4ad14233e9cf35052cf35770cab04965082c12045866c1184048d0f7db797efeb7c4',
-  CONFIRM_TOKEN_EXP_TIME: '15m'
+  ACCESS_TOKEN_SECRET: config.ACCESS_TOKEN_SECRET || 'access_supersecret',
+  ACCESS_TOKEN_EXP_TIME: config.ACCESS_TOKEN_EXP_TIME || '15m',
+  REFRESH_TOKEN_SECRET: config.REFRESH_TOKEN_SECRET || 'refresh_supersecret',
+  REFRESH_TOKEN_EXP_TIME: config.REFRESH_TOKEN_EXP_TIME || '30d',
+  CONFIRM_TOKEN_SECRET: config.CONFIRM_TOKEN_SECRET || 'confirm_supersecret',
+  CONFIRM_TOKEN_EXP_TIME: config.CONFIRM_TOKEN_EXP_TIME || '15m',
+
+  IP_API_KEY: config.IP_API_KEY || 'yourapikey',
 };

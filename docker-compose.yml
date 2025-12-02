@@ -9,10 +9,9 @@ services:
       - /app/node_modules
     ports:
       - "8080:8080" # HOST_PORT:CONTAINER_PORT
-    environment: # environmental variables that can be used in backend files like process.env.API_PORT
-      - NODE_ENV=development
-      - API_PORT=8080
-      - APP_PORT=5173
+    env_file:
+      - ./.env.development
+      - ./.env
 
   app-dev:
     build:
@@ -24,10 +23,8 @@ services:
       - /app/node_modules
     ports:
       - "5173:5173"
-    environment: # environmental variables that can be used in frontend files like process.env.VITE_API_URL
-      - NODE_ENV=development
-      - VITE_API_URL=http://localhost:8080/api # except NODE_ENV frontend environmental variables must have names like VITE_<NAME>
-      - APP_PORT=5173
+    env_file:
+      - ./.env.development
     depends_on:
       - backend-dev
 
@@ -38,10 +35,21 @@ services:
       target: prod
     ports:
       - "8888:8888"
-    environment:
-      - NODE_ENV=production
-      - API_PORT=8888
-      - APP_PORT=8000
+    env_file:
+      - ./.env.production
+    # secrets:
+    #   - EMAIL_HOST
+    #   - EMAIL_PORT
+    #   - EMAIL_USER
+    #   - EMAIL_PASSWORD
+    #   - ACCESS_TOKEN_SECRET
+    #   - ACCESS_TOKEN_EXP_TIME
+    #   - REFRESH_TOKEN_SECRET
+    #   - REFRESH_TOKEN_EXP_TIME
+    #   - CONFIRM_TOKEN_SECRET
+    #   - CONFIRM_TOKEN_EXP_TIME
+    #   - IP_API_KEY
+    #   - HOLIDAYS_API_KEY
 
   app-prod:
     build:
@@ -50,9 +58,33 @@ services:
       target: prod
     ports:
       - "8000:80"
-    environment:
-      - NODE_ENV=production
-      - VITE_API_URL=http://localhost:8888/api
-      - APP_PORT=8000
+    env_file:
+      - ./.env.production
     depends_on:
       - backend-prod
+
+# secrets:
+#   EMAIL_HOST:
+#     external: true
+#   EMAIL_PORT:
+#     external: true
+#   EMAIL_USER:
+#     external: true
+#   EMAIL_PASSWORD:
+#     external: true
+#   ACCESS_TOKEN_SECRET:
+#     external: true
+#   ACCESS_TOKEN_EXP_TIME:
+#     external: true
+#   REFRESH_TOKEN_SECRET:
+#     external: true
+#   REFRESH_TOKEN_EXP_TIME:
+#     external: true
+#   CONFIRM_TOKEN_SECRET:
+#     external: true
+#   CONFIRM_TOKEN_EXP_TIME:
+#     external: true
+#   IP_API_KEY:
+#     external: true
+#   HOLIDAYS_API_KEY:
+#     external: true
