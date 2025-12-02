@@ -23,10 +23,11 @@ export const MainButton = (
   );
 };
 
-export const MenuButton = ({ onClick, dis = false }) => {
+export const MenuButton = ({ onClick, dis = false, constant }) => {
   return (
     <button
-      className="menu-button" type="button" onClick={onClick} disabled={dis}
+      className={"menu-button" + (constant ? " constant" : "")}
+      type="button" onClick={onClick} disabled={dis}
     ><DotsIcon /></button>
   );
 };

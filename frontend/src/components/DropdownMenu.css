@@ -19,7 +19,7 @@
   background: var(--lighter-main-bg-color);
   border-radius: 18px;
   box-shadow: 0 0 4px 1px var(--main-shadow-color);
-  padding: 10px 0;
+  padding: 7px 0;
   height: auto;
   width: max-content;
   max-width: 150px;
@@ -59,7 +59,7 @@
   color: var(--faded-accent-color);
   font-size: 1rem;
   font-weight: bold;
-  padding: 6px 14px 4px 14px;
+  padding: 5px 13px 3px 13px;
   cursor: pointer;
   transition: all ease-in-out 0.3s;
 }
@@ -124,7 +124,7 @@
 
 .dropdown-menu-container.small ul {
   box-shadow: 0 0 2px 1px var(--main-shadow-color);
-  top: 0;
+  top: -1px;
   right: calc(100% + 4px);
   padding: 2px;
 }

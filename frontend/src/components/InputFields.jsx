@@ -103,7 +103,7 @@ export const Checkbox = (
           className="checkbox-container"
           style={checked ? { background: color } : {}}
         ></div>
-        <span className="checkbox-field-label">{label}{icon}</span>
+        <span className="checkbox-field-label"><span>{label}</span>{icon}</span>
       </label>
     </div>
   );

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import Events from '../api/eventsApi.js';
 import { SearchIcon } from '../assets';
-import { fSearchedDate } from '../utils/formatDate.js';
+import { fEventDate } from '../utils/formatDate.js';
 import { getEventIcon } from '../utils/getIcon.jsx';
 import './SearchForms.css';
 import './InputFields.css';
@@ -21,7 +21,7 @@ const SearchedEvent = ({ event }) => {
         {event.calendar.name}
       </div>
       <div className="searched-event-date">
-        {fSearchedDate(event.type, event.startDate, event.endDate, event.allDay)}
+        {fEventDate(event.type, event.startDate, event.endDate, event.allDay)}
       </div>
     </Link>
   )
@@ -97,7 +97,7 @@ const EventSearchForm = ({ label, id, onSubmit, search, setSearch, searchOpen, s
         {
           events.length > 0
             ? <>{events.map(e => <li key={`searchedevent${e.id}`}><SearchedEvent event={e} /></li>)}</>
-            : <li className="search-message">{feedback.msg}</li>
+            : <li className="info-message">{feedback.msg}</li>
         }
         </ul>
       }

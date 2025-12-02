@@ -4,7 +4,7 @@ export const fBirthday = (date) => {
   return fmt(new Date(date), 'd MMMM yyyy');
 };
 
-export const fSearchedDate = (type, startDate, endDate, allDay) => {
+export const fEventDate = (type, startDate, endDate, allDay) => {
   const sd = new Date(startDate), ed = new Date(endDate);
 
   if (type !== 'arrangement')

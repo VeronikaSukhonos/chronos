@@ -73,6 +73,17 @@
   width: 20px;
 }
 
+.main-button.small.short {
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  width: auto;
+  min-height: auto;
+  min-width: max-content;
+  max-width: max-content;
+  padding: 3px 5px;
+}
+
 .main-button:not(:disabled):hover {
   background-position: center bottom;
   box-shadow: 0 0 4px 1px var(--main-shadow-color);
@@ -98,6 +109,8 @@
 
 .menu-button {
   display: flex;
+  justify-content: center;
+  align-items: center;
   background: none;
   border: none;
   border-radius: 6px;
@@ -124,5 +137,25 @@
 :hover > .dropdown-menu-container .menu-button svg path,
 .dropdown-menu-container ul.open + .menu-button svg path,
 .menu-button:hover svg path {
+  fill: var(--accent-color);
+}
+
+.menu-button.constant {
+  background: var(--lighter-shadow-color);
+  height: 28px;
+  width: 28px;
+}
+
+.menu-button.constant svg {
+  height: 18px;
+  width: 18px;
+}
+
+.menu-button.constant svg path {
+  fill: var(--faded-accent-color);
+  transition: all ease-in-out 0.3s;
+}
+
+.menu-button.constant:hover svg path {
   fill: var(--accent-color);
 }

@@ -24,7 +24,8 @@
 }
 
 .modal-container .modal-content {
-  max-height: 600px;
+  max-height: 90%;
+  min-width: 348px;
   overflow-y: auto;
   width: auto;
   transform: scale(0);

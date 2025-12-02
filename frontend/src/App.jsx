@@ -16,6 +16,7 @@ import EmailConfirmationPage from './pages/EmailConfirmationPage.jsx';
 import PasswordResetPage from './pages/PasswordResetPage.jsx';
 import UserProfilePage from './pages/UserProfilePage.jsx';
 import UserSettingsPage from './pages/UserSettingsPage.jsx';
+import ParticipationConfirmationPage from './pages/ParticipationConfirmationPage.jsx';
 import ArchivePage from './pages/ArchivePage.jsx';
 import CalendarPage from './pages/CalendarPage.jsx';
 import EventCreatePage from './pages/EventCreatePage.jsx';
@@ -67,6 +68,8 @@ const App = () => {
 
           <Route path="/users/:userId" element={<UserProfilePage />} />
           <Route path="/settings" element={<UserSettingsPage />} />
+          <Route path="/participation-confirmation" element={<ParticipationConfirmationPage />} />
+          <Route path="/participation-confirmation/:confirmToken" element={<ParticipationConfirmationPage />} />
           <Route path="/archive" element={<ArchivePage />} />
           <Route path="/calendars/:calendarId" element={<CalendarPage />} />
 

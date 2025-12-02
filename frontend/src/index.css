@@ -105,6 +105,18 @@ img.load {
   text-align: center;
 }
 
+.info-message {
+  color: var(--faded-accent-color);
+  font-weight: normal;
+  font-size: 0.95rem;
+  text-align: center;
+  padding-top: 6px;
+}
+
+.info-message.left {
+  text-align: left;
+}
+
 .warning {
   color: var(--attention-color);
   font-size: 0.85rem;
@@ -112,7 +124,8 @@ img.load {
 }
 
 html, textarea, .modal-content,
-.side-panel .accordion-menu, .search-results {
+.side-panel .accordion-menu-scroll-container,
+.user-list, .search-results {
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) transparent;
 }
@@ -120,6 +133,7 @@ html, textarea, .modal-content,
 .small-icon {
   height: 16px;
   width: 16px;
+  flex-shrink: 0;
 }
 
 .small-icon path {

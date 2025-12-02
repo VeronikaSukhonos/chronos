@@ -37,8 +37,12 @@ class Calendars {
     return await api.post(`/calendars/${calendarId}/confirm`, params);
   }
 
-  async confirmParticipation(calendarId, confirmToken) {
-    return await api.post(`/calendars/${calendarId}/confirm/${confirmToken}`);
+  async viewParticipation(confirmToken) {
+    return await api.get(`/calendars/confirm/${confirmToken}`);
+  }
+
+  async confirmParticipation(confirmToken) {
+    return await api.post(`/calendars/confirm/${confirmToken}`);
   }
 
   async followCalendar(calendarId) {

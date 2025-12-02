@@ -9,14 +9,7 @@
   position: absolute;
   top: 120%;
   left: 0;
-}
-
-.search-message {
-  color: var(--faded-accent-color);
-  font-weight: normal;
-  font-size: 0.95rem;
-  text-align: center;
-  padding-top: 6px;
+  z-index: 100;
 }
 
 .searched-event {
@@ -93,4 +86,143 @@
   .searched-event-title .searched-event-name {
     font-size: 0.9rem;
   }
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 108px;
+  overflow-y: auto;
+  max-width: 600px;
+  transition: all ease-in-out 0.3s;
+}
+
+.user-list.disabled {
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.user-list-user {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 15px;
+  transition: all ease-in-out 0.3s;
+}
+
+.user-list-user:hover {
+  background: var(--lighter-shadow-color);
+}
+
+.user-list-user a {
+  display: flex;
+  flex-direction: row;
+  gap: 7px;
+  align-items: center;
+  flex-grow: 1;
+  border-radius: 15px;
+  padding: 5px 10px;
+}
+
+.user-list-user-avatar,
+.searched-user-avatar {
+  border: 3px solid var(--accent-color);
+  border-radius: 10px;
+  height: 26px;
+  width: 26px;
+  object-fit: cover;
+}
+
+.user-list-user-login,
+.searched-user-login {
+  color: var(--accent-color);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+@media screen and (max-width: 400px) {
+  .user-list-user-login {
+    max-width: 112px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.user-list-buttons-container,
+.user-list-confirmed {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  border-radius: 10px;
+}
+
+.user-list-confirmed svg {
+  height: 22px;
+  width: 22px;
+}
+
+.user-list-confirmed {
+  font-size: 0.8rem;
+}
+
+.user-list-delete {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.user-list-delete svg {
+  height: 20px;
+  width: 20px;
+  transform: rotate(45deg);
+}
+
+.user-list-delete svg path {
+  fill: var(--faded-accent-color);
+  transition: all ease-in-out 0.3s;
+}
+
+.user-list-delete:hover svg path {
+  fill: var(--accent-color);
+}
+
+.user-search-form-container .info-message.left {
+  color: var(--faded-accent-color);
+  font-size: 0.9rem;
+  padding: 4px 7px 0;
+}
+
+.search-results.users {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 92px;
+  padding: 4px 5px;
+}
+
+.searched-user {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all ease-in-out 0.3s;
+}
+
+.searched-user:hover {
+  background: var(--lighter-shadow-color);
+}
+
+.searched-user-email {
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  font-weight: 400;
 }

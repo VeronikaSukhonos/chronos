@@ -381,7 +381,7 @@ class Calendars {
           message: "Calendar is not found"
         });
       const user = await User.findOne({
-        _id: req.body.participantId
+        _id: req.body?.participantId
       }).select("+email");
       if (!user)
         return res.status(404).json({
@@ -393,7 +393,7 @@ class Calendars {
           await calendar.save();
           await sendCalendarParticipation(user, calendar, calendar.participants[i].isConfirmed);
           return res.status(200).json({
-            message: "The mail with the confirmation link is sent to your e-mail address"
+            message: "Participation link has been sent to the user's email address"
           });
         }
       }
@@ -403,7 +403,7 @@ class Calendars {
     } catch (err) {
       if (err instanceof mongoose.CastError)
         return res.status(404).json({ message: 'Calendar is not found' });
-      err.message = `Mail sending failed: ${err.message}`;
+      err.message = `Participation mail sending failed: ${err.message}`;
       throw err;
     }
   }
@@ -428,11 +428,11 @@ class Calendars {
               calendar.participants[i].isConfirmed = null;
               await calendar.save();
               return res.status(200).json({
-                message: "Your participation in the calendar has been confirmed successfully"
+                message: "Confirmed participation in the calendar successfully"
               });
             } else
               return res.status(400).json({
-                message: "Incorrect token. Please follow the link from the latest e-mail"
+                message: "Invalid or expired participation token. Please use the link from the latest email"
               });
           }
         }
@@ -723,7 +723,7 @@ class Calendars {
         });
       } else {
         for (let i of calendar.participants) {
-          if (i.participantId === req.user._id) {
+          if (i.participantId.toString() === req.user._id.toString()) {
             calendar.participants.pop(i);
             break;
           }
@@ -776,7 +776,3 @@ class Calendars {
 }
 
 export default new Calendars;
-
-
-
-

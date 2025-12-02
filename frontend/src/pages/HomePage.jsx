@@ -49,8 +49,8 @@ function HomePage() {
     Calendars.fetchCalendars()
       .then(({ data: res }) => {
         dispatch(setCalendar({
-          myCalendars: res.data.calendars.filter(c => c.authorId === auth.id),
-          otherCalendars: res.data.calendars.filter(c => c.authorId !== auth.id),
+          myCalendars: res.data.calendars.filter(c => c.author.id === auth.id),
+          otherCalendars: res.data.calendars.filter(c => c.author.id !== auth.id),
           calendarsLoad: false
         }));
       })
@@ -102,47 +102,49 @@ function HomePage() {
             type="button" dis={vsLoad}
           />
         </div>
-        <AccordionMenu
-          defaultOpenItems={[0, 1, 2, 3]}
-          items={[
-            {
-              title: "My Calendars",
-              content:
-                <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small={true} /></li>
-                    : myCalendars.map(c => <SidePanelItem key={`calendar${c.id}`} item={c} group="myCalendars" />)}
-                </ul>
-            },
-            {
-              title: "Other Calendars",
-              content:
-                <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small={true} /></li>
-                    : (otherCalendars.length ?
-                      otherCalendars.map(c => <SidePanelItem key={`calendar${c.id}`} item={c} group="otherCalendars" />)
-                    : <li className="side-panel-group-no-content" key="no-calendars">You do not have other calendars. Find one!</li>)}
-                </ul>
-            },
-            {
-              title: "Event Types",
-              content:
-                <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small={true} /></li>
-                    : eventTypes.map(et => <SidePanelItem key={et.type} item={et} group="eventTypes" />)}
-                </ul>
-            },
-            {
-              title: "Event Tags",
-              content:
-                <ul className="side-panel-group">
-                  {vsLoad ? <li><LoadPage small={true} /></li>
-                    : (tags.length ? tags.map(t => <SidePanelItem key={`tag${t.id}`} item={t} group="tags" />)
-                    : <li className="side-panel-group-no-content" key="no-tags">You do not have tags. Create one!</li>)}
-                </ul>,
-              button: <MainButton Icon={AddIcon} small={true} onClick={openTagCreateForm} type="button" />
-            }
-          ]}
-        />
+        <div className="accordion-menu-scroll-container">
+          <AccordionMenu
+            defaultOpenItems={[0, 1, 2, 3]}
+            items={[
+              {
+                title: "My Calendars",
+                content:
+                  <ul className="side-panel-group">
+                    {vsLoad ? <li><LoadPage small={true} /></li>
+                      : myCalendars.map(c => <SidePanelItem key={`calendar${c.id}`} item={c} group="myCalendars" />)}
+                  </ul>
+              },
+              {
+                title: "Other Calendars",
+                content:
+                  <ul className="side-panel-group">
+                    {vsLoad ? <li><LoadPage small={true} /></li>
+                      : (otherCalendars.length ?
+                        otherCalendars.map(c => <SidePanelItem key={`calendar${c.id}`} item={c} group="otherCalendars" />)
+                      : <li className="side-panel-group-no-content" key="no-calendars">You do not have other calendars. Find one!</li>)}
+                  </ul>
+              },
+              {
+                title: "Event Types",
+                content:
+                  <ul className="side-panel-group">
+                    {vsLoad ? <li><LoadPage small={true} /></li>
+                      : eventTypes.map(et => <SidePanelItem key={et.type} item={et} group="eventTypes" />)}
+                  </ul>
+              },
+              {
+                title: "Event Tags",
+                content:
+                  <ul className="side-panel-group">
+                    {vsLoad ? <li><LoadPage small={true} /></li>
+                      : (tags.length ? tags.map(t => <SidePanelItem key={`tag${t.id}`} item={t} group="tags" />)
+                      : <li className="side-panel-group-no-content" key="no-tags">You do not have tags. Create one!</li>)}
+                  </ul>,
+                button: <MainButton Icon={AddIcon} small={true} onClick={openTagCreateForm} type="button" />
+              }
+            ]}
+          />
+        </div>
       </div>
       <div className="main-panel">
         <Calendar

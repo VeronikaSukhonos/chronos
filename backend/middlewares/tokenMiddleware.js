@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 
 import User from '../models/userModel.js';
+import Calendar from '../models/calendarModel.js';
+// import Event from '../models/eventModel.js';
 import config from '../config.js';
 
 export const isAuth = (req, res, next) => {
@@ -60,7 +62,9 @@ export const checkConfirmToken = (req, res, next) => {
       || (req.path.includes('password-reset') && (!user || user.passwordToken !== confirmToken)))
       return res.status(400).json({ message });
 
-    req.user = user;
+    if (!req.user) req.user = user;
+    else if (req.user !== user) return res.status(400).json({ message });
+  
     next();
   });
 };
@@ -70,16 +74,23 @@ export const checkParticipationToken = (req, res, next) => {
 
   if (!confirmToken)
     return res.status(400).json({
-      message: 'Confirm token is missing. Please use the link sent to your email'
+      message: 'Participation token is missing. Please use the link sent to your email'
     });
   jwt.verify(confirmToken, config.CONFIRM_TOKEN_SECRET, async (err, data) => {
-    const message = 'Invalid or expired confirm token. Please request a new one';
+    const calendar = req.originalUrl.includes('calendars');
+    const message = 'Invalid or expired participation token. '
+      + `Please ask an author of the ${calendar ? 'calendar' : 'event'} to send you a new one`;
 
     if (err) return res.status(400).json({ message });
 
-    if ((req.path.includes('confirm') && (!data || req.user._id.toString() !== data.userId.toString()))) {
+    if ((req.path.includes('confirm') && (!data || req.user._id.toString() !== data.userId.toString())))
       return res.status(400).json({ message });
-    }
+
+    if (calendar && !(await Calendar.findOne({
+      participants: { $elemMatch: { participantId: req.user._id, isConfirmed: confirmToken }}
+    }))) return res.status(400).json({ message });
+    
+    // if (!calendar && await Event.find)...
 
     req.calendarId = data.calendarId;
     next();

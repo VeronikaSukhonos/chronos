@@ -56,7 +56,7 @@ const UserProfilePage = () => {
       <div className="basic-form profile-container">
         <img
           className={"profile-avatar" + (userId === auth.id ? " self" : "") + (avatarLoad ? " load" : "")}
-          onClick={() => setAvatarMenuOpen(true)}
+          onClick={() => { if (userId === auth.id) setAvatarMenuOpen(true)}}
           src={`${import.meta.env.VITE_API_URL}${userId === auth.id ? auth?.avatar : user?.avatar}`}
           alt={`${user?.login}'s avatar`}
         />

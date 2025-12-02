@@ -34,8 +34,6 @@ const initialState = {
   view: 'month',
   events: [],
 
-  archived: [],
-
   calendarsLoad: true,
   tagsLoad: true,
   vsLoad: true,
@@ -45,7 +43,9 @@ const initialState = {
 
   calendarCreateForm: initialCalendarCreateForm,
   tagCreateForm: initialTagCreateForm,
-  confirmDeleteForm: initialConfirmDeleteForm
+  confirmDeleteForm: initialConfirmDeleteForm,
+
+  archived: []
 };
 
 const calendarSlice = createSlice({

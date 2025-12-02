@@ -159,7 +159,7 @@ const SidePanelItem = ({ item, group }) => {
         {
           group === 'myCalendars' ?
             <CalendarMenu calendar={item} menuOpen={menuOpen} setLoad={setLoad} my={true} />
-          : (group === 'myCalendars' ?
+          : (group === 'otherCalendars' ?
             <CalendarMenu calendar={item} menuOpen={menuOpen} setLoad={setLoad} my={false} />
           : group === 'tags' ?
             <TagMenu tag={item} menuOpen={menuOpen} setLoad={setLoad} />

@@ -3,6 +3,7 @@ export { default as Spinner } from './spinner.svg?react';
 
 export { default as AttentionIcon } from './attention.svg?react';
 export { default as ConfirmIcon } from './confirm.svg?react';
+export { default as QuestionIcon } from './question.svg?react';
 
 export { default as EyeCloseIcon } from './eye-close.svg?react';
 export { default as EyeOpenIcon } from './eye-open.svg?react';

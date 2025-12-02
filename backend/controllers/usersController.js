@@ -25,7 +25,7 @@ class Users {
 
       return res.status(200).json({
         message: users.length !== 0 ? 'Fetched users successfully' : 'No users found',
-        data: { users, filter}
+        data: { users: users.map(u => new UserDto(u)), filter}
       });
     } catch (err) {
       err.message = `Getting users failed: ${err.message}`;

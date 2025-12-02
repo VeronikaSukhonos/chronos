@@ -4,6 +4,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 
 import Auth from '../api/authApi.js';
 import { selectAuthUser, updateAuthUser } from '../store/authSlice.js';
+import LoadPage from '../pages/LoadPage.jsx';
 import { TextField, MainButton } from '../components';
 import { useForm } from '../hooks';
 import { Logo, ConfirmIcon, AttentionIcon } from '../assets';
@@ -25,7 +26,7 @@ const EmailConfirmationPage = () => {
     };
   });
 
-  const [_, setLoad] = useState(true);
+  const [load, setLoad] = useState(true);
   const [feedback, setFeedback] = useState({ msg: '', status: '' });
 
   const submitRequest = (e) => {
@@ -96,24 +97,24 @@ const EmailConfirmationPage = () => {
       <h1 className="basic-form-title">Email Confirmation</h1>
 
       <div className="basic-form">
-        {feedback && <p className={"basic-form-feedback " + (feedback.status)}>
-          {feedback.msg}</p>}
-          {
-            feedback.status === 'ok'
-              ? <ConfirmIcon className="basic-form-result-icon ok" />
-              : (feedback.status === 'fail'
-                ? <AttentionIcon className="basic-form-result-icon fail" /> : '')
-          }
-          {
-            feedback.msg.includes("link") && <div className="basic-form-note">
-              <Link to={!auth ? "/email-confirmation" : "/settings"}>Want to request a new link?</Link>
-            </div>
-          }
-          {
-            auth
-              ? <div className="basic-form-note"><Link to="/">Back to Home</Link></div>
-              : <div className="basic-form-note"><Link to="/login">Back to Login</Link></div>
-          }
+        {
+          load ? <LoadPage />
+            : (feedback && <p className={"basic-form-feedback " + (feedback.status)}>{feedback.msg}</p>)}
+        {
+          feedback.status === 'ok'
+            ? <ConfirmIcon className="basic-form-result-icon ok" />
+            : (feedback.status === 'fail' && <AttentionIcon className="basic-form-result-icon fail" />)
+        }
+        {
+          feedback.msg.includes("link") && <div className="basic-form-note">
+            <Link to={!auth ? "/email-confirmation" : "/settings"}>Want to request a new link?</Link>
+          </div>
+        }
+        {
+          auth
+            ? <div className="basic-form-note"><Link to="/">Back to Home</Link></div>
+            : <div className="basic-form-note"><Link to="/login">Back to Login</Link></div>
+        }
       </div>
     </div>
   );

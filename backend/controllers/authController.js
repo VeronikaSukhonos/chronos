@@ -24,8 +24,8 @@ class Auth {
       const user = await User.create({ login, email, password });
 
       const calendars = (await Calendar.create([
-        { authorId: user.id, name: 'Main', type: 'main' },
-        { authorId: user.id, name: 'Holidays', type: 'holidays' }
+        { authorId: user.id, name: 'Main', type: 'main', description: 'Calendar only for you and your plans' },
+        { authorId: user.id, name: 'Holidays', type: 'holidays', description: 'Calendar with the national holidays in your region and any other holidays you want to remember about' }
       ])).map(c => c._id);
 
       user.visibilitySettings = {
