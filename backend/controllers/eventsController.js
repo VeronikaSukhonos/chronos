@@ -333,6 +333,20 @@ class Events {
             isConfirmed: i.isConfirmed === null ? true:false
           });
       }
+      const calendar = await Calendar.findOne({
+        _id: event.calendarId
+      });
+      if (!calendar)
+        return res.status(404).json({
+          message: "Calendar is not found"
+        });
+      result.calendar = {
+        id: calendar._id,
+        name: calendar.name,
+        color: calendar.color,
+        authorId: calendar.authorId
+      };
+      delete result.calendarId;
 
       return res.status(200).json({
         message: 'Fetched event data successfully',
@@ -592,6 +606,16 @@ class Events {
               }
             }
           }
+          filteredParticipants.sort((p1, p2) => {
+            if (p1.participantId.toString() === req.user._id.toString()
+                || p1.participantId.toString() === calendar.authorId.toString())
+              return -1
+            else if (p2.participantId.toString() === req.user._id.toString()
+                     || p2.participantId.toString() === calendar.authorId.toString())
+              return 1
+            else
+              return 0
+          });
           event.participants = filteredParticipants;
         }
       }

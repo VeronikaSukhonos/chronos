@@ -521,6 +521,16 @@ class Calendars {
             });
           }
         }
+        participants.sort((p1, p2) => {
+          if (p1.participantId.toString() === req.user._id.toString()
+              || p1.participantId.toString() === calendar.authorId.toString())
+            return -1
+          else if (p2.participantId.toString() === req.user._id.toString()
+                   || p2.participantId.toString() === calendar.authorId.toString())
+            return 1
+          else
+            return 0
+        });
         const newEvent = await Event.create({
           authorId: req.user._id,
           calendarId: calendar._id,
