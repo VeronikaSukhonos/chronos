@@ -57,8 +57,6 @@ function HomePage() {
       .catch((err) => {
         dispatch(setCalendar({ loadError: err.message }));
       });
-
-    return () => dispatch(setCalendar())
   }, []);
 
   useEffect(() => {

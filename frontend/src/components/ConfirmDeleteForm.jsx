@@ -17,7 +17,8 @@ const ConfirmDeleteForm = () => {
       setModalOpen={(_) => dispatch(closeForm('confirmDeleteForm'))}
       title={
         (form.group === 'myCalendars' || form.group === 'otherCalendars') ? 'Delete Calendar?'
-        : (form.group === 'tags' ? 'Delete Tag?' : '')
+        : (form.group === 'tags' ? 'Delete Tag?'
+        : (form.group === 'events' ? 'Delete Event?' : ''))
       }
     >
       <div className="basic-form transparent confirm-form">
@@ -25,7 +26,8 @@ const ConfirmDeleteForm = () => {
           {
             form.group === 'myCalendars' ? 'Deleting this calendar will delete all data associated with it from all users. Are you sure?'
             : (form.group === 'otherCalendars' ? 'By deleting this calendar, you will lose access to all events that it has. Are you sure?'
-            : (form.group === 'tags' ? 'By deleting this tag, you will no longer be able to filter events by it. Are you sure?' : ''))
+            : (form.group === 'tags' ? 'By deleting this tag, you will no longer be able to filter events by it. Are you sure?'
+            : (form.group === 'events' ? 'Deleting this event will delete all data associated with it from all users. Are you sure?' : '')))
           }
         </div>
         <div className="buttons-container">

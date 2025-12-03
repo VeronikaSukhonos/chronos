@@ -17,10 +17,11 @@ const SearchedEvent = ({ event }) => {
         </div>
       </div>
       <div className="searched-event-calendar">
-        <div className="searched-event-calendar-color" style={{ background: event.calendar.color }}></div>
-        {event.calendar.name}
+        <div className="searched-event-calendar-color" style={{ background: event.calendar?.color }}></div>
+        {event.calendar?.name}
       </div>
       <div className="searched-event-date">
+        {event.repeat && `each ${event.repeat.parameter} ${event.repeat.frequency}${event.repeat.parameter > 1 ? 's' : ''} from ` }
         {fEventDate(event.type, event.startDate, event.endDate, event.allDay)}
       </div>
     </Link>
@@ -54,7 +55,7 @@ const EventSearchForm = ({ label, id, onSubmit, search, setSearch, searchOpen, s
     const wait = setTimeout(() => {
       setLoad(true);
       setFeedback({ msg: '', status: '' });
-      Events.fetchEvents(`?name=${search.trim()}`)
+      Events.fetchEvents({ search: search.trim(), limit: 10 })
         .then(({ data: res }) => {
           setLoad(false);
           setFeedback({ msg: res.message, status: 'ok' });
@@ -69,6 +70,10 @@ const EventSearchForm = ({ label, id, onSubmit, search, setSearch, searchOpen, s
 
     return () => clearTimeout(wait);
   }, [search]);
+
+  useEffect(() => {
+    return () => setSearch('');
+  }, []);
 
   return (
     <div className={"event-search-form-container " + (searchOpen ? "open" : "close")}>
@@ -97,7 +102,7 @@ const EventSearchForm = ({ label, id, onSubmit, search, setSearch, searchOpen, s
         {
           events.length > 0
             ? <>{events.map(e => <li key={`searchedevent${e.id}`}><SearchedEvent event={e} /></li>)}</>
-            : <li className="info-message">{feedback.msg}</li>
+            : <li className="info-message">{feedback.status === 'ok' ? 'No events found' : feedback.msg}</li>
         }
         </ul>
       }

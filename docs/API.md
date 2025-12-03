@@ -179,7 +179,7 @@ All endpoints require authorization.
 
 **Data**: created event data (everything except participants, author is an object (`id`, `login`, `avatar`))
 
-**Important**: works if an authorized user is an author or participant of a calendar; he can select event participants from all users, in this case a user is added as calendar participant
+**Important**: works if an authorized user is an author or participant of a calendar; can select event participants from all users, in this case a user is added as calendar participant
 
 # Events module
 
@@ -259,4 +259,3 @@ All endpoints require authorization.
 **Parameter**: `title`
 
 4. `DELETE /api/tags/:tagId` - deletes a tag
-

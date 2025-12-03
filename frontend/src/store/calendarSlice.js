@@ -31,6 +31,12 @@ const initialState = {
   ],
   tags: [],
 
+  period: {
+    year: null,
+    week: null,
+    month: null,
+    day: null
+  },
   view: 'month',
   events: [],
 
@@ -108,13 +114,17 @@ const calendarSlice = createSlice({
         : (form === 'tagCreateForm' ? initialTagCreateForm
           : initialConfirmDeleteForm))))
         state[form][prop] = val;
+    },
+    setPeriod: (state, action) => {
+      for (const [prop, val] of Object.entries(action.payload))
+        state.period[prop] = val;
     }
   }
 });
 
 export const {
   setCalendar, addToCalendar, updateInCalendar, deleteFromCalendar,
-  setVs, updateVs,
+  setVs, updateVs, setPeriod,
   setForm
 } = calendarSlice.actions;
 
@@ -130,6 +140,8 @@ export const selectCalendar = {
   otherCalendars: (state) => state.calendar.otherCalendars,
   eventTypes: (state) => state.calendar.eventTypes,
   tags: (state) => state.calendar.tags,
+
+  period: (state) => state.calendar.period,
 
   view: (state) => state.calendar.view,
   events: (state) => state.calendar.events,

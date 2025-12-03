@@ -25,23 +25,193 @@
   border-radius: 15px;
   color: var(--accent-color);
   font-family: 'Unbounded', sans-serif;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   font-weight: bold;
   text-align: center;
-  padding: 5px;
+  padding: 2px 5px;
+}
+
+.calendar-navigation-current span {
+  color: var(--faded-accent-color);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: all ease-in-out 0.3s;
 }
 
 .calendar-container {
-  background: var(--lighter-main-bg-color);
+  display: flex;
+  flex-direction: column;
+  background: var(--main-shadow-color);
   border-radius: 20px;
   height: 100%;
   flex-grow: 1;
   transition: all ease-in-out 0.3s;
 }
 
+.calendar-container.start {
+  background: var(--lighter-main-bg-color);
+}
+
 .calendar-container.disabled {
-  opacity: 0.8;
   pointer-events: none;
+}
+
+.calendar-weekdays-line-container {
+  display: flex;
+  flex-direction: row;
+  background: var(--accent-bg-color);
+  border-radius: 20px 20px 0 0;
+  color: var(--accent-color);
+  font: bold 1.1rem 'Unbounded', sans-serif;
+  height: 40px;
+}
+
+.calendar-weekday-no-content {
+  width: 32px;
+}
+
+.calendar-weekdays-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.calendar-weekday {
+  flex-grow: 1;
+  text-align: center;
+  width: 50px;
+  transition: all ease-in-out 0.3s;
+}
+
+.calendar-days-grid-container,
+.calendar-hours-days-grid-container,
+.calendar-hours-grid-container {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  gap: 1px;
+  transition: all ease-in-out 0.3s;
+}
+
+.calendar-container.disabled .calendar-days-grid-container,
+.calendar-container.disabled .calendar-hours-days-grid-container,
+.calendar-container.disabled .calendar-hours-grid-container {
+  opacity: 0.85;
+}
+
+.calendar-week-numbers-column,
+.calendar-hour-numbers-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  gap: 1px;
+  color: var(--faded-accent-color);
+  font-weight: bold;
+  font-size: 0.9rem;
+  width: 32px;
+}
+
+.calendar-week-number,
+.calendar-hour-number {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  background: var(--lighter-main-bg-color);
+  transition: all ease-in-out 0.3s;
+}
+
+.calendar-week-number:last-of-type,
+.calendar-hour-number:last-of-type {
+  border-bottom-left-radius: 20px;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex-grow: 1;
+  gap: 1px;
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  background: var(--lighter-main-bg-color);
+  padding: 5px;
+  transition: all ease-in-out 0.3s;
+}
+
+.calendar-container:not(.disabled) .calendar-day {
+  cursor: pointer;
+}
+
+.calendar-day:last-of-type {
+  border-bottom-right-radius: 20px;
+}
+
+.calendar-container.month .calendar-day-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all ease-in-out 0.3s;
+}
+
+.calendar-container.month .calendar-day-header span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--main-bg-color);
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  height: 22px;
+  width: 22px;
+}
+
+.calendar-container.month .calendar-day-header span.calendar-day-today {
+  background: var(--accent-color);
+  color: var(--lighter-main-bg-color);
+}
+
+.calendar-container.week .calendar-day-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  flex-basis: 0;
+  transition: all ease-in-out 0.3s;
+}
+
+.calendar-container.week .calendar-day-header span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 7px;
+  padding: 0 5px;
+  margin: 2px;
+}
+
+.calendar-container.week .calendar-day-header span.calendar-day-today {
+  background: var(--accent-color);
+  color: var(--lighter-main-bg-color);
+}
+
+@media screen and (max-width: 800px) {
+  .calendar-navigation-current {
+    font-size: 0.9rem;
+  }
+
+  .calendar-container .calendar-weekday,
+  .calendar-container .calendar-day-header {
+    font-size: 0.9rem;
+  }
+
+  .calendar-week-number,
+  .calendar-hour-number {
+    font-size: 0.8rem;
+  }
 }
 
 @media screen and (max-width: 600px) {
