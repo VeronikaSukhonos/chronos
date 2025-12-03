@@ -116,7 +116,7 @@ All endpoints require authorization.
 **Sorting:**
 * always sorts in an alphabetical order (main and holidays are first)
 
-**Data**: array of calendars (`id`, `name`, `color`, `authorId`, `type`, `role` (role of an authorized user in the calendar), `isPublic`)
+**Data**: array of calendars (`id`, `name`, `color`, `author` (`id`, `login` and `avatar`), `type`, `role` (role of an authorized user in the calendar), `isPublic`)
 
 **Important**: only the first value of a parameter is used if multiple provided, hidden calendars can be seen only by authors
 
@@ -157,27 +157,29 @@ All endpoints require authorization.
 
 **Important**: works if an authorized user is an author of a calendar
 
-8. `POST /api/calendars/:calendarId/confirm` - (re)sends a calendar participation link to the user
+8. `GET /api/calendars/confirm/:confirmToken` - views information about a calendar participation in which an authorized user should confirm
 
-**Parameters**: `userId`
+**Data**: calendar data(`id`, `name`, `author` (`id` and `login`))
 
-9. `POST /api/calendars/:calendarId/confirm/:confirmToken` - confirms an authorized user's participation in the calendar
+9. `POST /api/calendars/:calendarId/confirm` - (re)sends a calendar participation link to the user
 
-10. `POST /api/calendars/:calendarId/follow` - adds a follower to the calendar
+**Parameters**: `participantId`
 
-11. `DELETE /api/calendars/:calendarId` - deletes a calendar
+10. `POST /api/calendars/confirm/:confirmToken` - confirms an authorized user's participation in the calendar
+
+11. `POST /api/calendars/:calendarId/follow` - adds a follower to the calendar
+
+12. `DELETE /api/calendars/:calendarId` - deletes a calendar
 
 **Important**: if an authorized user is an author of the calendar, it is deleted completely, if an autorized user is a participant/follower, the calendar is deleted only for them; main and holidays calendars cannot be deleted
 
-12. `POST /api/calendars/:calendarId/events` - creates a new event in the calendar
+13. `POST /api/calendars/:calendarId/events` - creates a new event in the calendar
 
 **Parameters**: `name`, `type`, `startDate`, optional `description`, `color` (default - color of calendar), `participants` (if isn't visible for all, default - author, calendar's author), `repeat`, `tags`, optional for arrangements `endDate` (default is `startDate` + 1 hour), `link`, `visibleForAll` (default - false)
 
 **Data**: created event data (everything except participants, author is an object (`id`, `login`, `avatar`))
 
-**Important**: works if an authorized user is an author or participant of a calendar
-
-// TODO can select event participants from all users, in this case a user is added as calendar participant
+**Important**: works if an authorized user is an author or participant of a calendar; he can select event participants from all users, in this case a user is added as calendar participant
 
 # Events module
 
@@ -202,27 +204,37 @@ All endpoints require authorization.
 
 2. `GET /api/events/:eventId` - gets information about a specified event
 
-**Data**: event data (everything, participants are arrays (only `id`, `login`, and `avatar` for this time), author is an object (`id`, `login`, `avatar`))
+**Data**: event data (everything, participants are arrays (`id`, `login`, `avatar` and `isConfirmed`), author is an object (`id`, `login`, `avatar`), calendar is an object (`id`, `name`, `color` and `authorId`))
 
 **Important:** works if an authorized user has access to the event
 
-3. `PATCH /api/events/:eventId` - updates an event
+3. `GET /api/events/confirm/:confirmToken` - views information about an event participation in which an authorized user should confirm
 
-**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `color`, `participants` (if it's an event not from Main or Holidays calendars), `tags`, `repeat` (if an arrangement or reminder), `link` (if an arrangement), `visibleForAll` (if it's an event not from Main or Holidays calendars)
+**Data**: event data(`id`, `name`, `author` (`id` and `login`), `calendar` (`id` and `name`))
+
+4. `POST /api/events/:eventId/confirm` - (re)sends an event participation link to the user
+
+**Parameters**: `participantId`
+
+5. `POST /api/events/confirm/:confirmToken` - confirms an authorized user's participation in the event
+
+6. `PATCH /api/events/:eventId` - updates an event
+
+**Parameters**: at least one of `name` (cannot be empty if provided), `description`, `startDate`, `endDate`, `color`, `participants` (if it's an event not from Main or Holidays calendars), `tags`, `repeat` (if an arrangement or reminder), `link` (if an arrangement), `visibleForAll` (if it's an event not from Main or Holidays calendars)
 
 **Data**: updated event data (everything except participants, author is an object (`id`, `login`, `avatar`))
 
 **Important**: works if an authorized user is an author of a event
 
-4. `POST /api/events/:eventId/done` - does a task
+7. `POST /api/events/:eventId/done` - does a task
 
 **Important**: works if an authorized user is an author or participant of an event
 
-5. `DELETE /api/events/:eventId/done` - undoes a task
+8. `DELETE /api/events/:eventId/done` - undoes a task
 
 **Important**: works if an authorized user is an author or participant of an event
 
-6. `DELETE /api/events/eventId` - deletes an event
+9. `DELETE /api/events/eventId` - deletes an event
 
 **Important**: works if an authorized user is an author of an event
 

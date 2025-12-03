@@ -76,12 +76,26 @@ class Events {
         }
       }
       const today = new Date();
-      let startDate, endDate;
-      if (req.body.search !== undefined)
+      let startDate, endDate, events;
+      if (req.body.search !== undefined) {
         parameters.name = {
-          $regex: req.body.search
+          $regex: new RegExp(req.body.search, 'i')
         };
-      else {
+        events = await Event.find({
+                                    ...parameters,
+                                    $or: [
+                                      { authorId: req.user._id },
+                                      {
+                                        participants: {
+                                          $in: [req.user._id]
+                                        }
+                                      },
+                                      { visibleForAll: true }
+                                    ]
+                                  })
+                            .select("-participants")
+                            .populate('tags');
+      } else {
         let year = req.body.year !== undefined
           ? (req.body.year instanceof Array ? req.body.year[0] : req.body.year)
           : today.getFullYear();
@@ -110,22 +124,34 @@ class Events {
                              month + (req.body.month !== undefined && req.body.day === undefined ? 1 : 0),
                              day + (req.body.day !== undefined || (req.body.year === undefined && req.body.month === undefined) ? 1 : 0)));
         }
-        parameters.startDate = { $gte: startDate, $lt: endDate };
-      }
-      let events = await Event.find({
-                                      ...parameters,
-                                      $or: [
-                                        { authorId: req.user._id },
-                                        {
-                                          participants: {
-                                            $in: [req.user._id]
+        events = await Event.find({
+                                    ...parameters,
+                                    $and: [
+                                      {
+                                        $or: [
+                                          { authorId: req.user._id },
+                                          {
+                                            participants: {
+                                              $in: [req.user._id]
+                                            }
+                                          },
+                                          { visibleForAll: true }
+                                        ]
+                                      },
+                                      {
+                                        $or: [
+                                          { startDate: { $gte: startDate, $lt: endDate } },
+                                          {
+                                            startDate: { $lt: startDate },
+                                            endDate: { $gte: startDate }
                                           }
-                                        },
-                                        { visibleForAll: true }
-                                      ]
-                                    })
-                              .select("-participants")
-                              .populate('tags');
+                                        ]
+                                      }
+                                    ]
+                                  })
+                            .select("-participants")
+                            .populate('tags');
+      }
       if (req.body.tag)
         events = events.filter(event => event.tags.some(tag => req.body.tag.includes(tag.title)));
       if (req.body.search === undefined) {
@@ -138,13 +164,14 @@ class Events {
           if (startDate.getUTCFullYear() != endDate.getUTCFullYear())
             endYearHolidaysResponce = await axios.get(`https://date.nager.at/api/v3/PublicHolidays/${endDate.getUTCFullYear()}/${countryResponce.data.country_code}`);
           events = events.concat(startYearHolidaysResponce.data.map(holiday => { return { calendarId: holidaysCalendar._id, name: holiday.name, startDate: holiday.date, type: 'holiday' }; })
-            .filter(holiday => new Date(holiday.startDate) >= startDate && new Date(holiday.startDate) < endDate),
-            endYearHolidaysResponce.data.map(holiday => { return { calendarId: holidaysCalendar._id, name: holiday.name, startDate: holiday.date, type: 'holiday' }; })
-              .filter(holiday => new Date(holiday.startDate) < endDate));
+                                                               .filter(holiday => new Date(holiday.startDate) >= startDate && new Date(holiday.startDate) < endDate),
+                                 endYearHolidaysResponce.data.map(holiday => { return { calendarId: holidaysCalendar._id, name: holiday.name, startDate: holiday.date, type: 'holiday' }; })
+                                                               .filter(holiday => new Date(holiday.startDate) < endDate));
         }
         let repeatEvents = await Event.find({
                                               ...parameters,
                                               startDate: { $lt: startDate },
+                                              endDate: { $lt: startDate },
                                               repeat: { $exists: true },
                                               $or: [
                                                 { authorId: req.user._id },
@@ -286,27 +313,45 @@ class Events {
         };
         await req.user.save();
       } else
-        events = events.map(event => new EventDto(event));
+        events = await Promise.all(events.map(async event => {
+          event = await event.populate('calendarId');
+          const formattedEvent = new EventDto(event);
+          formattedEvent.calendar = {
+            id: event.calendarId._id.toString(),
+            name: event.calendarId.name,
+            color: event.calendarId.color
+          };
+          delete formattedEvent.calendarId;
+          return formattedEvent;
+        }));
       events.sort((a, b) => {
         const firstStartDate = new Date(a.startDate);
         const secondStartDate = new Date(b.startDate);
+        const firstCreateDate = new Date(a.createDate);
+        const secondCreateDate = new Date(b.createDate);
         if (req.body.search !== undefined) {
-          if ((firstStartDate > today && secondStartDate < today)
-            || (firstStartDate < today && secondStartDate > today))
+          if ((firstStartDate >= today && secondStartDate < today)
+            || (firstStartDate <= today && secondStartDate > today))
             return secondStartDate - firstStartDate;
           else
-            return Math.abs(firstStartDate - today) - Math.abs(secondStartDate - today);
+            return firstStartDate !== secondStartDate
+                   ? Math.abs(firstStartDate - today) - Math.abs(secondStartDate - today)
+                   : Math.abs(firstCreateDate - today) - Math.abs(secondCreateDate - today);
         } else
-          return firstStartDate - secondStartDate;
+          return firstStartDate !== secondStartDate
+                 ? firstStartDate - secondStartDate
+                 : firstCreateDate - secondCreateDate;
       });
-      if (req.body.search !== undefined)
+      if (req.body.search !== undefined && req.body.limit !== undefined)
         events = events.slice(0, req.body.limit || 0);
       return res.status(200).json({
-        message: 'Getting events successfully',
+        message: 'Fetched events successfully',
         data: { events }
       })
     } catch (err) {
-      err.message = `Getting events failed: ${err.message}`;
+      if (err instanceof CastError)
+        return res.status(404).json({ message: 'Calendar is not found' });
+      err.message = `Fetched events failed: ${err.message}`;
       throw err;
     }
   }
@@ -333,6 +378,20 @@ class Events {
             isConfirmed: i.isConfirmed === null ? true:false
           });
       }
+      const calendar = await Calendar.findOne({
+        _id: event.calendarId
+      });
+      if (!calendar)
+        return res.status(404).json({
+          message: "Calendar is not found"
+        });
+      result.calendar = {
+        id: calendar._id,
+        name: calendar.name,
+        color: calendar.color,
+        authorId: calendar.authorId
+      };
+      delete result.calendarId;
 
       return res.status(200).json({
         message: 'Fetched event data successfully',
@@ -341,7 +400,7 @@ class Events {
     } catch (err) {
       if (err instanceof CastError)
         return res.status(404).json({ message: 'Invalid event ID' });
-      err.message = `Getting event data failed: ${err.message}`;
+      err.message = `Fetched event data failed: ${err.message}`;
       throw err;
     }
   }
@@ -389,7 +448,7 @@ class Events {
     } catch (err) {
       if (err instanceof CastError)
         return res.status(404).json({ message: 'Event is not found' });
-      err.message = `Getting event failed: ${err.message}`;
+      err.message = `Fetched event failed: ${err.message}`;
       throw err;
     }
   }
@@ -517,7 +576,7 @@ class Events {
 
   async editOne(req, res) {
     try {
-      const { name, description, color, participants, tags, repeat, link, visibleForAll } = req.body;
+      const { name, description, startDate, endDate, color, participants, tags, repeat, link, visibleForAll } = req.body;
       const eventId = req.params.eventId;
       const event = await Event.findOne({ _id: eventId });
 
@@ -530,6 +589,17 @@ class Events {
         event.name = name;
       if (event.description || description !== undefined) event.description = description;
       if (event.color || color) event.color = color;
+      if (startDate)
+        event.startDate = startDate;
+      if ((event.type == 'arrangement' || event.type == 'task') && endDate) {
+        if (new Date(endDate) <= new Date(event.startDate))
+          return res.status(400).json({
+            message: "Validation failed",
+            errors: [ { param: "endDate", error: "End Date must be in the future compared to Start Date" } ]
+          });
+        else
+          event.endDate = endDate;
+      }
       if (calendar.type == 'main' || calendar.type == 'holidays') {
         event.participants = [];
         event.visibleForAll = false;
@@ -592,6 +662,16 @@ class Events {
               }
             }
           }
+          filteredParticipants.sort((p1, p2) => {
+            if (p1.participantId.toString() === req.user._id.toString()
+                || p1.participantId.toString() === calendar.authorId.toString())
+              return -1
+            else if (p2.participantId.toString() === req.user._id.toString()
+                     || p2.participantId.toString() === calendar.authorId.toString())
+              return 1
+            else
+              return 0
+          });
           event.participants = filteredParticipants;
         }
       }
@@ -604,7 +684,22 @@ class Events {
         event.tags = tags;
       if ((event.type === 'arrangement' || event.type === 'reminder') && (event.repeat || repeat))
         event.repeat = repeat;
-      if (event.type === 'arrangement' && (event.link || link)) event.link = link;
+      if (event.type == 'arrangement' && event.repeat) {
+        const timeDelta = new Date(event.endDate) - new Date(event.startDate);
+        let repetitionTime = 86400000 * event.repeat.parameter;
+        if (event.repeat.frequency === 'week')
+          repetitionTime *= 7;
+        else if (event.repeat.frequency === 'month')
+          repetitionTime *= 30
+        else if (event.repeat.frequency === 'year')
+          repetitionTime *= 365;
+        if (timeDelta >= repetitionTime)
+          return res.status(400).json({
+            message: "Validation failed",
+            errors: [{ param: "repeat", error: "Repeat period must be longer that event duration" }]
+          });
+      }
+      if (event.type === 'arrangement' && (event.link || link !== undefined)) event.link = link;
 
       if (event.isModified()) {
         await event.save();
@@ -616,6 +711,8 @@ class Events {
         });
       } else return res.status(200).json({ message: 'Nothing has changed' });
     } catch (err) {
+      if (err instanceof CastError)
+        return res.status(404).json({ message: 'Invalid ID' });
       err.message = `Updating event failed: ${err.message}`;
       throw err;
     }
@@ -638,6 +735,8 @@ class Events {
           message: "You are not the author"
         });
     } catch (err) {
+      if (err instanceof CastError)
+        return res.status(404).json({ message: 'Event is not found' });
       err.message = `Deleting event failed: ${err.message}`;
       throw err;
     }
@@ -672,6 +771,8 @@ class Events {
         message: result ? 'Marking done successully':'Something went wrong'
       });
     } catch (err) {
+      if (err instanceof CastError)
+        return res.status(404).json({ message: 'Event is not found' });
       err.message = `Marking done failed: ${err.message}`;
       throw err;
     }
@@ -706,6 +807,8 @@ class Events {
         message: result ? 'Unmarking done successully':'Something went wrong'
       });
     } catch (err) {
+      if (err instanceof CastError)
+        return res.status(404).json({ message: 'Event is not found' });
       err.message = `Unmarking done failed: ${err.message}`;
       throw err;
     }

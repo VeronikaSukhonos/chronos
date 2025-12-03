@@ -521,16 +521,26 @@ class Calendars {
             });
           }
         }
+        participants.sort((p1, p2) => {
+          if (p1.participantId.toString() === req.user._id.toString()
+              || p1.participantId.toString() === calendar.authorId.toString())
+            return -1
+          else if (p2.participantId.toString() === req.user._id.toString()
+                   || p2.participantId.toString() === calendar.authorId.toString())
+            return 1
+          else
+            return 0
+        });
         const newEvent = await Event.create({
           authorId: req.user._id,
           calendarId: calendar._id,
           name: req.body.name,
           description: req.body.description,
           startDate: req.body.startDate,
-          endDate: req.body.endDate,
-          link: req.body.link,
+          endDate: req.body.type == 'arrangement' || req.body.type == 'task' ? req.body.endDate:undefined,
+          link: req.body.type == 'arrangement' ? req.body.link:undefined,
           color: req.body.color,
-          repeat: req.body.repeat,
+          repeat: req.body.type !== 'task' ? req.body.repeat:undefined,
           participants: participants,
           tags: req.body.tags,
           type: req.body.type,

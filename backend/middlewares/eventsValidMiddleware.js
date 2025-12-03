@@ -46,7 +46,7 @@ const get = [
   body('limit').if((value, { req }) => req.body.search !== undefined).optional()
     .customSanitizer(value => {
       let check = Array.isArray(value) ? value[0]:value;
-      return isNaN(check) ? 0:Math.abs(parseInt(check));
+      return check == undefined ? check:(isNaN(check) ? 0:Math.abs(parseInt(check)));
     }),
   isValid
 ]
@@ -85,13 +85,25 @@ const eventParams = {
     .withMessage('End Date must be in the future compared to Start Date'),
   repeat: body('repeat').if(body('type').isIn(['arrangement', 'reminder'])).optional()
     .isObject().withMessage('Repeat must be an object').bail()
-    .custom((value) => {
+    .custom((value, { req }) => {
       if (value.frequency === undefined || value.parameter === undefined)
         throw new Error("Repeat object must contain 'frequency' and 'parameter' fields");
       else if (typeof value.frequency != 'string' || !['year', 'month', 'week', 'day'].includes(value.frequency))
         throw new Error("Repeat frequency can be 'year', 'month', 'week' or 'day'");
       else if (typeof value.parameter != 'number' || value.parameter <= 0)
-        throw new Error('Repeat frequency must be a positive number');
+        throw new Error('Repeat parameter must be a positive number');
+      if (req.body.type == 'arrangement') {
+        const timeDelta = new Date(req.body.endDate) - new Date(req.body.startDate);
+        let repetitionTime = 86400000 * value.parameter;
+        if (value.frequency === 'week')
+          repetitionTime *= 7;
+        else if (value.frequency === 'month')
+          repetitionTime *= 30
+        else if (value.frequency === 'year')
+          repetitionTime *= 365;
+        if (timeDelta >= repetitionTime)
+          throw new Error('Repeat period must be longer that event duration');
+      }
       return true;
     }),
   link: body('link').if(body('type').equals('arrangement')).optional().trim()
@@ -111,18 +123,36 @@ const update = [
       if (!val) return false;
       return !((val.name === undefined || val.name === null)
         && (val.description === undefined || val.description === null)
+        && (val.startDate === undefined || val.startDate === null)
+        && (val.endDate === undefined || val.endDate === null)
         && (val.color === undefined || val.color === null)
         && (val.participants === undefined || val.participants === null)
         && (val.tags === undefined || val.tags === null)
         && (val.visibleForAll === undefined || val.visibleForAll === null)
         && (val.repeat === undefined || val.repeat === null)
         && (val.link === undefined || val.link === null));
-    }).withMessage('At least one of Name, Description, Color, Participants, Tags, Visibility, Repeat (if it is not a task) or Link (if it is an arrangement) is required'),
+    }).withMessage('At least one of Name, Description, Start Date, End Date (if it is arrangement or task), Color, Participants, Tags, Visibility, Repeat (if it is not a task) or Link (if it is an arrangement) is required'),
   body('name').optional().trim()
     .notEmpty().withMessage('Name is required').bail()
     .isLength({ max: 60 }).withMessage('Name must be at most 60 characters'),
-  eventParams.description, eventParams.color, eventParams.participants, eventParams.tags, eventParams.visibleForAll,
-  eventParams.repeat, eventParams.link,
+  body('startDate').optional({ checkFalsy: true }).trim()
+    .isISO8601({strict: true}).withMessage('Start Date must be a valid date').bail()
+    .custom((val) => new Date(val) > Date.now()).withMessage('Start Date must be in the future'),
+  body('endDate').optional({ checkFalsy: true }).trim()
+    .isISO8601({strict: true}).withMessage('End Date must be a valid date'),
+  body('repeat').optional()
+    .isObject().withMessage('Repeat must be an object').bail()
+    .custom((value, { req }) => {
+      if (value.frequency === undefined || value.parameter === undefined)
+        throw new Error("Repeat object must contain 'frequency' and 'parameter' fields");
+      else if (typeof value.frequency != 'string' || !['year', 'month', 'week', 'day'].includes(value.frequency))
+        throw new Error("Repeat frequency can be 'year', 'month', 'week' or 'day'");
+      else if (typeof value.parameter != 'number' || value.parameter <= 0)
+        throw new Error('Repeat parameter must be a positive number');
+      return true;
+    }),
+  eventParams.description, eventParams.color, eventParams.participants,
+  eventParams.tags, eventParams.visibleForAll, eventParams.link,
   isValid
 ];
 
