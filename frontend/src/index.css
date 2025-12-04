@@ -96,6 +96,10 @@ img.load {
   opacity: 0.65;
 }
 
+.center-container.error {
+  padding: 0 20px;
+}
+
 .error-page-description {
   color: var(--accent-color);
   font-size: 1.03rem;
@@ -125,7 +129,8 @@ img.load {
 
 html, textarea, .modal-content,
 .side-panel .accordion-menu-scroll-container,
-.user-list, .search-results {
+.user-list, .search-results,
+.calendar-hours-days-grid-container {
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) transparent;
 }

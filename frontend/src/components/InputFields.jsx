@@ -161,6 +161,7 @@ export const SelectField = (
               <input
                 type="radio"
                 id={opt.value} name={name}
+                onClick={() => { setSelectOpen(false); onChange({ target: { name: name, value: opt.value } }); }}
                 onChange={() => { setSelectOpen(false); onChange({ target: { name: name, value: opt.value } }); }}
                 checked={opt.value === sel?.value}
                 disabled={dis}

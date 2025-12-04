@@ -10,13 +10,13 @@ const ErrorPage = ({ error, entity = "page" }) => {
   if (error.includes('not found'))
     return <NotFoundPage entity={entity} />
   else if (error.includes('have access'))
-    return <div className="center-container">
+    return <div className="center-container error">
       <AttentionIcon />
       <p className="error-page-description">We looked across past, present and future... but you don't have access to this {entity} :(</p>
     </div>
   else
     return (
-      <div className="center-container">
+      <div className="center-container error">
         {!auth && <Logo />}
         <AttentionIcon />
         <p className="error-page-description">We wish we could go back in time to fix this :( {error}</p>

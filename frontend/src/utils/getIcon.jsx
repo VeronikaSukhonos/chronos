@@ -12,10 +12,10 @@ export const getCalendarIcon = (c, cl) => {
   </>
 };
 
-export const getEventIcon = (e, cl) => {
-  return e === 'arrangement' ? <ArrangementIcon className={cl} />
-    : e === 'task' ? <TaskIcon className={cl} />
-    : e === 'reminder' ? <ReminderIcon className={cl} />
-    : e === 'holiday' ? <HolidayIcon className={cl} />
-    : e === 'birthday' ? <BirthdayIcon className={cl} /> : <></>
+export const getEventIcon = (etype, cl) => {
+  return etype === 'arrangement' ? <ArrangementIcon className={cl} />
+    : etype === 'task' ? <TaskIcon className={cl} />
+    : etype === 'reminder' ? <ReminderIcon className={cl} />
+    : etype === 'holiday' ? <HolidayIcon className={cl} />
+    : etype === 'birthday' ? <BirthdayIcon className={cl} /> : <></>
 };

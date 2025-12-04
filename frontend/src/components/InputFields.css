@@ -422,6 +422,11 @@
   transition: all ease-in-out 0.3s;
 }
 
+.select-field-option input:checked + label {
+  font-weight: 600;
+  transition: all ease-in-out 0.3s;
+}
+
 .select-field-option label:hover {
   transform: scale(1.02);
 }

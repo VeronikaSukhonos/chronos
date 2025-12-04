@@ -46,21 +46,25 @@ function HomePage() {
   };
 
   useEffect(() => {
-    Calendars.fetchCalendars()
-      .then(({ data: res }) => {
-        dispatch(setCalendar({
-          myCalendars: res.data.calendars.filter(c => c.author.id === auth.id),
-          otherCalendars: res.data.calendars.filter(c => c.author.id !== auth.id),
-          calendarsLoad: false
-        }));
-      })
-      .catch((err) => {
-        dispatch(setCalendar({ loadError: err.message }));
-      });
-  }, []);
+    if (calendarsLoad) {
+      dispatch(setCalendar({ calendarsLoad: true }));
+      Calendars.fetchCalendars()
+        .then(({ data: res }) => {
+          dispatch(setCalendar({
+            myCalendars: res.data.calendars.filter(c => c.author.id === auth.id),
+            otherCalendars: res.data.calendars.filter(c => c.author.id !== auth.id),
+            calendarsLoad: false
+          }));
+        })
+        .catch((err) => {
+          dispatch(setCalendar({ loadError: err.message }));
+        });
+    }
+  }, [calendarsLoad]);
 
   useEffect(() => {
     if (!calendarsLoad) {
+      dispatch(setCalendar({ tagsLoad: true }));
       Tags.fetchTags()
         .then(({ data: res }) => {
           dispatch(setCalendar({ tags: res.data.tags, tagsLoad: false }));
@@ -73,6 +77,7 @@ function HomePage() {
 
   useEffect(() => {
     if (!tagsLoad) {
+      dispatch(setCalendar({ vsLoad: true }));
       Users.fetchVisibilitySettings()
         .then(({ data: res }) => {
           dispatch(setCalendar({ vsLoad: false }));

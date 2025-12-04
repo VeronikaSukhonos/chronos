@@ -12,12 +12,12 @@ const SearchedEvent = ({ event }) => {
   return (
     <Link className="searched-event" to={`events/${event.id}`}>
       <div className="searched-event-title">
-        <div className="searched-event-name" style={{ background: event.color }}>
+        <div className="searched-event-name" style={{ background: event.color || '#ade4ff' }}>
           { getEventIcon(event.type, "searched-event-type") }{event.name}
         </div>
       </div>
       <div className="searched-event-calendar">
-        <div className="searched-event-calendar-color" style={{ background: event.calendar?.color }}></div>
+        <div className="searched-event-calendar-color" style={{ background: event.calendar?.color || '#ade4ff' }}></div>
         {event.calendar?.name}
       </div>
       <div className="searched-event-date">

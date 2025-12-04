@@ -131,15 +131,15 @@ const update = [
         && (val.visibleForAll === undefined || val.visibleForAll === null)
         && (val.repeat === undefined || val.repeat === null)
         && (val.link === undefined || val.link === null));
-    }).withMessage('At least one of Name, Description, Start Date, End Date (if it is arrangement or task), Color, Participants, Tags, Visibility, Repeat (if it is not a task) or Link (if it is an arrangement) is required'),
+    }).withMessage('At least one of name, description, start date, end date (if it is arrangement or task), color, participants, tags, visibility, repeat (if it is not a task) or link (if it is an arrangement) is required'),
   body('name').optional().trim()
     .notEmpty().withMessage('Name is required').bail()
     .isLength({ max: 60 }).withMessage('Name must be at most 60 characters'),
   body('startDate').optional({ checkFalsy: true }).trim()
-    .isISO8601({strict: true}).withMessage('Start Date must be a valid date').bail()
-    .custom((val) => new Date(val) > Date.now()).withMessage('Start Date must be in the future'),
+    .isISO8601({strict: true}).withMessage('Start date must be a valid date').bail()
+    .custom((val) => new Date(val) > Date.now()).withMessage('Start date must be in the future'),
   body('endDate').optional({ checkFalsy: true }).trim()
-    .isISO8601({strict: true}).withMessage('End Date must be a valid date'),
+    .isISO8601({strict: true}).withMessage('End date must be a valid date'),
   body('repeat').optional()
     .isObject().withMessage('Repeat must be an object').bail()
     .custom((value, { req }) => {

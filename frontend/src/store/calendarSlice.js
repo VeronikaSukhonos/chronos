@@ -7,6 +7,11 @@ const initialCalendarCreateForm = {
   findMode: false
 };
 
+const initialEventCreateForm = {
+  event: null,
+  open: false,
+};
+
 const initialTagCreateForm = {
   tag: null,
   open: false
@@ -48,6 +53,7 @@ const initialState = {
   loadError: '',
 
   calendarCreateForm: initialCalendarCreateForm,
+  eventCreateForm: initialEventCreateForm,
   tagCreateForm: initialTagCreateForm,
   confirmDeleteForm: initialConfirmDeleteForm,
 
@@ -112,7 +118,8 @@ const calendarSlice = createSlice({
       for (const [prop, val] of Object.entries(action.payload.params ||
         (form === 'calendarCreateForm' ? initialCalendarCreateForm
         : (form === 'tagCreateForm' ? initialTagCreateForm
-          : initialConfirmDeleteForm))))
+          : (form === 'eventCreateForm' ? initialEventCreateForm
+          : initialConfirmDeleteForm)))))
         state[form][prop] = val;
     },
     setPeriod: (state, action) => {
@@ -158,5 +165,6 @@ export const selectCalendarLoad = {
 };
 
 export const selectCalendarCreateForm = (state) => state.calendar.calendarCreateForm;
+export const selectEventCreateForm = (state) => state.calendar.calendarEventForm;
 export const selectTagCreateForm = (state) => state.calendar.tagCreateForm;
 export const selectConfirmDeleteForm = (state) => state.calendar.confirmDeleteForm;
