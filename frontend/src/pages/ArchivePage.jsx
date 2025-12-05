@@ -164,7 +164,7 @@ const ArchivePage = () => {
       {archived.length < 1
         ? <div className="info-message">You have no archived calendars</div>
         : <div className="archived-calendars-container">
-            {archived.map(c => <ArchivedCalendar calendar={c} />)}
+            {archived.map(c => <ArchivedCalendar key={c.id} calendar={c} />)}
           </div>}
       <ConfirmDeleteForm />
     </div>
