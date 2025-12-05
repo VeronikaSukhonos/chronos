@@ -25,6 +25,8 @@ services:
       - "5173:5173"
     env_file:
       - ./.env.development
+    environment:
+      - VITE_IP_API_KEY=${IP_API_KEY}
     depends_on:
       - backend-dev
 
@@ -37,6 +39,7 @@ services:
       - "8888:8888"
     env_file:
       - ./.env.production
+      - ./.env
     # secrets:
     #   - EMAIL_HOST
     #   - EMAIL_PORT
@@ -48,8 +51,6 @@ services:
     #   - REFRESH_TOKEN_EXP_TIME
     #   - CONFIRM_TOKEN_SECRET
     #   - CONFIRM_TOKEN_EXP_TIME
-    #   - IP_API_KEY
-    #   - HOLIDAYS_API_KEY
 
   app-prod:
     build:
@@ -60,6 +61,10 @@ services:
       - "8000:80"
     env_file:
       - ./.env.production
+    environment:
+      - VITE_IP_API_KEY=${IP_API_KEY}
+    # secrets:
+    #   - IP_API_KEY
     depends_on:
       - backend-prod
 
@@ -85,6 +90,4 @@ services:
 #   CONFIRM_TOKEN_EXP_TIME:
 #     external: true
 #   IP_API_KEY:
-#     external: true
-#   HOLIDAYS_API_KEY:
 #     external: true

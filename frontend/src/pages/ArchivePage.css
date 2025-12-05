@@ -1,0 +1,76 @@
+/*
+326 200
+450 334
+61
+1520
+1450 3
+980 2
+510 1
+*/
+
+@media (max-width: 510px) {
+  .archived-calendars-container {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-item {
+    width: 326px;
+  }
+
+  .archive-item .content-name {
+    max-width: 200px;
+  }
+}
+
+@media (min-width: 510px) {
+  .archived-calendars-container {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-item {
+    width: 450px;
+  }
+
+  .archive-item .content-name {
+    max-width: 334px;
+  }
+}
+
+@media (min-width: 980px) {
+  .archived-calendars-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1450px) {
+  .archived-calendars-container {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.archived-calendars-container {
+  display: grid;
+  gap: 20px;
+}
+
+.archive-item {
+  background: var(--lighter-shadow-color);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 10px;
+}
+
+.archive-item .content-name {
+  max-height: 45.6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archive-item .content-description {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 15px;
+}

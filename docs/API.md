@@ -191,6 +191,7 @@ All endpoints require authorization.
 * by calendars (`"calendar": "calendarId"` or `"calendar": ["Id1", "Id2"]`) - gets events from calendars with these Ids
 * by types (`"type": "arrangement"` or `"type": ["arrangement", "task"]`) - gets events of these types
 * by tags (`"tag": "work"` or `"tag": ["work", "uni"]`) - gets events with these tags
+* by country code (`"country": "UA"`) - gets this country's holidays
 * by year (`"year": 2026`) - gets events of this year or current year if nothing is provided, must be greater than current year - 50 and less than current year + 50 (it seems such way)
 * by week (`"week": 2`) - gets events of this week of the year (for example, week 2 of year 2026 starts from January 5th), must be a positive number, if provided - `month` and `day` aren't taken into account
 * by month (`"month": 1`) - gets events of this month or current month if nothing is provided (except case when `year` is provided but `day` isn't), must be a not-negative number

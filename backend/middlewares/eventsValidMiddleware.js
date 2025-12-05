@@ -20,10 +20,12 @@ const get = [
   body('tag').optional()
     .custom((value) => {
       if (typeof value !== 'string' && !(value instanceof Array && value.every(item => typeof item === 'string')))
-        throw new Error('Tags must be provided as single string or array of strings');
+        throw new Error('Tags must be provided as single Id string or array of Id strings');
       return true;
     })
     .customSanitizer(value => typeof value === 'string' ? value.trim():value.map(el => el.trim())),
+  body('country').optional()
+    .isISO31661Alpha2().withMessage('Country must be a valid ISO 3166-1 alpha-2 country code'),
   body('year').optional()
     .isInt().withMessage('Year must be an integer').bail()
     .toInt()

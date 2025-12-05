@@ -70,9 +70,11 @@ class Events {
         if (!(req.body.tag instanceof Array))
           req.body.tag = [req.body.tag];
         for (let i = req.body.tag.length - 1; i >= 0; --i) {
-          if (!(await Tag.findOne({ authorId: req.user._id, title: req.body.tag[i] }))
-            || req.body.tag.indexOf(req.body.tag[i]) < i)
+          const tag = await Tag.findOne({ _id: req.body.tag[i] });
+          if (!tag || req.body.tag.indexOf(req.body.tag[i]) < i)
             req.body.tag.splice(i, 1);
+          else
+            req.body.tag[i] = tag.title;
         }
       }
       const today = new Date();
@@ -155,17 +157,16 @@ class Events {
       if (req.body.tag)
         events = events.filter(event => event.tags.some(tag => req.body.tag.includes(tag.title)));
       if (req.body.search === undefined) {
-        if (getHolidays) {
+        if (getHolidays && req.body.country) {
           if (!holidaysCalendar)
             holidaysCalendar = await Calendar.findOne({ authorId: req.user._id, type: 'holidays' });
-          const countryResponce = await axios.get(`https://api.ipinfo.io/lite/me?token=${config.IP_API_KEY}`);
-          const startYearHolidaysResponce = await axios.get(`https://date.nager.at/api/v3/PublicHolidays/${startDate.getUTCFullYear()}/${countryResponce.data.country_code}`);
+          const startYearHolidaysResponce = await axios.get(`https://date.nager.at/api/v3/PublicHolidays/${startDate.getFullYear()}/${req.body.country}`);
           let endYearHolidaysResponce = { data: [] };
-          if (startDate.getUTCFullYear() != endDate.getUTCFullYear())
-            endYearHolidaysResponce = await axios.get(`https://date.nager.at/api/v3/PublicHolidays/${endDate.getUTCFullYear()}/${countryResponce.data.country_code}`);
-          events = events.concat(startYearHolidaysResponce.data.map(holiday => { return { calendarId: holidaysCalendar._id, name: holiday.name, startDate: holiday.date, type: 'holiday' }; })
+          if (startDate.getFullYear() != endDate.getFullYear())
+            endYearHolidaysResponce = await axios.get(`https://date.nager.at/api/v3/PublicHolidays/${endDate.getFullYear()}/${req.body.country}`);
+          events = events.concat(startYearHolidaysResponce.data.map(holiday => { return { calendarId: holidaysCalendar._id, name: holiday.name, startDate: holiday.date, type: 'holiday', color: holidaysCalendar.color }; })
                                                                .filter(holiday => new Date(holiday.startDate) >= startDate && new Date(holiday.startDate) < endDate),
-                                 endYearHolidaysResponce.data.map(holiday => { return { calendarId: holidaysCalendar._id, name: holiday.name, startDate: holiday.date, type: 'holiday' }; })
+                                 endYearHolidaysResponce.data.map(holiday => { return { calendarId: holidaysCalendar._id, name: holiday.name, startDate: holiday.date, type: 'holiday', color: holidaysCalendar.color }; })
                                                                .filter(holiday => new Date(holiday.startDate) < endDate));
         }
         let repeatEvents = await Event.find({
@@ -189,16 +190,19 @@ class Events {
           repeatEvents = repeatEvents.filter(event => event.tags.some(tag => req.body.tag.includes(tag.title)));
         for (let i of repeatEvents) {
           let eventDate = new Date(i.startDate);
-          let repeatDelta, nextRepeatEventTime, startMonth, eventMonth, newDate;
+          let repeatDelta, nextRepeatEventTime, prevRepeatEventTime, prevRepeatEventEndTime, startMonth, eventMonth, newDate, prevDate;
           if (i.authorId)
             i.author = new UserDto(await User.findOne({ _id: i.authorId }).select('id login avatar'));
           switch (i.repeat.frequency) {
             case 'day':
               repeatDelta = (Math.ceil((startDate - eventDate) / 86400000) % i.repeat.parameter) || i.repeat.parameter;
               nextRepeatEventTime = startDate.getTime() + (i.repeat.parameter - repeatDelta) * 86400000;
-              if (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate) {
+              prevRepeatEventTime = nextRepeatEventTime - i.repeat.parameter * 86400000;
+              prevRepeatEventEndTime = prevRepeatEventTime + (new Date(i.endDate).setHours(0, 0, 0, 0) - new Date(i.startDate).setHours(0, 0, 0, 0)) * 86400000;
+              if ((prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate)
+                || (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate)) {
                 const newEvent = JSON.parse(JSON.stringify(new EventDto(i)));
-                let timeToAdd = (Math.ceil((startDate - eventDate) / 86400000) + (i.repeat.parameter - repeatDelta)) * 86400000;
+                let timeToAdd = (Math.ceil((startDate - eventDate) / 86400000) + (i.repeat.parameter - repeatDelta - (prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate ? i.repeat.parameter:0))) * 86400000;
                 newEvent.startDate = new Date(eventDate.getTime() + timeToAdd).toISOString();
                 if (i.endDate)
                   newEvent.endDate = new Date(new Date(i.endDate).getTime() + timeToAdd).toISOString();
@@ -208,9 +212,12 @@ class Events {
             case 'week':
               repeatDelta = ((Math.ceil((startDate - eventDate) / 86400000) / 7) % i.repeat.parameter) || i.repeat.parameter;
               nextRepeatEventTime = startDate.getTime() + (i.repeat.parameter - repeatDelta) * 86400000 * 7 + (7 - ((Math.ceil((startDate - eventDate) / 86400000) % 7) || 7)) * 86400000;
-              if (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate) {
+              prevRepeatEventTime = nextRepeatEventTime - i.repeat.parameter * 7 * 86400000;
+              prevRepeatEventEndTime = prevRepeatEventTime + (new Date(i.endDate).setHours(0, 0, 0, 0) - new Date(i.startDate).setHours(0, 0, 0, 0)) * 86400000;
+              if ((prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate)
+                || (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate)) {
                 const newEvent = JSON.parse(JSON.stringify(new EventDto(i)));
-                let timeToAdd = ((Math.ceil((startDate - eventDate) / 86400000) / 7) + (i.repeat.parameter - repeatDelta)) * 86400000 * 7;
+                let timeToAdd = ((Math.ceil((startDate - eventDate) / 86400000) / 7) + (i.repeat.parameter - repeatDelta - (prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate ? i.repeat.parameter:0))) * 86400000 * 7;
                 newEvent.startDate = new Date(eventDate.getTime() + timeToAdd).toISOString();
                 if (i.endDate)
                   newEvent.endDate = new Date(new Date(i.endDate).getTime() + timeToAdd).toISOString();
@@ -225,19 +232,25 @@ class Events {
               let yearsToAdd = Math.floor(monthCount / 12);
               let monthsToAdd = monthCount % 12;
               newDate = new Date(eventDate);
-              newDate.setUTCFullYear(newDate.getUTCFullYear() + yearsToAdd);
-              newDate.setUTCMonth(newDate.getUTCMonth() + monthsToAdd);
-              if (newDate.getUTCDate() != eventDate.getUTCDate())
-                newDate.setUTCDate(0);
-              if (newDate >= startDate && newDate < endDate) {
+              newDate.setFullYear(newDate.getFullYear() + yearsToAdd);
+              newDate.setMonth(newDate.getMonth() + monthsToAdd);
+              if (newDate.getDate() != eventDate.getDate())
+                newDate.setDate(0);
+              prevDate = new Date(eventDate);
+              prevDate.setFullYear(prevDate.getFullYear() + yearsToAdd);
+              prevDate.setMonth(prevDate.getMonth() + monthsToAdd - i.repeat.parameter);
+              if (prevDate.getDate() != eventDate.getDate())
+                prevDate.setDate(0);
+              if ((prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate)
+                || (newDate >= startDate && newDate < endDate)) {
                 const newEvent = JSON.parse(JSON.stringify(new EventDto(i)));
-                newEvent.startDate = newDate.toISOString();
+                newEvent.startDate = (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? prevDate:newDate).toISOString();
                 if (i.endDate) {
                   const newEndDate = new Date(i.endDate);
-                  newEndDate.setUTCFullYear(newEndDate.getUTCFullYear() + yearsToAdd);
-                  newEndDate.setUTCMonth(newEndDate.getUTCMonth() + monthsToAdd);
-                  if (newEndDate.getUTCDate() != new Date(i.endDate).getUTCDate())
-                    newEndDate.setUTCDate(0);
+                  newEndDate.setFullYear(newEndDate.getFullYear() + yearsToAdd);
+                  newEndDate.setMonth(newEndDate.getMonth() + monthsToAdd - (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? 1:0));
+                  if (newEndDate.getDate() != new Date(i.endDate).getDate())
+                    newEndDate.setDate(0);
                   newEvent.endDate = newEndDate.toISOString();
                 }
                 events.push(newEvent);
@@ -249,17 +262,22 @@ class Events {
               let yearsCount = (startDate.getFullYear() - eventDate.getFullYear() - (startMonth < eventMonth ? 1 : 0));
               yearsCount += i.repeat.parameter - ((yearsCount % i.repeat.parameter) || i.repeat.parameter);
               newDate = new Date(eventDate);
-              newDate.setUTCFullYear(newDate.getUTCFullYear() + yearsCount);
-              if (newDate.getUTCDate() != eventDate.getUTCDate())
-                newDate.setUTCDate(0);
-              if (newDate >= startDate && newDate < endDate) {
+              newDate.setFullYear(newDate.getFullYear() + yearsCount);
+              if (newDate.getDate() != eventDate.getDate())
+                newDate.setDate(0);
+              prevDate = new Date(eventDate);
+              prevDate.setFullYear(prevDate.getFullYear() + yearsCount - i.repeat.parameter);
+              if (prevDate.getDate() != eventDate.getDate())
+                prevDate.setDate(0);
+              if ((prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate)
+                || (newDate >= startDate && newDate < endDate)) {
                 const newEvent = JSON.parse(JSON.stringify(new EventDto(i)));
-                newEvent.startDate = newDate.toISOString();
+                newEvent.startDate = (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? prevDate:newDate).toISOString();
                 if (i.endDate) {
                   const newEndDate = new Date(i.endDate);
-                  newEndDate.setUTCFullYear(newEndDate.getUTCFullYear() + yearsCount);
-                  if (newEndDate.getUTCDate() != new Date(i.endDate).getUTCDate())
-                    newEndDate.setUTCDate(0);
+                  newEndDate.setFullYear(newEndDate.getFullYear() + yearsCount - (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? 1:0));
+                  if (newEndDate.getDate() != new Date(i.endDate).getDate())
+                    newEndDate.setDate(0);
                   newEvent.endDate = newEndDate.toISOString();
                 }
                 events.push(newEvent);
@@ -281,24 +299,24 @@ class Events {
               timeToAdd.day = events[i].repeat.parameter * 7;
             let j = 1;
             while (new Date(Date.UTC(eventDate.getUTCFullYear() + (timeToAdd.year || 0) * j,
-                                     eventDate.getMonth() + (timeToAdd.month || 0) * j,
+                                     eventDate.getUTCMonth() + (timeToAdd.month || 0) * j,
                                      eventDate.getUTCDate() + (timeToAdd.day || 0) * j))
               < endDate) {
               const newEvent = JSON.parse(JSON.stringify(new EventDto(events[i])));
               const newStartDate = new Date(eventDate);
-              newStartDate.setUTCFullYear(newStartDate.getUTCFullYear() + (timeToAdd.year || 0) * j);
-              newStartDate.setUTCMonth(newStartDate.getUTCMonth() + (timeToAdd.month || 0) * j);
-              newStartDate.setUTCDate(newStartDate.getUTCDate() + (timeToAdd.day || 0) * j);
-              if (!timeToAdd.day && newStartDate.getUTCDate() != eventDate.getUTCDate())
-                newStartDate.setUTCDate(0);
+              newStartDate.setFullYear(newStartDate.getFullYear() + (timeToAdd.year || 0) * j);
+              newStartDate.setMonth(newStartDate.getMonth() + (timeToAdd.month || 0) * j);
+              newStartDate.setDate(newStartDate.getDate() + (timeToAdd.day || 0) * j);
+              if (!timeToAdd.day && newStartDate.getDate() != eventDate.getDate())
+                newStartDate.setDate(0);
               newEvent.startDate = newStartDate.toISOString();
               if (events[i].endDate) {
                 const newEndDate = new Date(events[i].endDate);
-                newEndDate.setUTCFullYear(newEndDate.getUTCFullYear() + (timeToAdd.year || 0) * j);
-                newEndDate.setUTCMonth(newEndDate.getUTCMonth() + (timeToAdd.month || 0) * j);
-                newEndDate.setUTCDate(newEndDate.getUTCDate() + (timeToAdd.day || 0) * j);
-                if (!timeToAdd.day && newEndDate.getUTCDate() != new Date(events[i].endDate).getUTCDate())
-                  newEndDate.setUTCDate(0);
+                newEndDate.setFullYear(newEndDate.getFullYear() + (timeToAdd.year || 0) * j);
+                newEndDate.setMonth(newEndDate.getMonth() + (timeToAdd.month || 0) * j);
+                newEndDate.setDate(newEndDate.getDate() + (timeToAdd.day || 0) * j);
+                if (!timeToAdd.day && newEndDate.getDate() != new Date(events[i].endDate).getDate())
+                  newEndDate.setDate(0);
                 newEvent.endDate = newEndDate.toISOString();
               }
               events.push(newEvent);
