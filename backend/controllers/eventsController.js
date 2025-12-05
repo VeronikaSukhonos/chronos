@@ -248,7 +248,7 @@ class Events {
                 if (i.endDate) {
                   const newEndDate = new Date(i.endDate);
                   newEndDate.setFullYear(newEndDate.getFullYear() + yearsToAdd);
-                  newEndDate.setMonth(newEndDate.getMonth() + monthsToAdd - (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? 1:0));
+                  newEndDate.setMonth(newEndDate.getMonth() + monthsToAdd - (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? i.repeat.parameter:0));
                   if (newEndDate.getDate() != new Date(i.endDate).getDate())
                     newEndDate.setDate(0);
                   newEvent.endDate = newEndDate.toISOString();
@@ -275,7 +275,7 @@ class Events {
                 newEvent.startDate = (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? prevDate:newDate).toISOString();
                 if (i.endDate) {
                   const newEndDate = new Date(i.endDate);
-                  newEndDate.setFullYear(newEndDate.getFullYear() + yearsCount - (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? 1:0));
+                  newEndDate.setFullYear(newEndDate.getFullYear() + yearsCount - (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? i.repeat.parameter:0));
                   if (newEndDate.getDate() != new Date(i.endDate).getDate())
                     newEndDate.setDate(0);
                   newEvent.endDate = newEndDate.toISOString();

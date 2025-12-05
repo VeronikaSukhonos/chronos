@@ -1,13 +1,3 @@
-/*
-326 200
-450 334
-61
-1520
-1450 3
-980 2
-510 1
-*/
-
 @media (max-width: 510px) {
   .archived-calendars-container {
     grid-template-columns: 1fr;
