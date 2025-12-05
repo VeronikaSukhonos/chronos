@@ -46,7 +46,7 @@ function HomePage() {
   };
 
   useEffect(() => {
-    if (calendarsLoad) {
+    if (calendarsLoad || myCalendars.length === 0) {
       dispatch(setCalendar({ calendarsLoad: true }));
       Calendars.fetchCalendars()
         .then(({ data: res }) => {
@@ -60,7 +60,7 @@ function HomePage() {
           dispatch(setCalendar({ loadError: err.message }));
         });
     }
-  }, [calendarsLoad]);
+  }, [calendarsLoad, myCalendars]);
 
   useEffect(() => {
     if (!calendarsLoad) {

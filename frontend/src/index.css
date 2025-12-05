@@ -11,6 +11,8 @@
   --main-shadow-color: #25224d33;
   --lighter-shadow-color: #fafafa;
   --attention-color: #b60055;
+  --fc-today-bg-color: transparent;
+  --fc-now-indicator-color: #b60055;
 }
 
 * {
@@ -130,7 +132,7 @@ img.load {
 html, textarea, .modal-content,
 .side-panel .accordion-menu-scroll-container,
 .user-list, .search-results,
-.calendar-hours-days-grid-container {
+.fc-scroller {
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) transparent;
 }

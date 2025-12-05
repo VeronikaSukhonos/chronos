@@ -1,26 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   getISOWeek, getISOWeekYear, setISOWeek, startOfISOWeek,
-  addMonths, addWeeks, addDays,
-  endOfMonth, endOfISOWeek, eachDayOfInterval
+  addMonths, addWeeks, addDays
 } from 'date-fns';
+import { toast } from 'react-toastify';
+
+import FullCalendarReact from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
 
 import Events from '../api/eventsApi.js';
 import {
-  setCalendar, selectCalendar, selectCalendarLoad, setPeriod
+  setCalendar, selectCalendar, selectCalendarLoad, setPeriod, setForm
 } from '../store/calendarSlice.js';
 import LoadPage from '../pages/LoadPage.jsx';
 import ErrorPage from '../pages/ErrorPage.jsx';
 import { MainButton, SelectField } from '../components';
 import { ArrowIcon, ArrowLeftIcon } from '../assets';
 import { fCurrentPeriod } from '../utils/formatDate.js';
+import { getEventIcon } from '../utils/getIcon.jsx';
 import './Calendar.css';
 
-const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const Event = ({ event: ev }) => {
+  return (
+    <div className="calendar-event">
+      {getEventIcon(ev.extendedProps.type, "calendar-event-type")}
+      <span className="calendar-event-name">{ev.title}</span>
+    </div>
+  );
+};
 
 const Calendar = ({ addToNavigation }) => {
+  const calendarRef = useRef(null);
+
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const myCalendars = useSelector(selectCalendar.myCalendars);
   const otherCalendars = useSelector(selectCalendar.otherCalendars);
@@ -35,54 +52,70 @@ const Calendar = ({ addToNavigation }) => {
   const eventsLoad = useSelector(selectCalendarLoad.events);
   const [feedback, setFeedback] = useState(null);
 
-  const [nowDate, setNowDate] = useState(new Date());
-  const [monthDaysToDisplay, setMonthDaysToDisplay] = useState([]);
-  const [weekDaysToDisplay, setWeekDaysToDisplay] = useState([]);
-  const [dayDayToDisplay, setDayDayToDisplay] = useState(null);
-  const [swapLeft, setSwapLeft] = useState(false);
-  const [swapRight, setSwapRight] = useState(false);
-
   const setCurrentPeriodByView = (reset = false) => {
     const p = reset ? { year: null, week: null, month: null, day: null } : period;
+    const cApi = calendarRef?.current?.getApi();
 
     const now = new Date();
     const year = p.year || now.getFullYear();
     const sw = p.week ? startOfISOWeek(setISOWeek(new Date(year, 0, 4), p.week)) : null;
 
-    if (view === 'month')
-      dispatch(setPeriod({
+    if (view === 'dayGridMonth') {
+      const newP = {
         year,
         week: null,
-        month: sw?.getMonth() || p.month || now.getMonth(),
+        month: sw?.getMonth() || (p.month !== null ? p.month : null) || now.getMonth(),
         day: null
-      }));
-    else if (view === 'week')
-      dispatch(setPeriod({
+      };
+      dispatch(setPeriod(newP));
+      if (!reset) setTimeout(() => cApi?.changeView(view, new Date(newP.year, newP.month, 1)), 0);
+    }
+    else if (view === 'timeGridWeek') {
+      const newP = {
         year,
-        week: (p.month && getISOWeek(new Date(p.year, p.month, p.day || 1))) || getISOWeek(now),
+        week: (p.month !== null && getISOWeek(new Date(p.year, p.month, p.day || 1))) || getISOWeek(now),
         month: null,
         day: null
-      }));
-    else if (view === 'day')
-      dispatch(setPeriod({
+      };
+      dispatch(setPeriod(newP));
+      if (!reset) setTimeout(() => cApi?.changeView(view, startOfISOWeek(setISOWeek(new Date(newP.year, 0, 4), newP.week))), 0);
+    }
+    else if (view === 'timeGridDay') {
+      const newP = {
         year,
         week: null,
-        month: sw?.getMonth() || p.month || now.getMonth(),
-        day: sw?.getDate() || p.day || (p.month ? 1 : null) || now.getDate()
-      }));
+        month: sw?.getMonth() || (p.month !== null ? p.month : null) || now.getMonth(),
+        day: sw?.getDate() || p.day || (p.month !== null ? 1 : null) || now.getDate()
+      };
+      dispatch(setPeriod(newP));
+      if (!reset) setTimeout(() => cApi?.changeView(view, new Date(newP.year, newP.month, newP.day)), 0);
+    }
+
+    if (reset) cApi?.today();
   };
 
   const addToCurrentPeriod = (add = true) => {
-    if (view === 'month') {
+    const ny = new Date().getFullYear(), max = 50;
+    const msg = `Supported year range is ±${max} years from the current year`;
+
+    if (view === 'dayGridMonth') {
       const newD = addMonths(new Date(period.year, period.month, 1), add ? 1 : -1);
-      dispatch(setPeriod({ year: newD.getFullYear(), week: null, month: newD.getMonth(), day: null }));
-    } else if (view === 'week') {
+      if (newD.getFullYear() >= ny - max && newD.getFullYear() <= ny + max)
+        dispatch(setPeriod({ year: newD.getFullYear(), week: null, month: newD.getMonth(), day: null }));
+      else toast(msg);
+    } else if (view === 'timeGridWeek') {
       const newD = addWeeks((setISOWeek(new Date(period.year, 0, 4), period.week)), add ? 1 : -1);
-      dispatch(setPeriod({ year: getISOWeekYear(newD), week: getISOWeek(newD), month: null, day: null }));
-    } else if (view === 'day') {
+      if (getISOWeekYear(newD) >= ny - max && getISOWeekYear(newD) <= ny + max)
+        dispatch(setPeriod({ year: getISOWeekYear(newD), week: getISOWeek(newD), month: null, day: null }));
+      else toast(msg);
+    } else if (view === 'timeGridDay') {
       const newD = addDays(new Date(period.year, period.month, period.day), add ? 1 : -1);
-      dispatch(setPeriod({ year: newD.getFullYear(), week: null, month: newD.getMonth(), day: newD.getDate() }));
+      if (newD.getFullYear() >= ny - max && newD.getFullYear() <= ny + max)
+        dispatch(setPeriod({ year: newD.getFullYear(), week: null, month: newD.getMonth(), day: newD.getDate() }));
+      else toast(msg);
     }
+    if (add) calendarRef?.current?.getApi().next();
+    else calendarRef?.current?.getApi().prev();
   };
 
   useEffect(() => {
@@ -101,23 +134,18 @@ const Calendar = ({ addToNavigation }) => {
     }
 
     const wait = setTimeout(() => {
-      setNowDate(new Date());
+      const cs = myCalendars.concat(otherCalendars).filter(c => c.visible).map(c => c.id);
+      const ets = eventTypes.filter(et => et.visible).map(et => et.type);
+      const ts = tags.filter(t => t.visible).map(t => t.id);
+
       dispatch(setCalendar({ eventsLoad: true }));
       Events.fetchEvents({
-        calendars: myCalendars.concat(otherCalendars).map(c => c.id),
-        types: eventTypes.map(et => et.type),
-        tags: tags.map(et => et.name),
+        ...(cs.length && { calendar: cs }),
+        ...(ets.length && { type: ets }),
+        ...(ts.length && { tag: ts }),
         ...Object.fromEntries((Object.entries(period).filter(e => e[1] !== null)))
       })
         .then(({ data: res }) => {
-          if (view === 'month') {
-            const fd = new Date(period.year, period.month, 1), ld = endOfMonth(fd);
-            setMonthDaysToDisplay(eachDayOfInterval({ start: startOfISOWeek(fd), end: endOfISOWeek(ld) }));
-          } else if (view === 'week') {
-            const w = setISOWeek(new Date(period.year, 0, 4), period.week);
-            setWeekDaysToDisplay(eachDayOfInterval({ start: startOfISOWeek(w), end: endOfISOWeek(w) }));
-          } else if (view === 'day')
-            setDayDayToDisplay();
           dispatch(setCalendar({ events: res.data.events, eventsLoad: false }));
           setFeedback({ msg: res.message, status: 'ok' });
         })
@@ -130,63 +158,31 @@ const Calendar = ({ addToNavigation }) => {
     return () => clearTimeout(wait);
   }, [vsLoad, myCalendars, otherCalendars, eventTypes, tags, period, view]);
 
-  const monthCalendar = <>
-    <div className="calendar-weekdays-line-container month">
-      <div className="calendar-weekday-no-content"></div>
-      <div className="calendar-weekdays-line">
-        {WEEKDAYS.map((d, i) => <div key={i} className="calendar-weekday">{d}</div>)}
-      </div>
-    </div>
-    <div className="calendar-days-grid-container">
-      <div className="calendar-week-numbers-column">
-        {[...new Set(monthDaysToDisplay.map(d => getISOWeek(d)))]
-          .map((w, i) => <div key={i} className="calendar-week-number">{w}</div>)}
-      </div>
-      <div className="calendar-days-grid">
-        {monthDaysToDisplay.map((d, i) => <div key={i} className="calendar-day">
-          <div className="calendar-day-header">
-            <span className={(d.getFullYear() === nowDate.getFullYear() && d.getMonth() === nowDate.getMonth()
-              && d.getDate() === nowDate.getDate()) ? "calendar-day-today" : ""}>{d.getDate()}
-            </span>
-          </div>
-          <div className="calendar-day-events-container">
+  useEffect(() => {
+    const cApi = calendarRef?.current?.getApi();
 
-          </div>
-        </div>)}
-      </div>
-    </div>
-  </>
-
-  const weekCalendar = <>
-    <div className="calendar-weekdays-line-container week">
-      <div className="calendar-weekday-no-content"></div>
-      <div className="calendar-weekdays-line">
-        {weekDaysToDisplay.map((d, i) => <div key={i} className="calendar-day-header">
-            <span className={(d.getFullYear() === nowDate.getFullYear() && d.getMonth() === nowDate.getMonth()
-              && d.getDate() === nowDate.getDate()) ? "calendar-day-today" : ""}>
-                {d.getDate()}, {WEEKDAYS[i]}
-            </span>
-          </div>)}
-      </div>
-    </div>
-    <div className="calendar-hours-days-grid-container">
-      <div className="calendar-hour-numbers-column">
-        {Array.from({ length: 24 }, (_, i) => i)
-          .map((h, i) => <div key={i} className="calendar-hour-number">{h}</div>)}
-      </div>
-      <div className="calendar-days-grid">
-        {weekDaysToDisplay.map((d, i) => <div key={i} className="calendar-day">
-          <div className="calendar-day-events-container">
-
-          </div>
-        </div>)}
-      </div>
-    </div>
-  </>
-
-  const dayCalendar = <>
-
-  </>
+    setTimeout(() => {
+      cApi?.getEvents().forEach(ev => { ev.remove(); });
+      events.forEach(ev => cApi?.addEvent({
+        id: ev.repeat ? (ev.id + ev.startDate) : ev.id,
+        groupId: ev.id,
+        title: ev.name,
+        start: ev.startDate, end: ev.endDate, allDay: ev.allDay,
+        color: ev.color || '#ade4ff',
+        editable: ev.type !== 'holiday',
+        extendedProps: {
+          calendarId: ev.calendarId,
+          authorId: ev.author?.id,
+          type: ev.type,
+          tags: ev.tags,
+          visibleForAll: ev.visibleForAll,
+          repeat: ev.repeat,
+          link: ev.link,
+          doneDate: ev.doneDate
+        }
+      }));
+    }, 0);
+  }, [events]);
 
   return (
     <div className="calendar">
@@ -195,37 +191,70 @@ const Calendar = ({ addToNavigation }) => {
         <SelectField
           name="view"
           options={[
-            { label: 'Day', value: 'day' },
-            { label: 'Week', value: 'week' },
-            { label: 'Month', value: 'month' }
+            { label: 'Day', value: 'timeGridDay' },
+            { label: 'Week', value: 'timeGridWeek' },
+            { label: 'Month', value: 'dayGridMonth' }
           ]}
           selected={view}
           onChange={(e) => { dispatch(setCalendar({ view: e.target.value })) }}
-          nav={true}
+          nav={true} dis={vsLoad}
         />
         <div className="calendar-navigation-current">
-          <div>{fCurrentPeriod(period)} {view === 'week' && <span>{`(week ${period.week})`}</span>}</div>
+          <div>{fCurrentPeriod(period)} {view === 'timeGridWeek' && <span>{`(week ${period.week})`}</span>}</div>
         </div>
         <MainButton
           title="Now" type="button" short={true} nav={true}
-          onClick={() => setCurrentPeriodByView(true)}
+          onClick={() => setCurrentPeriodByView(true)} dis={vsLoad}
         />
         <MainButton
           title={<ArrowLeftIcon />} type="button" square={true} nav={true}
-          onClick={() => addToCurrentPeriod(false)}
+          onClick={() => addToCurrentPeriod(false)} dis={vsLoad}
         />
         <MainButton
           title={<ArrowIcon />} type="button" square={true} nav={true}
-          onClick={() => addToCurrentPeriod()}
+          onClick={() => addToCurrentPeriod()} dis={vsLoad}
         />
       </div>
       <div className={`calendar-container ${view}` + (eventsLoad ? " disabled" : "")
-        + (feedback === null ? " start" : "")}>
-        {feedback?.status === 'fail' ? <ErrorPage error={feedback?.msg} />
-        : (feedback === null ? <LoadPage />
-        : (view === 'month' ? monthCalendar
-        : (view === 'week' ? weekCalendar
-        : (view === 'day' ? dayCalendar : 'Invalid view'))))}
+        + ((feedback === null || feedback?.status === 'fail') ? " white" : "")}>
+        {feedback === null ? <LoadPage />
+        : (feedback?.status === 'fail' ? <ErrorPage error={feedback?.msg} />
+        : <FullCalendarReact ref={calendarRef}
+            plugins={[ dayGridPlugin, timeGridPlugin, interactionPlugin ]}
+            headerToolbar={false}
+            initialDate={new Date()} initialView={view} initialEvents={events}
+            height="100%"
+            weekNumberCalculation="ISO"
+            views={{
+              timeGridDay: {
+                dayHeaderFormat: { weekday: 'long' },
+                weekNumbers: true, weekNumberFormat: { week: 'numeric' }
+              },
+              timeGridWeek: {
+                dayHeaderFormat: { day: 'numeric', weekday: 'short' }
+              },
+              dayGridMonth: {
+                dayHeaderFormat: { weekday: 'short' },
+                weekNumbers: true, weekNumberFormat: { week: 'numeric' }
+              }
+            }}
+            eventContent={Event}
+            fixedWeekCount={false}
+            showNonCurrentDates={false}
+            slotDuration="01:00:00"
+            slotLabelFormat={{ hour: 'numeric', hour12: false }}
+            nowIndicator={true}
+            nowIndicatorClassNames="now-indicator"
+            windowResizeDelay={10}
+            dateClick={function(i) {
+              dispatch(setForm({ form: 'eventCreateForm', params: { open: true, event: { startDate: i.dateStr }}}));
+            }}
+            eventClick={function(i) {
+              if (i.event.extendedProps.type !== 'holiday')
+                navigate(`/events/${i.event.groupId}`);
+            }}
+            displayEventTime={false}
+          />)}
       </div>
     </div>
   );

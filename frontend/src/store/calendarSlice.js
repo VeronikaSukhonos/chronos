@@ -42,7 +42,7 @@ const initialState = {
     month: null,
     day: null
   },
-  view: 'month',
+  view: 'dayGridMonth',
   events: [],
 
   calendarsLoad: true,
