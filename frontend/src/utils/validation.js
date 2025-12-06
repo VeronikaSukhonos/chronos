@@ -1,5 +1,16 @@
 import validator from 'validator';
 
+const cmpDays = (d1, d2, sign = '=') => {
+  if (sign === '<=')
+    return d1?.getFullYear() <= d2?.getFullYear()
+      && d1?.getMonth() <= d2?.getMonth() && d1?.getDate() <= d2?.getDate();
+  else if (sign === '>=')
+    return d1?.getFullYear() >= d2?.getFullYear()
+      && d1?.getMonth() >= d2?.getMonth() && d1?.getDate() >= d2?.getDate();
+  return d1?.getFullYear() === d2?.getFullYear()
+    && d1?.getMonth() === d2?.getMonth() && d1?.getDate() === d2?.getDate();
+};
+
 const login = (params) => {
   const val = (params.login || '').trim().toLowerCase();
   let err = '';
@@ -75,7 +86,7 @@ const dob = (params) => {
 
   if (validator.isISO8601(val))
     err = 'Date of birth must be a valid date';
-  else if (new Date(val) > Date.now())
+  else if (cmpDays(new Date(val), new Date(), '<='))
     err = 'Date of birth must not be in the future';
 
   return err;
@@ -115,20 +126,45 @@ const calendarDescription = (params) => {
   return err;
 };
 
-const cmpDays = (d1, d2, sign = '=') => {
-  if (sign === '<=')
-    return d1?.getFullYear() <= d2?.getFullYear()
-      && d1?.getMonth() <= d2?.getMonth() && d1?.getDate() <= d2?.getDate();
-  else if (sign === '>=')
-    return d1?.getFullYear() >= d2?.getFullYear()
-      && d1?.getMonth() >= d2?.getMonth() && d1?.getDate() >= d2?.getDate();
-  return d1?.getFullYear() === d2?.getFullYear()
-    && d1?.getMonth() === d2?.getMonth() && d1?.getDate() === d2?.getDate();
+const startDate = (params) => {
+  const val = (params.startDate || '').toString().trim().toLowerCase();
+  let err = '';
+
+  if (validator.isEmpty(val))
+    err = 'Start date is required';
+  if (validator.isISO8601(val))
+    err = 'Start date must be a valid date';
+  else if (cmpDays(new Date(val), new Date(), '>=') && params.type !== 'birthday')
+    err = 'Start date must be in the future';
+
+  return err;
+};
+
+const endDate = (params) => {
+  const val = (params.endDate || '').toString().trim().toLowerCase();
+  let err = '';
+
+  if (validator.isISO8601(val))
+    err = 'End date must be a valid date';
+  else if (new Date(val) > new Date(params.startDate))
+    err = 'End date must be later than start date';
+
+  return err;
+};
+
+const arrangementLink = (params) => {
+  const val = (params.link || '').toString().trim().toLowerCase();
+  let err = '';
+
+  if (validator.isURL(val))
+    err = 'Link must be a URL';
+
+  return err;
 };
 
 export default {
   login, email, password, passwordConfirmation, fullName, dob,
   calendarName, calendarDescription,
-  cmpDays,
+  cmpDays, startDate, endDate, arrangementLink,
   tagTitle
 };

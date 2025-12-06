@@ -62,9 +62,9 @@ const eventParams = {
     .isIn(["arrangement", "reminder", "task", "holiday", "birthday"])
     .withMessage("Type can be 'arrangement', 'reminder', 'task', 'holiday' or 'birthday'"),
   startDate: body('startDate').trim()
-    .notEmpty().withMessage('Start Date is required').bail()
-    .isISO8601({strict: true}).withMessage('Start Date must be a valid date').bail()
-    .custom((val) => new Date(val) > Date.now()).withMessage('Start Date must be in the future'),
+    .notEmpty().withMessage('Start date is required').bail()
+    .isISO8601({strict: true}).withMessage('Start date must be a valid date').bail()
+    .custom((val) => new Date(val) > Date.now()).withMessage('Start date must be in the future'),
   description: body('description').optional().trim()
     .isLength({ max: 250 }).withMessage('Description must be at most 250 characters'),
   color: body('color').optional().trim()
@@ -80,11 +80,11 @@ const eventParams = {
   tags: body('tags').optional()
     .isArray().withMessage('Tags must be provided as array')
     .customSanitizer(value => value.map(el => el.trim())),
-  visibleForAll: body('isPublic').optional().customSanitizer(val => val === true || val === 'true'),
+  visibleForAll: body('visibleForAll').optional().customSanitizer(val => val === true || val === 'true'),
   endDate: body('endDate').if(body('type').isIn(['arrangement', 'task'])).optional({ checkFalsy: true }).trim()
-    .isISO8601({strict: true}).withMessage('End Date must be a valid date').bail()
+    .isISO8601({strict: true}).withMessage('End date must be a valid date').bail()
     .custom((val, { req }) => new Date(val) > new Date(req.body.startDate))
-    .withMessage('End Date must be in the future compared to Start Date'),
+    .withMessage('End date must be later than start date'),
   repeat: body('repeat').if(body('type').isIn(['arrangement', 'reminder'])).optional()
     .isObject().withMessage('Repeat must be an object').bail()
     .custom((value, { req }) => {
@@ -109,7 +109,7 @@ const eventParams = {
       return true;
     }),
   link: body('link').if(body('type').equals('arrangement')).optional().trim()
-    .isURL().withMessage('Link must be an URL')
+    .isURL().withMessage('Link must be a URL')
 };
 
 const create = [
