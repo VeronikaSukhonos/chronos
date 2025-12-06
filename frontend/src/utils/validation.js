@@ -1,12 +1,12 @@
 import validator from 'validator';
 
 const cmpDays = (d1, d2, sign = '=') => {
-  if (sign === '<=')
-    return d1?.getFullYear() <= d2?.getFullYear()
-      && d1?.getMonth() <= d2?.getMonth() && d1?.getDate() <= d2?.getDate();
-  else if (sign === '>=')
-    return d1?.getFullYear() >= d2?.getFullYear()
-      && d1?.getMonth() >= d2?.getMonth() && d1?.getDate() >= d2?.getDate();
+  if (sign === '<')
+    return d1?.getFullYear() < d2?.getFullYear()
+      && d1?.getMonth() < d2?.getMonth() && d1?.getDate() < d2?.getDate();
+  else if (sign === '>')
+    return d1?.getFullYear() > d2?.getFullYear()
+      && d1?.getMonth() > d2?.getMonth() && d1?.getDate() > d2?.getDate();
   return d1?.getFullYear() === d2?.getFullYear()
     && d1?.getMonth() === d2?.getMonth() && d1?.getDate() === d2?.getDate();
 };
@@ -86,7 +86,7 @@ const dob = (params) => {
 
   if (validator.isISO8601(val))
     err = 'Date of birth must be a valid date';
-  else if (cmpDays(new Date(val), new Date(), '<='))
+  else if (cmpDays(new Date(val), new Date(), '>'))
     err = 'Date of birth must not be in the future';
 
   return err;
@@ -134,7 +134,7 @@ const startDate = (params) => {
     err = 'Start date is required';
   if (validator.isISO8601(val))
     err = 'Start date must be a valid date';
-  else if (cmpDays(new Date(val), new Date(), '>=') && params.type !== 'birthday')
+  else if ((new Date(val) < new Date()) && params.type !== 'birthday' && !params.allDay)
     err = 'Start date must be in the future';
 
   return err;
@@ -146,7 +146,7 @@ const endDate = (params) => {
 
   if (validator.isISO8601(val))
     err = 'End date must be a valid date';
-  else if (new Date(val) > new Date(params.startDate))
+  else if (val && !(new Date(val) > new Date(params.startDate)))
     err = 'End date must be later than start date';
 
   return err;
@@ -156,7 +156,7 @@ const arrangementLink = (params) => {
   const val = (params.link || '').toString().trim().toLowerCase();
   let err = '';
 
-  if (validator.isURL(val))
+  if (val && !validator.isURL(val))
     err = 'Link must be a URL';
 
   return err;

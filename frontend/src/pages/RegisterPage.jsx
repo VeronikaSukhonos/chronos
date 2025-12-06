@@ -62,6 +62,7 @@ const RegisterPage = () => {
           ac="email"
         />
         <PasswordField
+          id="password"
           onChange={setParam}
           val={params.password}
           err={errors}

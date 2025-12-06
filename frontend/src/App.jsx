@@ -46,6 +46,7 @@ const App = () => {
         setLoad(false);
         setFeedback({ msg: err.message, status: 'fail' });
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (load) return <LoadPage spinner={false} />

@@ -195,3 +195,4 @@ dist
 # End of https://www.toptal.com/developers/gitignore/api/macos,linux,node,dotenv
 
 *.rest
+package-lock.json

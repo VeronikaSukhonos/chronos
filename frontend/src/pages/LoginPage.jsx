@@ -54,6 +54,7 @@ const LoginPage = () => {
           ac="username"
         />
         <PasswordField
+          id="password"
           onChange={setParam}
           val={params.password}
           err={errors}

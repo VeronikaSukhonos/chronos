@@ -126,10 +126,12 @@ const Calendar = ({ addToNavigation }) => {
   useEffect(() => {
     setCurrentPeriodByView();
     return () => dispatch(setCalendar());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setCurrentPeriodByView();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view]);
 
   useEffect(() => {
@@ -168,7 +170,7 @@ const Calendar = ({ addToNavigation }) => {
     }, 300);
 
     return () => clearTimeout(wait);
-  }, [vsLoad, myCalendars, otherCalendars, eventTypes, tags, period, view]);
+  }, [vsLoad, myCalendars, otherCalendars, eventTypes, tags, period, view, dispatch]);
 
   useEffect(() => {
     const cApi = calendarRef?.current?.getApi();
@@ -182,8 +184,7 @@ const Calendar = ({ addToNavigation }) => {
         start: ev.startDate, end: ev.endDate, allDay: ev.allDay,
         color: ev.color || '#ade4ff',
         ...(!ev.author && { className: 'holiday' }),
-        ...((ev.type === 'arrangement' || ev.type === 'task')
-          && (Math.abs(differenceInHours(ev.startDate, ev.endDate)) >= 24)
+        ...(!ev.allDay && (Math.abs(differenceInHours(ev.startDate, ev.endDate)) >= 24)
           && view !== 'dayGridMonth' && { className: 'background' }),
         extendedProps: {
           calendarId: ev.calendarId,
@@ -197,6 +198,7 @@ const Calendar = ({ addToNavigation }) => {
         }
       }));
     }, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events]);
 
   return (
