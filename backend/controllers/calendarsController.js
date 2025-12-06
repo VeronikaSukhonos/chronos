@@ -488,7 +488,7 @@ class Calendars {
         if (!req.body.color)
           req.body.color = calendar.color;
         if (req.body.type == 'birthday' || req.body.type == 'holiday') {
-          req.body.repeat = { frequency: 'year', repeat: 1 };
+          req.body.repeat = { frequency: 'year', parameter: 1 };
           req.body.allDay = true;
         }
         if (req.body.visibleForAll || calendar.type == 'main' || calendar.type == 'holidays') {
@@ -546,7 +546,7 @@ class Calendars {
           name: req.body.name,
           description: req.body.description,
           startDate: req.body.startDate,
-          endDate: req.body.type == 'arrangement' || req.body.type == 'task' ? req.body.endDate:undefined,
+          endDate: req.body.endDate,
           link: req.body.type == 'arrangement' ? req.body.link:undefined,
           color: req.body.color,
           repeat: req.body.type !== 'task' ? req.body.repeat:undefined,

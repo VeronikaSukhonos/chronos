@@ -259,7 +259,7 @@ class Events {
             case 'year':
               startMonth = startDate.getMonth();
               eventMonth = eventDate.getMonth();
-              let yearsCount = (startDate.getFullYear() - eventDate.getFullYear() - (startMonth < eventMonth ? 1 : 0));
+              let yearsCount = startDate.getFullYear() - eventDate.getFullYear();
               yearsCount += i.repeat.parameter - ((yearsCount % i.repeat.parameter) || i.repeat.parameter);
               newDate = new Date(eventDate);
               newDate.setFullYear(newDate.getFullYear() + yearsCount);
@@ -290,7 +290,7 @@ class Events {
           if (events[i].authorId)
             events[i].author = new UserDto(await User.findOne({ _id: events[i].authorId }).select('id login avatar'));
           events[i] = new EventDto(events[i]);
-          if (events[i].repeat) {
+          if (events[i].repeat && events[i].repeat.frequency && events[i].repeat.parameter) {
             let eventDate = new Date(events[i].startDate);
             const timeToAdd = {};
             if (events[i].repeat.frequency !== 'week')
@@ -298,9 +298,10 @@ class Events {
             else
               timeToAdd.day = events[i].repeat.parameter * 7;
             let j = 1;
-            while (new Date(Date.UTC(eventDate.getUTCFullYear() + (timeToAdd.year || 0) * j,
-                                     eventDate.getUTCMonth() + (timeToAdd.month || 0) * j,
-                                     eventDate.getUTCDate() + (timeToAdd.day || 0) * j))
+            while ((timeToAdd.year || timeToAdd.month || timeToAdd.day)
+              && new Date(Date.UTC(eventDate.getUTCFullYear() + (timeToAdd.year || 0) * j,
+                                   eventDate.getUTCMonth() + (timeToAdd.month || 0) * j,
+                                   eventDate.getUTCDate() + (timeToAdd.day || 0) * j))
               < endDate) {
               const newEvent = JSON.parse(JSON.stringify(new EventDto(events[i])));
               const newStartDate = new Date(eventDate);
