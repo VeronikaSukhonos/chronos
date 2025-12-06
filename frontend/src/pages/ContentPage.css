@@ -102,3 +102,17 @@
   font-size: 1.1rem;
   font-weight: bold;
 }
+
+.tag {
+  background-color: var(--faded-accent-color);
+  color: var(--lighter-main-bg-color);
+  font-size: 18px;
+}
+
+.tags {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+}

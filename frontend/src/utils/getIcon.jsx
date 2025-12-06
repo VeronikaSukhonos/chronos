@@ -19,3 +19,7 @@ export const getEventIcon = (etype, cl) => {
     : etype === 'holiday' ? <HolidayIcon className={cl} />
     : etype === 'birthday' ? <BirthdayIcon className={cl} /> : <></>
 };
+
+export const getPublicEventIcon = (visibleForAll, cl) => {
+  return visibleForAll ? <GlobeIcon className={cl} /> : <></>
+};

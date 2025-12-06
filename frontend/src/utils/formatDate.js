@@ -19,6 +19,12 @@ export const fEventDate = (type, startDate, endDate, allDay) => {
       ];
 };
 
+export const fDate = (date) => {
+  const dateObj = new Date(date);
+
+  return fmt(dateObj, 'd MMM yyyy HH:mm');
+};
+
 export const fCurrentPeriod = (period) => {
   const { year, week, month, day } = period;
 

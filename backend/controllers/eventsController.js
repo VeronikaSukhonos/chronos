@@ -783,18 +783,18 @@ class Events {
       const eventCalendar = await Calendar.findOne({ _id: event.calendarId });
       let isParticipant = false;
       if ((event.visibleForAll || eventCalendar?.type == 'main' || eventCalendar?.type == 'holidays')
-        && eventCalendar?.authorId == req.user._id)
+        && eventCalendar?.authorId.toString() == req.user._id.toString())
         isParticipant = true;
       else {
         for (let i of event.participants) {
-          if (i.participantId == req.user._id) {
+          if (i.participantId.toString() == req.user._id.toString()) {
             isParticipant = i.isConfirmed === null;
             break;
           }
         }
         if (!isParticipant && event.visibleForAll && eventCalendar) {
           for (let i of eventCalendar.participants) {
-            if (i.participantId == req.user._id) {
+            if (i.participantId.toString() == req.user._id.toString()) {
               isParticipant = i.isConfirmed === null;
               break;
             }
@@ -812,7 +812,12 @@ class Events {
       event.doneDate = Date.now();
       const result = await event.save();
       return res.status(result ? 200:500).json({
-        message: result ? 'Marking done successully':'Something went wrong'
+        message: result ? 'Marking done successully':'Something went wrong',
+        data: result
+        ? {
+          doneDate: event.doneDate
+        }
+        : undefined
       });
     } catch (err) {
       if (err instanceof CastError)
@@ -838,18 +843,18 @@ class Events {
       const eventCalendar = await Calendar.findOne({ _id: event.calendarId });
       let isParticipant = false;
       if ((event.visibleForAll || eventCalendar?.type == 'main' || eventCalendar?.type == 'holidays')
-        && eventCalendar?.authorId == req.user._id)
+        && eventCalendar?.authorId.toString() == req.user._id.toString())
         isParticipant = true;
       else {
         for (let i of event.participants) {
-          if (i.participantId == req.user._id) {
+          if (i.participantId.toString() == req.user._id.toString()) {
             isParticipant = i.isConfirmed === null;
             break;
           }
         }
         if (!isParticipant && event.visibleForAll && eventCalendar) {
           for (let i of eventCalendar.participants) {
-            if (i.participantId == req.user._id) {
+            if (i.participantId.toString() == req.user._id.toString()) {
               isParticipant = i.isConfirmed === null;
               break;
             }
@@ -867,7 +872,12 @@ class Events {
       event.doneDate = null;
       const result = await event.save();
       return res.status(result ? 200:500).json({
-        message: result ? 'Unmarking done successully':'Something went wrong'
+        message: result ? 'Unmarking done successully':'Something went wrong',
+        data: result
+        ? {
+          doneDate: event.doneDate
+        }
+        : undefined
       });
     } catch (err) {
       if (err instanceof CastError)
