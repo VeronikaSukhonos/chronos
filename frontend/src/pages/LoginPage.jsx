@@ -63,6 +63,7 @@ const LoginPage = () => {
         />
 
         {feedback && <p className={"basic-form-feedback " + (feedback.status)}>{feedback.msg}</p>}
+        {feedback.msg && feedback.msg.includes('not confirmed') && <div className="basic-form-note"><Link to="/email-confirmation">Registered with a wrong email?</Link></div>}
 
         <MainButton title="Log In" dis={load} />
 

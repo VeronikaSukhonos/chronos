@@ -1,16 +1,5 @@
 import validator from 'validator';
 
-const cmpDays = (d1, d2, sign = '=') => {
-  if (sign === '<')
-    return d1?.getFullYear() < d2?.getFullYear()
-      && d1?.getMonth() < d2?.getMonth() && d1?.getDate() < d2?.getDate();
-  else if (sign === '>')
-    return d1?.getFullYear() > d2?.getFullYear()
-      && d1?.getMonth() > d2?.getMonth() && d1?.getDate() > d2?.getDate();
-  return d1?.getFullYear() === d2?.getFullYear()
-    && d1?.getMonth() === d2?.getMonth() && d1?.getDate() === d2?.getDate();
-};
-
 const login = (params) => {
   const val = (params.login || '').trim().toLowerCase();
   let err = '';
@@ -86,7 +75,7 @@ const dob = (params) => {
 
   if (validator.isISO8601(val))
     err = 'Date of birth must be a valid date';
-  else if (cmpDays(new Date(val), new Date(), '>'))
+  else if (new Date(val) > new Date())
     err = 'Date of birth must not be in the future';
 
   return err;
@@ -164,7 +153,6 @@ const arrangementLink = (params) => {
 
 export default {
   login, email, password, passwordConfirmation, fullName, dob,
-  calendarName, calendarDescription,
-  cmpDays, startDate, endDate, arrangementLink,
+  calendarName, calendarDescription, startDate, endDate, arrangementLink,
   tagTitle
 };

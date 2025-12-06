@@ -258,6 +258,7 @@ const Calendar = ({ addToNavigation }) => {
                 dayMaxEventRows: true
               }
             }}
+            eventDisplay="block"
             eventContent={Event}
             fixedWeekCount={false}
             showNonCurrentDates={false}

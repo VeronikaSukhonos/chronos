@@ -35,7 +35,7 @@ const UserList = ({ users, name, setUsers, author, resend, del, entityId, entity
         .then(() => {
           setLoad(false);
           setUsers(left);
-          toast(`Removed ${name} successfully`);
+          toast(`Removed ${name.slice(0, -1)} successfully`);
         })
         .catch((err) => {
           setLoad(false);
@@ -43,7 +43,7 @@ const UserList = ({ users, name, setUsers, author, resend, del, entityId, entity
         })
     } else {
       setUsers(left);
-      toast(`Removed ${name} successfully`);
+      toast(`Removed ${name.slice(0, -1)} successfully`);
     }
   };
 
@@ -75,7 +75,7 @@ const UserList = ({ users, name, setUsers, author, resend, del, entityId, entity
                     : <QuestionIcon className="user-list-confirmed-icon" />}
                 </div>
               }
-              <button className="user-list-delete" onClick={() => deleteUser(u)} disabled={load}>
+              <button type="button" className="user-list-delete" onClick={() => deleteUser(u)} disabled={load}>
                 <AddIcon />
               </button>
             </div>}

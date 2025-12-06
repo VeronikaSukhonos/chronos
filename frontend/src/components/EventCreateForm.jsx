@@ -70,7 +70,6 @@ const EventCreateForm = () => {
         })
         .catch((err) => { if (formOpenRef.current) setFailure(err); });
     } else {
-      console.log(params);
       Calendars.createEvent(params.calendar, {...params,
         participants: params.participants.map(p => p.id) })
         .then(({ data: res }) => {
@@ -110,6 +109,18 @@ const EventCreateForm = () => {
             const main = res.data.calendars.find(c => c.type === 'main');
             const now = addMinutes(new Date(), 10);
             const initDate = new Date(f.initDate);
+            let startDate = initialVals.startDate;
+
+            if (f.initDate && initDate >= new Date()) {
+              if (['timeGridDay', 'timeGridWeek'].includes(view)) {
+                startDate = initDate;
+              } else {
+                initDate.setHours(now.getHours(), now.getMinutes());
+                startDate = initDate;
+              }
+            } else {
+              startDate = now;
+            }
 
             setCalendars(res.data.calendars.filter(
               (c => ['author', 'participant'].includes(c.role) && c.type !== 'holidays')));
@@ -118,10 +129,8 @@ const EventCreateForm = () => {
                 name: prop,
                 value:
                   prop === 'calendar' ? main?.id :
-                  ((prop === 'color') ? (main?.color || '#ade4ff') :
-                  ((prop === 'startDate') ? (f.initDate && valid.cmpDays(new Date(f.initDate), new Date(), '>=')
-                    ? (['timeGridDay', 'timeGridWeek'].includes(view) ? initDate
-                      : (() => { initDate.setHours(now.getHours(), now.getMinutes()); return initDate})()) : now) : val))
+                  (prop === 'color' ? (main?.color || '#ade4ff') :
+                  (prop === 'startDate' ? startDate : val))
               }});
             setInitLoad(false);
           })
@@ -231,7 +240,10 @@ const EventCreateForm = () => {
           label="All day?"
           id="allDay" name="allDay"
           checked={params.allDay}
-          onChange={setParam}
+          onChange={(v) => {
+            setParam(v);
+            setParam({ target: { name: 'endDate', value: '' } });
+          }}
           short={false}
         />}
         <TextAreaField
