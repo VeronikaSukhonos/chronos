@@ -57,12 +57,13 @@ services:
       context: .
       dockerfile: frontend/Dockerfile.frontend
       target: prod
+      args:
+        - VITE_API_URL=http://localhost:8888/api
+        - VITE_IP_API_KEY=${IP_API_KEY}
     ports:
       - "8000:80"
     env_file:
       - ./.env.production
-    environment:
-      - VITE_IP_API_KEY=${IP_API_KEY}
     # secrets:
     #   - IP_API_KEY
     depends_on:

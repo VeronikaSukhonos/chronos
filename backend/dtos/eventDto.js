@@ -16,12 +16,11 @@ export class EventDto {
     this.type = model.type;
     this.visibleForAll = model.visibleForAll;
     this.startDate = model.startDate;
-    if (this.type == 'arrangement') {
-      this.endDate = model.endDate;
+    this.endDate = model.endDate;
+    if (this.type == 'arrangement')
       this.link = model.link;
-    } else if (this.type == 'task')
+    else if (this.type == 'task')
       this.doneDate = model.doneDate;
-    else if (this.type == 'holiday' || this.type == 'birthday')
-      this.allDay = true;
+    this.allDay = model.allDay;
   }
 }

@@ -478,13 +478,18 @@ class Calendars {
           }
         }
       }
+      if (calendar.type === 'holidays')
+        return res.status(400).json({
+          message: "You can't create events in Holidays calendar"
+        });
       if (hasRights) {
-        if (req.body.type == 'arrangement' && !req.body.endDate)
+        if ((req.body.type == 'arrangement' || req.body.type == 'task') && !req.body.endDate)
           req.body.endDate = new Date(new Date(req.body.startDate).getTime() + 3600000).toISOString();
         if (!req.body.color)
           req.body.color = calendar.color;
         if (req.body.type == 'birthday' || req.body.type == 'holiday') {
           req.body.repeat = { frequency: 'year', repeat: 1 };
+          req.body.allDay = true;
         }
         if (req.body.visibleForAll || calendar.type == 'main' || calendar.type == 'holidays') {
           req.body.participants = [];
@@ -505,10 +510,14 @@ class Calendars {
         }
         if (req.body.tags) {
           for (let i = req.body.tags.length - 1; i >= 0; --i) {
-            if (!(await Tag.findOne({ _id: req.body.tags[i] }))
+            if (!(await Tag.findOne({ _id: req.body.tags[i], authorId: req.user._id }))
               || req.body.tags.indexOf(req.body.tags[i]) < i)
               req.body.tags.splice(i, 1);
           }
+        }
+        if (req.body.allDay) {
+          req.body.startDate = new Date(new Date(req.body.startDate).setHours(0, 0, 0, 0)).toISOString();
+          req.body.endDate = new Date(new Date(req.body.startDate).setHours(23, 59, 59, 999)).toISOString();
         }
         let participants = [];
         for (let i of req.body.participants) {
@@ -544,7 +553,8 @@ class Calendars {
           participants: participants,
           tags: req.body.tags,
           type: req.body.type,
-          visibleForAll: calendar.type == 'main' || calendar.type == 'holidays' ? false:req.body.visibleForAll
+          visibleForAll: calendar.type == 'main' || calendar.type == 'holidays' ? false:req.body.visibleForAll,
+          allDay: req.body.allDay
         });
         if (participants.length !== 0) {
           for (let i = 0; i < newEvent.participants.length; i += 1) {
@@ -586,8 +596,8 @@ class Calendars {
         });
       } else
         return res.status(403).json({
-        message: "You do not have rights to create events in the calendar"
-      });
+          message: "You do not have rights to create events in the calendar"
+        });
     } catch (err) {
       if (err instanceof mongoose.CastError)
         return res.status(404).json({ message: 'Calendar is not found' });

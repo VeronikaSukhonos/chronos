@@ -594,7 +594,7 @@ class Events {
 
   async editOne(req, res) {
     try {
-      const { name, description, startDate, endDate, color, participants, tags, repeat, link, visibleForAll } = req.body;
+      const { name, description, startDate, endDate, color, participants, tags, repeat, link, visibleForAll, allDay } = req.body;
       const eventId = req.params.eventId;
       const event = await Event.findOne({ _id: eventId });
 
@@ -607,21 +607,28 @@ class Events {
         event.name = name;
       if (event.description || description !== undefined) event.description = description;
       if (event.color || color) event.color = color;
-      if (startDate)
-        event.startDate = startDate;
-      if ((event.type == 'arrangement' || event.type == 'task') && endDate) {
-        if (new Date(endDate) <= new Date(event.startDate))
-          return res.status(400).json({
-            message: "Validation failed",
-            errors: [ { param: "endDate", error: "End Date must be in the future compared to Start Date" } ]
-          });
-        else
-          event.endDate = endDate;
+      if (!(event.type == 'birthday' || event.type == 'holiday')
+        && allDay !== undefined && allDay !== event.allDay) {
+        event.allDay = allDay;
+        if (event.allDay) {
+          event.startDate = new Date(new Date(event.startDate).setHours(0, 0, 0, 0)).toISOString();
+          event.endDate = new Date(new Date(event.startDate).setHours(23, 59, 59, 999)).toISOString();
+        }
       }
-      if (calendar.type == 'main' || calendar.type == 'holidays') {
-        event.participants = [];
-        event.visibleForAll = false;
-      } else {
+      if (!event.allDay) {
+        if (startDate)
+          event.startDate = startDate;
+        if ((event.type == 'arrangement' || event.type == 'task') && endDate) {
+          if (new Date(endDate) <= new Date(event.startDate))
+            return res.status(400).json({
+              message: "Validation failed",
+              errors: [{ param: "endDate", error: "End date must be later than start date" }]
+            });
+          else
+            event.endDate = endDate;
+        }
+      }
+      if (!(calendar.type == 'main' || calendar.type == 'holidays')) {
         let filteredParticipants = participants;
         if (visibleForAll !== undefined && visibleForAll !== event.visibleForAll) {
           if (visibleForAll || !participants) {
@@ -695,7 +702,7 @@ class Events {
       }
       if (tags)
         for (let i = tags.length - 1; i >= 0; --i) {
-          if (!(await Tag.findOne({ _id: tags[i] }))
+          if (!(await Tag.findOne({ _id: tags[i], authorId: req.user._id }))
             || tags.indexOf(tags[i]) < i)
             tags.splice(i, 1);
         }
@@ -774,8 +781,27 @@ class Events {
           message: "The event is not a task"
         });
       const eventCalendar = await Calendar.findOne({ _id: event.calendarId });
-      if (!(event.participants.includes(req.user._id)
-        || (event.visibleForAll && eventCalendar?.participants.includes(req.user._id))))
+      let isParticipant = false;
+      if ((event.visibleForAll || eventCalendar?.type == 'main' || eventCalendar?.type == 'holidays')
+        && eventCalendar?.authorId == req.user._id)
+        isParticipant = true;
+      else {
+        for (let i of event.participants) {
+          if (i.participantId == req.user._id) {
+            isParticipant = i.isConfirmed === null;
+            break;
+          }
+        }
+        if (!isParticipant && event.visibleForAll && eventCalendar) {
+          for (let i of eventCalendar.participants) {
+            if (i.participantId == req.user._id) {
+              isParticipant = i.isConfirmed === null;
+              break;
+            }
+          }
+        }
+      }
+      if (!isParticipant)
         return res.status(403).json({
           message: "You are not the participant"
         });
@@ -810,8 +836,27 @@ class Events {
           message: "The event is not a task"
         });
       const eventCalendar = await Calendar.findOne({ _id: event.calendarId });
-      if (!(event.participants.includes(req.user._id)
-        || (event.visibleForAll && eventCalendar?.participants.includes(req.user._id))))
+      let isParticipant = false;
+      if ((event.visibleForAll || eventCalendar?.type == 'main' || eventCalendar?.type == 'holidays')
+        && eventCalendar?.authorId == req.user._id)
+        isParticipant = true;
+      else {
+        for (let i of event.participants) {
+          if (i.participantId == req.user._id) {
+            isParticipant = i.isConfirmed === null;
+            break;
+          }
+        }
+        if (!isParticipant && event.visibleForAll && eventCalendar) {
+          for (let i of eventCalendar.participants) {
+            if (i.participantId == req.user._id) {
+              isParticipant = i.isConfirmed === null;
+              break;
+            }
+          }
+        }
+      }
+      if (!isParticipant)
         return res.status(403).json({
           message: "You are not the participant"
         });

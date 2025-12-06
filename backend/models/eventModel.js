@@ -78,6 +78,10 @@ const eventSchema = new Schema({
   visibleForAll: {
     type: Boolean,
     default: false
+  },
+  allDay: {
+    type: Boolean,
+    default: false
   }
 });
 

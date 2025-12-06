@@ -64,7 +64,15 @@ const eventParams = {
   startDate: body('startDate').trim()
     .notEmpty().withMessage('Start date is required').bail()
     .isISO8601({strict: true}).withMessage('Start date must be a valid date').bail()
-    .custom((val) => new Date(val) > Date.now()).withMessage('Start date must be in the future'),
+    .custom((val, { req }) => {
+      if (req.body.type == 'birthday') {
+        if (new Date(val) > Date.now())
+          throw new Error("Birthday can't be in the future");
+        return true;
+      } else if (new Date(val) <= Date.now())
+        throw new Error('Start date must be in the future');
+      return true;
+    }),
   description: body('description').optional().trim()
     .isLength({ max: 250 }).withMessage('Description must be at most 250 characters'),
   color: body('color').optional().trim()
@@ -81,6 +89,7 @@ const eventParams = {
     .isArray().withMessage('Tags must be provided as array')
     .customSanitizer(value => value.map(el => el.trim())),
   visibleForAll: body('visibleForAll').optional().customSanitizer(val => val === true || val === 'true'),
+  allDay: body('allDay').optional().customSanitizer(val => val === true || val === 'true'),
   endDate: body('endDate').if(body('type').isIn(['arrangement', 'task'])).optional({ checkFalsy: true }).trim()
     .isISO8601({strict: true}).withMessage('End date must be a valid date').bail()
     .custom((val, { req }) => new Date(val) > new Date(req.body.startDate))
@@ -114,7 +123,7 @@ const eventParams = {
 
 const create = [
   eventParams.name, eventParams.type, eventParams.startDate,
-  eventParams.description, eventParams.color, eventParams.participants, eventParams.tags, eventParams.visibleForAll,
+  eventParams.description, eventParams.color, eventParams.participants, eventParams.tags, eventParams.visibleForAll, eventParams.allDay,
   eventParams.endDate, eventParams.repeat, eventParams.link,
   isValid
 ];
@@ -139,7 +148,15 @@ const update = [
     .isLength({ max: 60 }).withMessage('Name must be at most 60 characters'),
   body('startDate').optional({ checkFalsy: true }).trim()
     .isISO8601({strict: true}).withMessage('Start date must be a valid date').bail()
-    .custom((val) => new Date(val) > Date.now()).withMessage('Start date must be in the future'),
+    .custom((val, { req }) => {
+      if (req.body.type == 'birthday') {
+        if (new Date(val) > Date.now())
+          throw new Error("Birthday can't be in the future");
+        return true;
+      } else if (new Date(val) <= Date.now())
+        throw new Error('Start date must be in the future');
+      return true;
+    }),
   body('endDate').optional({ checkFalsy: true }).trim()
     .isISO8601({strict: true}).withMessage('End date must be a valid date'),
   body('repeat').optional()
@@ -154,7 +171,7 @@ const update = [
       return true;
     }),
   eventParams.description, eventParams.color, eventParams.participants,
-  eventParams.tags, eventParams.visibleForAll, eventParams.link,
+  eventParams.tags, eventParams.visibleForAll, eventParams.allDay, eventParams.link,
   isValid
 ];
 
