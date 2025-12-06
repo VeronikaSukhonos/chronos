@@ -183,7 +183,7 @@ const CalendarPage = () => {
           setUsers={(users) => setCurCalendar({...curCalendar, participants: users})}
           author={curCalendar.author}
           resend={Calendars.resendParticipation} del={Calendars.updateCalendar}
-          entityId={curCalendar.id}
+          entityId={curCalendar.id} entityName='calendar' name='participants'
         />
       </div>}
       {curCalendar.isPublic && <div className="content-info-container">
@@ -191,7 +191,7 @@ const CalendarPage = () => {
         <UserList
           users={curCalendar.followers}
           setUsers={(users) => setCurCalendar({...curCalendar, followers: users})}
-          author={curCalendar.author}
+          author={curCalendar.author} entityName='calendar' name='followers'
           del={Calendars.updateCalendar}
         />
       </div>}

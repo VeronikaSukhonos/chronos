@@ -124,6 +124,10 @@
   cursor: pointer;
 }
 
+.field-container button.react-datepicker__navigation {
+  height: auto;
+}
+
 .field-container svg {
   height: auto;
   width: 22px;
@@ -183,6 +187,29 @@
   border-radius: 10px 10px 0 0;
 }
 
+.time .react-datepicker__header {
+  border-radius: 10px 10px 0 0;
+}
+
+.react-datepicker__time-container .react-datepicker__time
+.react-datepicker__time-box ul.react-datepicker__time-list
+li.react-datepicker__time-list-item {
+  transition: background ease-in-out 0.1s;
+}
+
+.react-datepicker__time-container .react-datepicker__time
+.react-datepicker__time-box ul.react-datepicker__time-list
+li.react-datepicker__time-list-item:hover,
+.react-datepicker__time-list-item--selected:hover {
+  background: var(--extra-accent-bg-color) !important;
+  color: var(--main-color);
+}
+
+.react-datepicker__time-list-item--selected {
+  background: var(--accent-color) !important;
+  transition: all ease-in-out 0.3s !important;
+}
+
 .react-datepicker__current-month {
   color: var(--accent-color);
 }
@@ -193,7 +220,7 @@
 
 .react-datepicker__navigation-icon::before {
   border-color: var(--accent-color);
-  top: -90px;
+  top: 12px;
   transition: all ease-in-out 0.3s;
 }
 
@@ -225,6 +252,12 @@
 .react-datepicker__day--keyboard-selected:not([aria-disabled=true]):hover {
   background: var(--accent-color);
   color: var(--lighter-main-bg-color);
+  font-weight: bold;
+  transition: all ease-in-out 0.3s;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background: var(--lighter-shadow-color);
 }
 
 .checkbox-field-container {
@@ -342,7 +375,6 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background: transparent;
   border: none;
   border-radius: 15px;
   color: var(--main-color);
@@ -355,12 +387,15 @@
 }
 
 .select-field-container.open .select-field-button,
-.select-field-button:not(:disabled):hover {
-  font-size: 1.13rem;
+.select-field-container .select-field-button:not(:disabled):hover {
   cursor: pointer;
 }
 
-.select-field-button svg {
+.select-field-container .select-field-button:not(:disabled):hover {
+  cursor: pointer;
+}
+
+.select-field-button > svg {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -371,19 +406,20 @@
   transition: all ease-in-out 0.5s;
 }
 
-.select-field-container.open .select-field-button svg,
-.select-field-button:not(:disabled):hover svg {
+.select-field-container.open .select-field-button > svg,
+.select-field-button:not(:disabled):hover > svg {
   transform: rotate(90deg) scale(1.05);
 }
 
 .select-field-options-container {
   display: flex;
   flex-direction: column;
-  justify-items: center;
   background: var(--lighter-main-bg-color);
   box-shadow: 0 0 5px 1px var(--main-shadow-color);
   border-radius: 15px;
   width: 100%;
+  max-height: 150px;
+  overflow: hidden auto;
   position: absolute;
   top: 120%;
   left: 0;
@@ -429,6 +465,29 @@
 
 .select-field-option label:hover {
   transform: scale(1.02);
+}
+
+.select-field-button div,
+.select-field-option label div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.select-field-button div svg,
+.select-field-option label div svg {
+  height: 20px;
+  width: 20px;
+}
+
+.select-field-button div span,
+.select-field-option label div span {
+  background: var(--main-bg-color);
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
 }
 
 .select-field-container.nav .select-field-button {

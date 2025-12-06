@@ -168,6 +168,11 @@
   font-size: 0.8rem;
 }
 
+.user-list-role {
+  font-size: 0.8rem;
+  padding-right: 7px;
+}
+
 .user-list-delete {
   display: flex;
   justify-content: center;

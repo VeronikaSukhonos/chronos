@@ -19,8 +19,8 @@ const SearchedUser = ({ user, onClick }) => {
 };
 
 const UserSearchForm = (
-  { label, name, chosen = [], author, setChosen, notDeletable = [],
-    req = false, resend, entityId, del, err, fOpen, removeFollower }
+  { label, name, id, chosen = [], author, setChosen, notDeletable = [],
+    req = false, resend, entityId, entityName = 'calendar', del, err, fOpen, removeFollower }
 ) => {
   const auth = useSelector(selectAuthUser.user);
 
@@ -74,12 +74,12 @@ const UserSearchForm = (
       <div className="field-container vertical">
         <UserList
           users={chosen} setUsers={(users) => setChosen({ target: { name, value: users } })}
-          author={author} resend={resend} entityId={entityId}
-          del={del} notDeletable={notDeletable}
+          author={author} resend={resend} entityId={entityId} entityName={entityName}
+          del={del} notDeletable={notDeletable} name={name}
         />
 
         {resend && <div className="user-search-form-add-container">
-          <input
+          <input id={id || name}
             type="text" name={name}
             onChange={(e) => setSearch(e.target.value)} value={search || ""}
             onBlur={() => {
@@ -111,8 +111,8 @@ const UserSearchForm = (
         </div>}
       </div>
 
-      {err?.[resend ? 'participants' : 'followers']
-        && <div className="field-err">{err[resend ? 'participants' : 'followers']}</div>}
+      {err?.[name]
+        && <div className="field-err">{err[name]}</div>}
     </div>
   );
 };

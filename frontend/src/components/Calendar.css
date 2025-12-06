@@ -50,6 +50,7 @@
 }
 
 .calendar-container.disabled {
+  cursor: auto;
   pointer-events: none;
 }
 
@@ -95,7 +96,8 @@
   transition: all ease-in-out 0.3s;
 }
 
-.fc-timeGridWeek-view .fc-day-today .fc-col-header-cell-cushion {
+.fc-timeGridWeek-view .fc-day-today .fc-col-header-cell-cushion,
+.fc-timeGridDay-view .fc-day-today .fc-col-header-cell-cushion {
   background: var(--accent-color);
   border-radius: 7px;
   color: var(--lighter-main-bg-color);
@@ -132,14 +134,11 @@
 
 .fc-daygrid-day-frame {
   background: var(--lighter-main-bg-color);
-  transition:
-    background ease-in-out 0.3s,
-    opacity ease-in-out 0.3s;
+  transition: background ease-in-out 0.3s;
 }
 
 .fc .fc-day-disabled .fc-daygrid-day-frame {
-  background: var(--faded-accent-color);
-  opacity: 0.01;
+  background: rgba(149, 131, 167, 0.1);
 }
 
 .fc .fc-day-disabled:last-of-type {
@@ -151,7 +150,7 @@
 }
 
 .fc-daygrid-day:not(.fc-day-disabled) .fc-daygrid-day-frame,
-.fc-timegrid-slot-lane {
+.fc-timegrid-slot-lane, .fc-daygrid-event {
   cursor: pointer;
 }
 
@@ -190,6 +189,15 @@
   filter: brightness(1.02);
 }
 
+.fc-event.holiday {
+  cursor: auto;
+}
+
+.fc-event.background {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
 .calendar-event {
   display: flex;
   flex-direction: row;
@@ -206,7 +214,8 @@
 }
 
 .fc-daygrid-dot-event.fc-event-mirror,
-.fc-daygrid-dot-event:hover {
+.fc-daygrid-dot-event:hover,
+.fc .fc-daygrid-more-link:hover:hover {
   background: rgba(149, 131, 167, 0.1);
 }
 
@@ -223,6 +232,38 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.fc-daygrid-more-link.fc-more-link {
+  border-radius: 5px;
+  color: var(--accent-color);
+  font-size: 0.75rem;
+  width: 100%;
+  transition: all ease-in-out 0.3s;
+}
+
+.fc-theme-standard .fc-popover {
+  background: var(--lighter-main-bg-color);
+  border-radius: 20px;
+  box-shadow: 0 0 4px 1px var(--main-shadow-color);
+}
+
+.fc-theme-standard .fc-popover-header {
+  background: var(--accent-bg-color);
+  border-radius: 20px 20px 0 0;
+  color: var(--accent-color);
+  font-weight: 700;
+  justify-content: center;
+  position: relative;
+}
+
+.fc-popover-close {
+  font-weight: 700;
+  position: absolute;
+  top: 6px;
+  right: 7px;
+}
+
+
 
 @media screen and (max-width: 800px) {
   .calendar-navigation-current {
@@ -268,6 +309,11 @@
   .fc .fc-daygrid-week-number {
     font: bold 0.7rem 'Poppins', sans-serif;
   }
+
+  .fc-timeGridWeek-view .fc-col-header-cell-cushion {
+    max-width: 38px;
+    margin-top: 6px;
+  }
 }
 
 @media screen and (max-width: 450px) {
@@ -287,14 +333,5 @@
 
   .main-button.nav:not(:disabled):hover {
     font-size: 0.85rem;
-  }
-
-  .fc-timeGridWeek-view .fc-col-header-cell-cushion {
-    margin: 2px;
-    margin-top: 5px;
-  }
-
-  .fc-timeGridWeek-view .fc-day-fri .fc-col-header-cell-cushion {
-    margin: 5px;
   }
 }

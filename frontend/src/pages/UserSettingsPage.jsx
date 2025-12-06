@@ -274,6 +274,7 @@ const UserSettingsPage = () => {
                   />
                   <DateField
                     label="Date of Birth"
+                    max={new Date()}
                     onChange={setParam}
                     id="dob"
                     val={params.dob}

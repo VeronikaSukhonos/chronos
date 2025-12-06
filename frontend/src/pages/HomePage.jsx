@@ -13,7 +13,7 @@ import ErrorPage from './ErrorPage.jsx';
 import LoadPage from './LoadPage.jsx';
 import {
   AccordionMenu, Calendar, SidePanelItem, MainButton,
-  CalendarCreateForm, TagCreateForm, ConfirmDeleteForm
+  CalendarCreateForm, EventCreateForm, TagCreateForm, ConfirmDeleteForm
 } from '../components';
 import { AddIcon, LinesIcon } from '../assets';
 import './HomePage.css';
@@ -157,6 +157,7 @@ function HomePage() {
         />
       </div>
       <CalendarCreateForm />
+      <EventCreateForm />
       <TagCreateForm />
       <ConfirmDeleteForm />
     </div>

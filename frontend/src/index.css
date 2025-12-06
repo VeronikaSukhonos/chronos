@@ -132,7 +132,8 @@ img.load {
 html, textarea, .modal-content,
 .side-panel .accordion-menu-scroll-container,
 .user-list, .search-results,
-.fc-scroller {
+.fc-scroller, .react-datepicker__time-list,
+.select-field-options-container {
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) transparent;
 }

@@ -35,8 +35,7 @@ const eventSchema = new Schema({
     default: null
   },
   color: {
-    type: String,
-    // TODO here possibly should be a function for default value - takes the value from the calendar color 
+    type: String
   },
   repeat: {
     type: {

@@ -8,37 +8,37 @@ import './InputFields.css';
 
 const COLORS = ['#ade4ff', '#f8d1ff', '#ffcedc', '#ffdab4', '#fced9a', '#cff2c8'];
 
-export const TextField = ({ label, onChange, id, val, err, req = false, ph = "", ac = "off", dis = false }) => {
+export const TextField = ({ label, onChange, id, name, val, err, req = false, ph = "", ac = "off", dis = false }) => {
   return (
     <div className="field">
       {label && <label className={"field-label" + (req ? " required" : "")} htmlFor={id}>{label}</label>}
       <div className="field-container">
         <input
           type="text"
-          id={id} name={id}
+          id={id} name={name || id}
           onChange={onChange} value={val || ""}
           placeholder={ph} autoComplete={ac} disabled={dis}
         />
       </div>
 
-      {err?.[id] && <div className="field-err">{err[id]}</div>}
+      {err?.[name || id] && <div className="field-err">{err[name || id]}</div>}
     </div>
   );
 };
 
-export const TextAreaField = ({ label, onChange, id, val, err, req = false, ph = "", dis = false }) => {
+export const TextAreaField = ({ label, onChange, id, name, val, err, req = false, ph = "", dis = false }) => {
   return (
     <div className="field">
       {label && <label className={"field-label" + (req ? " required" : "")} htmlFor={id}>{label}</label>}
       <div className="field-container area">
         <textarea
-          id={id} name={id}
+          id={id} name={name || id}
           onChange={onChange} value={val || ""}
           placeholder={ph} disabled={dis}
         ></textarea>
       </div>
 
-      {err?.[id] && <div className="field-err">{err[id]}</div>}
+      {err?.[name || id] && <div className="field-err">{err[name || id]}</div>}
     </div>
   );
 };
@@ -66,17 +66,18 @@ export const PasswordField = (
   );
 };
 
-export const DateField = ({ label, onChange, id, val, err, req = false, ac = "off", dis = false }) => {
+export const DateField = ({ label, min, max, time = false, onChange, id, val, err, req = false, ac = "off", dis = false }) => {
   return (
     <div className="field">
       {label && <label className={"field-label" + (req ? " required" : "")} htmlFor={id}>{label}</label>}
-      <div className="field-container">
+      <div className={"field-container" + (time ? " time" : "")}>
         <DatePicker
           id={id} name={id}
+          showTimeSelect={time}
           onChange={(d) => onChange({ target: { name: id, value: d }})}
           selected={val} autoComplete={ac}
-          placeholderText="dd/mm/yyyy" maxDate={new Date()}
-          dateFormat="dd/MM/yyyy" calendarStartDay={1}
+          placeholderText={ time ? "dd/MM/yyyy HH:mm" : "dd/MM/yyyy"} minDate={min} maxDate={max}
+          dateFormat={ time ? "dd/MM/yyyy HH:mm" : "dd/MM/yyyy"} timeFormat="HH:mm" calendarStartDay={1}
           disabled={dis}
         />
       </div>
@@ -110,7 +111,7 @@ export const Checkbox = (
 };
 
 export const ColorField = (
-  { label, name, checked, onChange, err, req = false, dis = false, colors = COLORS }
+  { label, name, id = 'cld', checked, onChange, err, req = false, dis = false, colors = COLORS }
 ) => {
   return (
     <div className="field">
@@ -118,10 +119,10 @@ export const ColorField = (
       <div className="color-field-container">
         {
           colors.map((c) => 
-            <label className="color-field-label" htmlFor={c} key={c}>
+            <label className="color-field-label" htmlFor={id + c} key={id + c}>
               <input
                 type="radio"
-                id={c} name={name}
+                id={id + c} name={name}
                 onChange={() => onChange({ target: { name, value: c } })}
                 checked={c === checked}
                 disabled={dis}
@@ -153,7 +154,7 @@ export const SelectField = (
       <div ref={selectRef} className={
         "select-field-container " + (dis ? "disabled close" : (selectOpen ? "open" : "close")) + (nav ? " nav" : "")
       }>
-        <button className="select-field-button" disabled={dis} onClick={() => { if (!dis) setSelectOpen(open => !open); }}>
+        <button type="button" className="select-field-button" disabled={dis} onClick={() => { if (!dis) setSelectOpen(open => !open); }}>
           {sel?.label}<ArrowIcon />
         </button>
         <div className="select-field-options-container">
@@ -161,8 +162,8 @@ export const SelectField = (
               <input
                 type="radio"
                 id={opt.value} name={name}
-                onClick={() => { setSelectOpen(false); onChange({ target: { name: name, value: opt.value } }); }}
-                onChange={() => { setSelectOpen(false); onChange({ target: { name: name, value: opt.value } }); }}
+                onClick={() => setSelectOpen(false)}
+                onChange={() => onChange({ target: { name, value: opt.value } })}
                 checked={opt.value === sel?.value}
                 disabled={dis}
               />

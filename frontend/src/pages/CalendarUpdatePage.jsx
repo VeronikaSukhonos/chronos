@@ -113,6 +113,7 @@ const CalendarUpdatePage = () => {
               author={calendar.author}
               resend={Calendars.resendParticipation}
               entityId={calendarId}
+              entityName='calendar'
               del={Calendars.updateCalendar}
               removeFollower={calendar.isPublic
                 ? (id) => setParam({ target: { name: 'followers',

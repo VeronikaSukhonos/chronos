@@ -13,9 +13,41 @@ The application was developed as a solution to the `chronos` challenge of **Trac
 All you need preinstalled is the [**Docker Desktop**](https://docs.docker.com/get-started/introduction/get-docker-desktop/).
 
 ### Tech Stack
-* [Node.js](https://nodejs.org/en/download)
 
-// TODO full tech stack list
+#### Backend
+
+* [Node.js](https://nodejs.org/en/download)
+* [Express](https://expressjs.com/)
+* [MongoDB](https://www.mongodb.com/)
+
+npm packages:
+
+* axios
+* bcryptjs
+* express, express-validator
+* jsonwebtoken
+* mongoose
+* multer
+* nodemailer
+
+#### Frontend
+
+* [React](https://react.dev/)
+* [Redux Toolkit](https://redux-toolkit.js.org/)
+* [Full Calendar](https://fullcalendar.io/)
+
+Other packages:
+
+* axios
+* date-fns
+* react-datepicker
+* react-toastify
+* validator
+
+#### External APIs
+
+* Public Holiday Api - [**Nager.Date**](https://date.nager.at/)
+* IP Data Api - [**IPinfo**](https://ipinfo.io/)
 
 ## How to use
 
@@ -37,7 +69,7 @@ Launch the Docker Desktop, and, in the same directory where `docker-compose.yml`
 docker compose build <app-dev/app-prod>
 ```
 
-Write `app-dev` to run the development build and `app-prod` to run the production build.
+Write `app-dev` to run the development build, and `app-prod` to run the production build.
 
 In the development build, you can change files both in `backend` and `frontend` directories (except Docker-related files like Dockerfile), and servers will be restarted automatically.
 

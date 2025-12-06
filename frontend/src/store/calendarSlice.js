@@ -9,7 +9,8 @@ const initialCalendarCreateForm = {
 
 const initialEventCreateForm = {
   event: null,
-  open: false,
+  initDate: null,
+  open: false
 };
 
 const initialTagCreateForm = {
@@ -165,6 +166,6 @@ export const selectCalendarLoad = {
 };
 
 export const selectCalendarCreateForm = (state) => state.calendar.calendarCreateForm;
-export const selectEventCreateForm = (state) => state.calendar.calendarEventForm;
+export const selectEventCreateForm = (state) => state.calendar.eventCreateForm;
 export const selectTagCreateForm = (state) => state.calendar.tagCreateForm;
 export const selectConfirmDeleteForm = (state) => state.calendar.confirmDeleteForm;

@@ -7,7 +7,7 @@ import { selectAuthUser } from '../store/authSlice.js';
 import { MainButton } from '../components';
 import { ConfirmIcon, AddIcon, QuestionIcon } from '../assets';
 
-const UserList = ({ users, setUsers, author, resend, del, entityId, notDeletable = [] }) => {
+const UserList = ({ users, name, setUsers, author, resend, del, entityId, entityName = 'calendar', notDeletable = [] }) => {
   const auth = useSelector(selectAuthUser.user);
   const [load, setLoad] = useState(false);
 
@@ -35,7 +35,7 @@ const UserList = ({ users, setUsers, author, resend, del, entityId, notDeletable
         .then(() => {
           setLoad(false);
           setUsers(left);
-          toast(`Removed ${resend ? 'participant' : 'follower'} successfully`);
+          toast(`Removed ${name} successfully`);
         })
         .catch((err) => {
           setLoad(false);
@@ -43,7 +43,7 @@ const UserList = ({ users, setUsers, author, resend, del, entityId, notDeletable
         })
     } else {
       setUsers(left);
-      toast(`Removed ${resend ? 'participant' : 'follower'} successfully`);
+      toast(`Removed ${name} successfully`);
     }
   };
 
@@ -60,7 +60,8 @@ const UserList = ({ users, setUsers, author, resend, del, entityId, notDeletable
               />
               <div className="user-list-user-login">{u.login}</div>
             </Link>
-            {auth.id === author?.id && !notDeletable.includes(u.id) && <div className="user-list-buttons-container">
+            {auth.id === author?.id && !notDeletable.find(nd => nd.id === u.id)
+              && <div className="user-list-buttons-container">
               {
                 resend && <div className="user-list-confirmed">
                   {![true, 'sent', 'new'].includes(u.isConfirmed) && <MainButton
@@ -78,11 +79,17 @@ const UserList = ({ users, setUsers, author, resend, del, entityId, notDeletable
                 <AddIcon />
               </button>
             </div>}
+            {(() => {
+              const role = notDeletable.find(nd => nd.id === u.id)?.role;
+              if (role) return <div className="user-list-role">{role}</div>
+            })()}
           </div>
         })
       }
     </div>
-  ) : <div className="info-message left">No {resend ? 'participants' : 'followers'} in this calendar</div>;
+  ) : (entityName === 'calendar'
+      ? <div className="info-message left">No {name} in this calendar</div> :
+        <div className="info-message left">This event is public</div>);
 };
 
 export default UserList;

@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import Calendars from '../api/calendarsApi.js';
+import { selectAuthUser } from '../store/authSlice.js';
 import {
   addToCalendar, updateInCalendar, selectCalendarCreateForm, setForm, closeForm
 } from '../store/calendarSlice.js';
@@ -17,6 +18,7 @@ import '../components/Forms.css';
 const CalendarCreateForm = () => {
   const dispatch = useDispatch();
 
+  const auth = useSelector(selectAuthUser.user);
   const f = useSelector(selectCalendarCreateForm);
   const formOpenRef = useRef();
 
@@ -82,7 +84,7 @@ const CalendarCreateForm = () => {
           setInitLoad(false);
           dispatch(closeForm('calendarCreateForm'));
           toast(err.message);
-        })
+        });
     } else {
       for (const [prop, val] of Object.entries(initialVals))
         setParam({ target: { name: prop, value: val } });
@@ -124,7 +126,7 @@ const CalendarCreateForm = () => {
               err={errors} dis={f.onlyColor}
             />
             <ColorField
-              label="Default Event Color" name="color"
+              label="Default Event Color" name="color" id="cld"
               checked={params.color}
               onChange={setParam}
               err={errors}
@@ -136,9 +138,9 @@ const CalendarCreateForm = () => {
             <UserSearchForm
               label="Participants" name="participants" err={errors}
               chosen={params.participants} setChosen={setParam}
-              author={f.calendar?.author}
+              author={f.calendar?.author || auth}
               resend={Calendars.resendParticipation}
-              entityId={f.calendar?.id}
+              entityId={f.calendar?.id} entityName='calendar'
               del={Calendars.updateCalendar}
               fOpen={formOpenRef.current}
               removeFollower={f.calendar?.id && f.calendar?.isPublic
@@ -150,8 +152,9 @@ const CalendarCreateForm = () => {
               <UserSearchForm
                 label="Participants" name="participants" err={errors}
                 chosen={params.followers} setChosen={setParam}
-                author={f.calendar?.author}
+                author={f.calendar?.author || auth}
                 del={Calendars.updateCalendar}
+                entityName='followers'
               />}
             <Checkbox
               label="Make this calendar public?"

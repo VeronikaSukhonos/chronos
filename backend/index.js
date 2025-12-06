@@ -35,7 +35,7 @@ app.use('/api/tags', isAuth, tagsRouter);
 app.use(notFoundError);
 app.use(serverError);
 
-mongoose.connect('mongodb+srv://prezchyk:oDpY8Sh75bhJ568j@chronos.uvtbggy.mongodb.net/chronos?appName=chronos') // TODO maybe replace with random user, move to .env
+mongoose.connect('mongodb+srv://prezchyk:oDpY8Sh75bhJ568j@chronos.uvtbggy.mongodb.net/chronos?appName=chronos')
   .then(() => {
     app.listen(port, () => {
       console.log(`API server running at http://${hostname}:${port}`);

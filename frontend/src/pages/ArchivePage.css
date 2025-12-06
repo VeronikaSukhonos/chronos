@@ -1,10 +1,11 @@
 @media (max-width: 510px) {
   .archived-calendars-container {
     grid-template-columns: 1fr;
+    width: 100%;
   }
 
   .archive-item {
-    width: 326px;
+    max-width: 100%;
   }
 
   .archive-item .content-name {
@@ -35,6 +36,7 @@
 @media (min-width: 1450px) {
   .archived-calendars-container {
     grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
   }
 }
 
@@ -44,7 +46,7 @@
 }
 
 .archive-item {
-  background: var(--lighter-shadow-color);
+  background: var(--lighter-main-bg-color);
   border-radius: 20px;
   padding: 20px;
   display: flex;

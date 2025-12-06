@@ -147,7 +147,7 @@ const SidePanelItem = ({ item, group }) => {
   return (
     <li className="side-panel-item">
       <Checkbox
-        id={item.id || item.type} name={group}
+        id={'vs' + (item.id || item.type)} name={group}
         label={item.name || item.title || item.type}
         checked={item.visible || false}
         onChange={() => dispatch(updateVs({ group, id: (item.id || item.type) }))}

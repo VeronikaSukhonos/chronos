@@ -115,8 +115,20 @@ const calendarDescription = (params) => {
   return err;
 };
 
+const cmpDays = (d1, d2, sign = '=') => {
+  if (sign === '<=')
+    return d1?.getFullYear() <= d2?.getFullYear()
+      && d1?.getMonth() <= d2?.getMonth() && d1?.getDate() <= d2?.getDate();
+  else if (sign === '>=')
+    return d1?.getFullYear() >= d2?.getFullYear()
+      && d1?.getMonth() >= d2?.getMonth() && d1?.getDate() >= d2?.getDate();
+  return d1?.getFullYear() === d2?.getFullYear()
+    && d1?.getMonth() === d2?.getMonth() && d1?.getDate() === d2?.getDate();
+};
+
 export default {
   login, email, password, passwordConfirmation, fullName, dob,
   calendarName, calendarDescription,
+  cmpDays,
   tagTitle
 };
