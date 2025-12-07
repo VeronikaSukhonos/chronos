@@ -161,7 +161,7 @@ const update = [
     }),
   body('endDate').optional({ checkFalsy: true }).trim()
     .isISO8601({strict: true}).withMessage('End date must be a valid date'),
-  body('repeat').optional()
+  body('repeat').optional().if(body('repeat').notEmpty())
     .isObject().withMessage('Repeat must be an object').bail()
     .custom((value, { req }) => {
       if (value.frequency === undefined || value.parameter === undefined)

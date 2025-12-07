@@ -205,7 +205,7 @@ All endpoints require authorization.
 
 2. `GET /api/events/:eventId` - gets information about a specified event
 
-**Data**: event data (everything, participants are arrays (`id`, `login`, `avatar` and `isConfirmed`), author is an object (`id`, `login`, `avatar`), calendar is an object (`id`, `name`, `color` and `authorId`))
+**Data**: event data (everything, participants are array of objects (`id`, `login`, `avatar` and `isConfirmed`), author is an object (`id`, `login`, `avatar`), calendar is an object (`id`, `name`, `color` and `authorId`), tags are array of objects (`id`, `title`))
 
 **Important:** works if an authorized user has access to the event
 

@@ -1,5 +1,5 @@
 export class EventDto {
-  constructor(model) {
+  constructor(model, forOneEvent) {
     this.id = model.id;
     this.author = model.author;
     this.calendarId = model.calendarId;
@@ -9,7 +9,7 @@ export class EventDto {
     if (model.repeat)
       this.repeat = { frequency: model.repeat.frequency, parameter: model.repeat.parameter };
     if (model.tags)
-      this.tags = model.tags.map(tag => tag.title);
+      this.tags = model.tags.map(tag => forOneEvent? { id: tag.id, title: tag.title }:tag.title);
     else
       this.tags = [];
     this.createDate = model.createDate;

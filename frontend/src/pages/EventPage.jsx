@@ -150,7 +150,7 @@ const EventPage = () => {
           short={false}
         />}
         <ul className="tags">
-          {currEvent.tags.length > 0 && currEvent.tags.map((tag) => <li key={tag} className="content-name tag">{tag}</li>)}
+          {currEvent.tags.length > 0 && currEvent.tags.map((tag) => <li key={tag.id} className="content-name tag">{tag.title}</li>)}
         </ul>
       </div>
       <div className="content-info-container">

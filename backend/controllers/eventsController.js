@@ -401,7 +401,7 @@ class Events {
       if (!event) return res.status(404).json({ message: 'Event is not found' });
       event.author = new UserDto(await User.findOne({ _id: event.authorId }).select('id login avatar'));
 
-      const result = new EventDto(event);
+      const result = new EventDto(event, true);
       if (event.author.id.toString() !== req.user._id.toString())
         event.participants = event.participants.filter(participant => participant.isConfirmed === null);
       result.participants = [];
