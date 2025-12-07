@@ -23,17 +23,19 @@ const EventMenu = ({ event, user, menuOpen, setMenuOpen, setLoad }) => {
 
   const confirmDeleteForm = useSelector(selectConfirmDeleteForm);
 
+  const [hasRights, setHasRights] = useState(false);
+
   const updateEvent = () => { navigate(`/events/${event.id}/update`); };
 
   const deleteEvent = () => {
     setMenuOpen(false);
     dispatch(setForm({ form: 'confirmDeleteForm', params: { id: event.id,
-      group: 'events', open: true }
+      group: 'eventsParticipation', open: true }
     }));
   };
 
   useEffect(() => {
-    if (confirmDeleteForm.group === 'events'
+    if (['events', 'eventsParticipation'].includes(confirmDeleteForm.group)
       && confirmDeleteForm.id === event.id && confirmDeleteForm.result === true) {
       dispatch(closeForm('confirmDeleteForm'));
       setLoad(true);
@@ -50,16 +52,27 @@ const EventMenu = ({ event, user, menuOpen, setMenuOpen, setLoad }) => {
       }
   }, [confirmDeleteForm.id, confirmDeleteForm.group, confirmDeleteForm.result]);
 
+  useEffect(() => {
+    if (event.author.id === user.id)
+      setHasRights(true);
+    else {
+      for (let i of event.participants) {
+        if (i.id === user.id) {
+          setHasRights(true);
+          break;
+        }
+      }
+    }
+  }, [event, user]);
+
   return (
     <ul className={menuOpen ? 'open' : 'close'}>
-      {event.author.id == user.id && <>
-        <li onClick={updateEvent}>
-          <button><UpdateIcon /><div>Update</div></button>
-        </li>
-        <li onClick={deleteEvent}>
-          <button><DeleteIcon /><div>Delete</div></button>
-        </li>
-      </>}
+      {event.author.id == user.id && <li onClick={updateEvent}>
+        <button><UpdateIcon /><div>Update</div></button>
+      </li>}
+      {hasRights && <li onClick={deleteEvent}>
+        <button><DeleteIcon /><div>Delete</div></button>
+      </li>}
     </ul>
   );
 }
@@ -163,7 +176,7 @@ const EventPage = () => {
           setUsers={(users) => setCurrEvent({...currEvent, participants: users})}
           author={currEvent.author}
           resend={Events.resendParticipation} del={Events.updateEvent} entityName={'event'}
-          entityId={currEvent.id} notDeletable={[currEvent.author.id, currEvent.calendar.authorId]}
+          entityId={currEvent.id} notDeletable={[currEvent.author.id, currEvent.calendar.author.id]}
         />
       </div>
       {currEvent.type === "arrangement" && currEvent.link && <div className="content-info-container">

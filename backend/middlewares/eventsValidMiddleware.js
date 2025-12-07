@@ -50,6 +50,7 @@ const get = [
       let check = Array.isArray(value) ? value[0]:value;
       return check == undefined ? check:(isNaN(check) ? 0:Math.abs(parseInt(check)));
     }),
+  body('vsChange').optional(),
   isValid
 ]
 

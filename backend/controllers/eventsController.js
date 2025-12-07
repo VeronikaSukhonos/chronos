@@ -89,7 +89,10 @@ class Events {
                                       { authorId: req.user._id },
                                       {
                                         participants: {
-                                          $in: [req.user._id]
+                                          $elemMatch: {
+                                            participantId: req.user._id,
+                                            isConfirmed: null
+                                          }
                                         }
                                       },
                                       { visibleForAll: true }
@@ -134,7 +137,10 @@ class Events {
                                           { authorId: req.user._id },
                                           {
                                             participants: {
-                                              $in: [req.user._id]
+                                              $elemMatch: {
+                                                participantId: req.user._id,
+                                                isConfirmed: null
+                                              }
                                             }
                                           },
                                           { visibleForAll: true }
@@ -194,7 +200,10 @@ class Events {
                                                 { authorId: req.user._id },
                                                 {
                                                   participants: {
-                                                    $in: [req.user._id]
+                                                    $elemMatch: {
+                                                      participantId: req.user._id,
+                                                      isConfirmed: null
+                                                    }
                                                   }
                                                 },
                                                 { visibleForAll: true }
@@ -350,12 +359,14 @@ class Events {
             }
           }
         }
-        req.user.visibilitySettings = {
-          calendars: req.body.calendar,
-          eventTypes: req.body.type,
-          tags: req.body.tag
-        };
-        await req.user.save();
+        if (req.body.vsChange !== false) {
+          req.user.visibilitySettings = {
+            calendars: req.body.calendar,
+            eventTypes: req.body.type,
+            tags: req.body.tag
+          };
+          await req.user.save();
+        }
       } else
         events = await Promise.all(events.map(async event => {
           event = await event.populate('calendarId');
@@ -406,22 +417,6 @@ class Events {
       const event = await Event.findOne({ _id: eventId }).populate('tags');
 
       if (!event) return res.status(404).json({ message: 'Event is not found' });
-      event.author = new UserDto(await User.findOne({ _id: event.authorId }).select('id login avatar'));
-
-      const result = new EventDto(event, true);
-      if (event.author.id.toString() !== req.user._id.toString())
-        event.participants = event.participants.filter(participant => participant.isConfirmed === null);
-      result.participants = [];
-      for (let i of event.participants) {
-        const user = await User.findOne({ _id: i.participantId });
-        if (user)
-          result.participants.push({
-            id: user._id,
-            login: user.login,
-            avatar: user.avatar,
-            isConfirmed: i.isConfirmed === null ? true:false
-          });
-      }
       const calendar = await Calendar.findOne({
         _id: event.calendarId
       });
@@ -429,19 +424,59 @@ class Events {
         return res.status(404).json({
           message: "Calendar is not found"
         });
-      result.calendar = {
-        id: calendar._id,
-        name: calendar.name,
-        color: calendar.color,
-        authorId: calendar.authorId,
-        type: calendar.type
-      };
-      delete result.calendarId;
+      event.author = new UserDto(await User.findOne({ _id: event.authorId }).select('id login avatar'));
 
-      return res.status(200).json({
-        message: 'Fetched event data successfully',
-        data: { event: result }
-      });
+      let hasAccess = false;
+      if (event.author.id.toString() === req.user._id.toString())
+        hasAccess = true;
+      else if (event.visibleForAll) {
+        for (let i of calendar.participants) {
+          if ((i.participantId.toString() === req.user._id.toString() && i.isConfirmed === null) || (calendar.isPublic && calendar.followers.includes(req.user._id))) {
+            hasAccess = true;
+            break;
+          }
+        }
+      } else {
+        for (let i of event.participants) {
+          if (i.participantId.toString() === req.user._id.toString() && i.isConfirmed === null) {
+            hasAccess = true;
+            break;
+          }
+        }
+      }
+      
+      if (hasAccess) {
+        const result = new EventDto(event, true);
+        if (event.author.id.toString() !== req.user._id.toString())
+          event.participants = event.participants.filter(participant => participant.isConfirmed === null);
+        result.participants = [];
+        for (let i of event.participants) {
+          const user = await User.findOne({ _id: i.participantId });
+          if (user)
+            result.participants.push({
+              id: user._id,
+              login: user.login,
+              avatar: user.avatar,
+              isConfirmed: i.isConfirmed === null ? true:false
+            });
+        }
+        result.calendar = {
+          id: calendar._id,
+          name: calendar.name,
+          color: calendar.color,
+          author: new UserDto(await User.findOne({ _id: calendar.authorId }).select('id login avatar')),
+          type: calendar.type
+        };
+        delete result.calendarId;
+        
+        return res.status(200).json({
+          message: 'Fetched event data successfully',
+          data: { event: result }
+        });
+      } else
+        return res.status(403).json({
+          message: 'You do not have access to this event'
+        });
     } catch (err) {
       if (err instanceof CastError)
         return res.status(404).json({ message: 'Event is not found' });
@@ -528,17 +563,20 @@ class Events {
       for (let i = 0; i < event.participants.length; i += 1) {
         if (event.participants[i].participantId.toString() === user._id.toString()) {
           let calendarParticipant = false;
-          for (let j of calendar.participants) {
-            if (j.participantId.toString() === newEvent.participants[i].participantId.toString() && j.isConfirmed === null) {
-              calendarParticipant = true;
+          for (let j = 0; j < calendar.participants.length; i += 1) {
+            if (calendar.participants[j].participantId.toString() === event.participants[i].participantId.toString()) {
+              calendarParticipant = calendar.participants[j].isConfirmed === null ? true:j;
               break;
             }
           }
-          if (!calendarParticipant) {
+          if (calendarParticipant === false)
             calendar.participants.push({
               participantId: user._id,
               isConfirmed: await createParticipationToken(user, calendar.id)
             });
+          else if (calendarParticipant !== true)
+            calendar.participants[calendarParticipant].isConfirmed = await createParticipationToken(user, calendar.id);
+          if (calendarParticipant !== true) {
             await calendar.save();
             await sendCalendarParticipation(user, calendar, calendar.participants[calendar.participants.length - 1].isConfirmed);
           }
@@ -778,12 +816,36 @@ class Events {
         return res.status(404).json({
           message: "Event is not found"
         });
-      if (event.authorId.toString() === req.user._id.toString()) {
-        await Event.deleteOne({ _id: event.id });
-        return res.status(200).json({ message: 'Deleted event successfully' });
+      let hasRights = false;
+      if (event.authorId.toString() === req.user._id.toString())
+        hasRights = true;
+      else {
+        for (let i of event.participants) {
+          if (i.participantId.toString() === req.user._id.toString()) {
+            hasRights = true;
+            break;
+          }
+        }
+      }
+      if (hasRights) {
+        if (event.authorId.toString() === req.user._id.toString()) {
+          await Event.deleteOne({ _id: event.id });
+          return res.status(200).json({ message: 'Deleted event successfully' });
+        } else {
+          for (let i = event.participants.length - 1; i >= 0; i -= 1) {
+            if (event.participants[i].participantId.toString() === req.user._id.toString()) {
+              event.participants.splice(i, 1);
+              break;
+            }
+          }
+          await event.save();
+          return res.status(200).json({
+            message: "You are no longer a participant of the event"
+          });
+        }
       } else
         return res.status(403).json({
-          message: "You are not the author"
+          message: "You do not have rights to delete the event"
         });
     } catch (err) {
       if (err instanceof CastError)
