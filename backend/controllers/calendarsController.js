@@ -555,7 +555,6 @@ class Calendars {
           visibleForAll: calendar.type == 'main' || calendar.type == 'holidays' ? false:req.body.visibleForAll,
           allDay: req.body.allDay
         });
-        console.log(newEvent);
         if (participants.length !== 0) {
           for (let i = 0; i < newEvent.participants.length; i += 1) {
             const user = await User.findOne({
