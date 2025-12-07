@@ -58,7 +58,11 @@ const EventCreateForm = () => {
     if (!resetForm()) return;
 
     if (f.event?.id) {
-      Events.updateEvent(f.event?.id, {...params, participants: params.participants.map(p => p.id)})
+      Events.updateEvent(f.event?.id, {...params,
+        participants: params.participants.map(p => p.id),
+        repeat: params.repeat.frequency === 'never' ? null : params.repeat,
+        tags: params.tags.map(t => t.id)
+      })
         .then(({ data: res }) => {
           if (res.data?.event) dispatch(updateInCalendar({
             group: 'events', item: res.data.event
@@ -96,7 +100,28 @@ const EventCreateForm = () => {
         Events.fetchEvent(f.event?.id)
           .then(({ data: res }) => {
             for (const [prop, val] of Object.entries(initialVals))
-              setParam({ target: { name: prop, value: res.data.event[prop] || val } });
+              setParam({ target: {
+                name: prop,
+                value: (prop === 'calendar' ? res.data.event.calendar.id : res.data.event[prop]) || val } });
+              dispatch(setForm({ form: 'eventCreateForm',
+                params: { event: res.data.event, calendar: res.data.event.calendar }}));
+            if (!res.data.event.visibleForAll) {
+                const participants = [{
+                    id: res.data.event.author.id,
+                    role: 'event author'
+                  }
+                ];
+
+                if (res.data.event.calendar.authorId !== participants[0].id) {
+                  participants.push({
+                    id: res.data.event.calendar.authorId,
+                    role: 'calendar author'
+                  });
+                }
+                setNotDeletable(participants);
+            } else {
+              setNotDeletable([]);
+            }
             setInitLoad(false);
           })
           .catch((err) => {
@@ -178,7 +203,7 @@ const EventCreateForm = () => {
             setParam(v);
             setParam({ target: { name: 'allDay', value: ['holiday', 'birthday'].includes(v.target.value) } });
             setParam({ target: { name: 'link', value: '' } });
-            if (v.target.value === 'task')
+            if (['task', 'holiday', 'birthday'].includes(v.target.value))
               setParam({ target: { name: 'repeat', value: initialVals.repeat } });
           }}
           dis={f.event?.id}
@@ -188,9 +213,11 @@ const EventCreateForm = () => {
           label="Calendar"
           name="calendar"
           options={
-            calendars?.map(c => ({
+            !f.event?.id ? calendars?.map(c => ({
               label: <div><span style={{background: c.color}}></span>{c.name}</div>, value: c.id
-            })) || []
+            })) : [{
+              label: <div><span style={{background: f.calendar?.color}}></span>{f.calendar.name}</div>, value: f.calendar.id
+            }]
           }
           selected={params.calendar}
           onChange={(v) => {
@@ -225,8 +252,9 @@ const EventCreateForm = () => {
           id="startDate"
           time={!params.allDay}
           onChange={setParam}
-          val={params.startDate}
+          val={(f.event?.id && params.startDate) ? new Date(params.startDate) : params.startDate}
           min={params.type === 'birthday' ? undefined : new Date()}
+          max={params.type === 'birthday' ? new Date() : undefined}
           err={errors}
           req={true}
         />
@@ -235,8 +263,8 @@ const EventCreateForm = () => {
           id="endDate"
           time={true}
           onChange={setParam}
-          val={params.endDate}
-          min={params.startDate}
+          val={(f.event?.id && params.endDate) ? new Date(params.endDate) : params.endDate}
+          min={(f.event?.id && params.startDate) ? new Date(params.startDate) : params.startDate}
           err={errors}
         />}
         {!['holiday', 'birthday'].includes(params.type) && <Checkbox
@@ -249,6 +277,12 @@ const EventCreateForm = () => {
           }}
           short={false}
         />}
+        <ColorField
+          label="Event Color" name="color" id="evt"
+          checked={params.color}
+          onChange={setParam}
+          err={errors}
+        />
         <TextAreaField
           label="Description"
           onChange={setParam}
@@ -256,23 +290,19 @@ const EventCreateForm = () => {
           val={params.description}
           err={errors}
         />
-        <ColorField
-          label="Event Color" name="color" id="evt"
-          checked={params.color}
-          onChange={setParam}
-          err={errors}
-        />
-        <UserSearchForm
+        {(f.event?.id ? f.calendar?.type !== 'main' : (calendars.find(c => c.id === params.calendar)?.type !== 'main'))
+          && <UserSearchForm
           label="Participants" name="participants" err={errors} id="evt-participants"
           chosen={params.participants} setChosen={setParam}
           author={f.event?.author || auth}
           resend={params.visibleForAll ? undefined: Events.resendParticipation}
-          entityId={f.event?.id}
+          entityId={f.event?.id} entityName='events'
           del={Events.updateEvent}
           fOpen={formOpenRef.current}
           notDeletable={notDeletable}
-        />
-        <Checkbox
+        />}
+        {(f.event?.id ? f.calendar?.type !== 'main' : (calendars.find(c => c.id === params.calendar)?.type !== 'main'))
+          && <Checkbox
           label="Visible for everyone in the calendar?"
           id="visibleForAll" name="visibleForAll"
           checked={params.visibleForAll}
@@ -282,25 +312,23 @@ const EventCreateForm = () => {
               setNotDeletable([]);
             } else {
               if (!params.participants.length) {
-                const participants = [
-                  { id: f.event?.author?.id || auth.id,
-                    login: f.event?.author?.login || auth.login,
-                    avatar: f.event?.author?.avatar || auth.avatar,
-                    isConfirmed: true,
-                    role: 'event author'
-                  }
-                ];
-                const cld = calendars?.find(c => c.id === params.calendar);
+                const participants = [{
+                  id: f.event?.author?.id || auth.id,
+                  login: f.event?.author?.login || auth.login,
+                  avatar: f.event?.author?.avatar || auth.avatar,
+                  isConfirmed: true,
+                  role: 'event author'
+                }];
+                const cld = f.event?.id ? f.calendar?.authorId : calendars?.find(c => c.id === params.calendar);
 
                 if (cld.author.id !== participants[0].id) {
                   participants.push({
-                      id: cld.author?.id,
-                      login: cld.author?.login,
-                      avatar: cld.author?.avatar,
-                      isConfirmed: true,
-                      role: 'calendar author'
-                    }
-                  );
+                    id: cld?.author?.id,
+                    login: cld?.author?.login,
+                    avatar: cld?.author?.avatar,
+                    isConfirmed: true,
+                    role: 'calendar author'
+                    });
                 }
                 setParam({ target: { name: 'participants', value: participants } });
                 setNotDeletable(participants);
@@ -309,7 +337,7 @@ const EventCreateForm = () => {
             setParam(v);
           }}
           short={false}
-        />
+        />}
         {!['task', 'holiday', 'birthday'].includes(params.type) &&
           <RepeatField
             label="Repeat"

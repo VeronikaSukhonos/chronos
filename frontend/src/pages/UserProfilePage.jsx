@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link, Navigate, useNavigate } from 'react-router-dom';
 
 import Users from '../api/usersApi.js';
+import { setCalendar } from '../store/calendarSlice.js';
 import { selectAuthUser, updateAuthUser } from '../store/authSlice.js';
 import ErrorPage from './ErrorPage.jsx';
 import LoadPage from './LoadPage.jsx';
@@ -15,6 +16,7 @@ import '../components/Forms.css';
 const UserProfilePage = () => {
   const { userId } = useParams();
 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const auth = useSelector(selectAuthUser.user);
@@ -27,7 +29,12 @@ const UserProfilePage = () => {
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
 
   const openEventCreateForm = () => {
-    console.log('Event creation form opens with prefilled values for birthday...'); // TODO
+    dispatch(setCalendar({ birthday: {
+      login: user.login,
+      fullname: user.fullName,
+      dob: user.dob
+    }}));
+    navigate('/events/create');
   };
 
   useEffect(() => {

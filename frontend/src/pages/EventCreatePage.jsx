@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import Calendars from '../api/calendarsApi.js';
 import Events from '../api/eventsApi.js';
 import { selectAuthUser } from '../store/authSlice.js';
+import { selectCalendar, setCalendar } from '../store/calendarSlice.js';
 import ErrorPage from './ErrorPage.jsx';
 import LoadPage from './LoadPage.jsx';
 import {
@@ -20,15 +21,17 @@ import '../components/Forms.css';
 const EventCreatePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const { eventId } = useParams();
   const auth = useSelector(selectAuthUser.user);
+  const birthday = useSelector(selectCalendar.birthday);
 
   const [initLoad, setInitLoad] = useState(true);
   const [initFeedback, setInitFeedback] = useState({ msg: '', status: '' });
   const [event, setEvent] = useState(null);
-  const [calendar, setCalendar] = useState(null);
-  const [calendars, setCalendars] = useState([]);
+  const [calendar, setCurEventCalendar] = useState(null);
+  const [calendars, setCurEventCalendars] = useState([]);
   const [notDeletable, setNotDeletable] = useState(eventId ? [] : [
     { id: auth?.id, login: auth?.login, avatar: auth?.avatar,
       isConfirmed: true, role: 'event author' }
@@ -91,13 +94,12 @@ const EventCreatePage = () => {
     if (eventId) {
       Events.fetchEvent(eventId)
         .then(({ data: res }) => {
-          console.log(res.data.event);
           for (const [prop, val] of Object.entries(initialVals))
             setParam({ target: {
               name: prop,
               value: (prop === 'calendar' ? res.data.event.calendar.id : res.data.event[prop]) || val } });
           setEvent(res.data.event);
-          setCalendar(res.data.event.calendar);
+          setCurEventCalendar(res.data.event.calendar);
           if (!res.data.event.visibleForAll) {
               const participants = [{
                 id: res.data.event.author.id,
@@ -126,7 +128,7 @@ const EventCreatePage = () => {
         .then(({ data: res }) => {
           const main = res.data.calendars.find(c => c.type === 'main');
 
-          setCalendars(res.data.calendars.filter(
+          setCurEventCalendars(res.data.calendars.filter(
             (c => ['author', 'participant'].includes(c.role) && c.type !== 'holidays')));
           for (const [prop, val] of Object.entries(initialVals))
             setParam({ target: {
@@ -136,6 +138,12 @@ const EventCreatePage = () => {
                 (prop === 'color' ? (main?.color || '#ade4ff') :
                 ((prop === 'startDate' && false) ? new Date() : val))
             }});
+          if (birthday) {
+            setParam({ target: { name: 'name', value: `${birthday.fullName || birthday.login}'s Birthday` }});
+            setParam({ target: { name: 'startDate', value: new Date(birthday.dob) }});
+            setParam({ target: { name: 'type', value: 'birthday' }});
+            setParam({ target: { name: 'allDay', value: true }});
+          }
           setInitLoad(false);
         })
         .catch((err) => {
@@ -144,6 +152,10 @@ const EventCreatePage = () => {
         });
     }
   }, [eventId]);
+
+  useEffect(() => {
+    return () => dispatch(setCalendar());
+  }, []);
 
   if (!auth) return <Navigate to="/login" />
   if (!eventId && !location.pathname.includes('create')) return <Navigate to="/" />
@@ -230,7 +242,7 @@ const EventCreatePage = () => {
           id="startDate"
           time={!params.allDay}
           onChange={setParam}
-          val={params.startDate}
+          val={(eventId && params.startDate) ? new Date(params.startDate) : params.startDate}
           min={params.type === 'birthday' ? undefined : new Date()}
           max={params.type === 'birthday' ? new Date() : undefined}
           err={errors}
@@ -241,8 +253,8 @@ const EventCreatePage = () => {
           id="endDate"
           time={true}
           onChange={setParam}
-          val={params.endDate}
-          min={params.startDate}
+          val={(eventId && params.endDate) ? new Date(params.endDate) : params.endDate}
+          min={(eventId && params.startDate) ? new Date(params.startDate) : params.startDate}
           err={errors}
         />}
         {!['holiday', 'birthday'].includes(params.type) && <Checkbox
@@ -290,25 +302,23 @@ const EventCreatePage = () => {
               setNotDeletable([]);
             } else {
               if (!params.participants.length) {
-                const participants = [
-                  { id: event?.author?.id || auth.id,
-                    login: event?.author?.login || auth.login,
-                    avatar: event?.author?.avatar || auth.avatar,
-                    isConfirmed: true,
-                    role: 'event author'
-                  }
-                ];
+                const participants = [{
+                  id: event?.author?.id || auth.id,
+                  login: event?.author?.login || auth.login,
+                  avatar: event?.author?.avatar || auth.avatar,
+                  isConfirmed: true,
+                  role: 'event author'
+                }];
                 const cld = eventId ? calendar.authorId : calendars?.find(c => c.id === params.calendar);
 
                 if (cld.author.id !== participants[0].id) {
                   participants.push({
-                      id: cld?.author?.id,
-                      login: cld?.author?.login,
-                      avatar: cld?.author?.avatar,
-                      isConfirmed: true,
-                      role: 'calendar author'
-                    }
-                  );
+                    id: cld?.author?.id,
+                    login: cld?.author?.login,
+                    avatar: cld?.author?.avatar,
+                    isConfirmed: true,
+                    role: 'calendar author'
+                  });
                 }
                 setParam({ target: { name: 'participants', value: participants } });
                 setNotDeletable(participants);

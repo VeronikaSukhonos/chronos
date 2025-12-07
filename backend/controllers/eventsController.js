@@ -392,7 +392,7 @@ class Events {
     } catch (err) {
       if (err instanceof CastError)
         return res.status(404).json({ message: 'Calendar is not found' });
-      err.message = `Fetched events failed: ${err.message}`;
+      err.message = `Fetching events failed: ${err.message}`;
       throw err;
     }
   }

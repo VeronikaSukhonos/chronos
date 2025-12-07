@@ -9,6 +9,7 @@ const initialCalendarCreateForm = {
 
 const initialEventCreateForm = {
   event: null,
+  calendar: null,
   initDate: null,
   open: false
 };
@@ -58,7 +59,8 @@ const initialState = {
   tagCreateForm: initialTagCreateForm,
   confirmDeleteForm: initialConfirmDeleteForm,
 
-  archived: []
+  archived: [],
+  birthday: null
 };
 
 const calendarSlice = createSlice({
@@ -154,7 +156,8 @@ export const selectCalendar = {
   view: (state) => state.calendar.view,
   events: (state) => state.calendar.events,
 
-  archived: (state) => state.calendar.archived
+  archived: (state) => state.calendar.archived,
+  birthday: (state) => state.calendar.birthday
 };
 
 export const selectCalendarLoad = {
