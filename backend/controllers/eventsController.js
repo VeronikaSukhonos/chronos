@@ -211,7 +211,7 @@ class Events {
           let repeatDelta, nextRepeatEventTime, prevRepeatEventTime, prevRepeatEventEndTime, startMonth, eventMonth, newDate, prevDate;
           if (i.authorId)
             i.author = new UserDto(await User.findOne({ _id: i.authorId }).select('id login avatar'));
-          switch (i.repeat.frequency) {
+          switch (i.repeat?.frequency) {
             case 'day':
               repeatDelta = (Math.ceil((startDate - eventDate) / 86400000) % i.repeat.parameter) || i.repeat.parameter;
               nextRepeatEventTime = startDate.getTime() + (i.repeat.parameter - repeatDelta) * 86400000;
@@ -219,7 +219,7 @@ class Events {
               prevRepeatEventEndTime = prevRepeatEventTime + (new Date(i.endDate).setHours(0, 0, 0, 0) - new Date(i.startDate).setHours(0, 0, 0, 0)) * 86400000;
               if ((prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate)
                 || (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate)) {
-                const newEvent = JSON.parse(JSON.stringify(new EventDto(i)));
+                const newEvent = JSON.parse(JSON.stringify(new EventDto(i, true)));
                 let timeToAdd = (Math.ceil((startDate - eventDate) / 86400000) + (i.repeat.parameter - repeatDelta - (prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate ? i.repeat.parameter:0))) * 86400000;
                 newEvent.startDate = new Date(eventDate.getTime() + timeToAdd).toISOString();
                 if (i.endDate)
@@ -234,7 +234,7 @@ class Events {
               prevRepeatEventEndTime = prevRepeatEventTime + (new Date(i.endDate).setHours(0, 0, 0, 0) - new Date(i.startDate).setHours(0, 0, 0, 0)) * 86400000;
               if ((prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate)
                 || (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate)) {
-                const newEvent = JSON.parse(JSON.stringify(new EventDto(i)));
+                const newEvent = JSON.parse(JSON.stringify(new EventDto(i, true)));
                 let timeToAdd = ((Math.ceil((startDate - eventDate) / 86400000) / 7) + (i.repeat.parameter - repeatDelta - (prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate ? i.repeat.parameter:0))) * 86400000 * 7;
                 newEvent.startDate = new Date(eventDate.getTime() + timeToAdd).toISOString();
                 if (i.endDate)
@@ -261,7 +261,7 @@ class Events {
                 prevDate.setDate(0);
               if ((prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate)
                 || (newDate >= startDate && newDate < endDate)) {
-                const newEvent = JSON.parse(JSON.stringify(new EventDto(i)));
+                const newEvent = JSON.parse(JSON.stringify(new EventDto(i, true)));
                 newEvent.startDate = (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? prevDate:newDate).toISOString();
                 if (i.endDate) {
                   const newEndDate = new Date(i.endDate);
@@ -289,7 +289,7 @@ class Events {
                 prevDate.setDate(0);
               if ((prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate)
                 || (newDate >= startDate && newDate < endDate)) {
-                const newEvent = JSON.parse(JSON.stringify(new EventDto(i)));
+                const newEvent = JSON.parse(JSON.stringify(new EventDto(i, true)));
                 newEvent.startDate = (prevDate < startDate && prevDate + (new Date(i.endDate) - new Date(i.startDate)) >= startDate ? prevDate:newDate).toISOString();
                 if (i.endDate) {
                   const newEndDate = new Date(i.endDate);
@@ -321,7 +321,7 @@ class Events {
                                    eventDate.getUTCMonth() + (timeToAdd.month || 0) * j,
                                    eventDate.getUTCDate() + (timeToAdd.day || 0) * j))
               < endDate) {
-              const newEvent = JSON.parse(JSON.stringify(new EventDto(events[i])));
+              const newEvent = JSON.parse(JSON.stringify(events[i]));
               const newStartDate = new Date(eventDate);
               newStartDate.setFullYear(newStartDate.getFullYear() + (timeToAdd.year || 0) * j);
               newStartDate.setMonth(newStartDate.getMonth() + (timeToAdd.month || 0) * j);
@@ -728,7 +728,7 @@ class Events {
         }
         event.tags = tags;
       if ((event.type === 'arrangement' || event.type === 'reminder') && (event.repeat || repeat))
-        event.repeat = repeat;
+        event.repeat = repeat !== null ? repeat:undefined;
       if (event.type == 'arrangement' && event.repeat) {
         const timeDelta = new Date(event.endDate) - new Date(event.startDate);
         let repetitionTime = 86400000 * event.repeat.parameter;
