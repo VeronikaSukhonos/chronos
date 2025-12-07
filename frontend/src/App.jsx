@@ -22,6 +22,7 @@ import CalendarPage from './pages/CalendarPage.jsx';
 import CalendarUpdatePage from './pages/CalendarUpdatePage.jsx';
 import EventCreatePage from './pages/EventCreatePage.jsx';
 import EventPage from './pages/EventPage.jsx';
+import EventsSearchPage from './pages/EventsSearchPage.jsx';
 import LoadPage from './pages/LoadPage.jsx';
 import ErrorPage from './pages/ErrorPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
@@ -79,6 +80,7 @@ const App = () => {
           <Route path="/calendars/:calendarId/update" element={<CalendarUpdatePage />} />
 
           <Route path="/events" element={<EventPage />} />
+          <Route path="/events/search" element={<EventsSearchPage />} />
           <Route path="/events/create" element={<EventCreatePage />} />
           <Route path="/events/:eventId" element={<EventPage />} />
 

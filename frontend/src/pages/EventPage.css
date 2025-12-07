@@ -1,0 +1,14 @@
+.event-title {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.events-container {
+  width: 100%;
+}
+
+.events-container .searched-event-date {
+  font-size: 1rem;
+}

@@ -165,9 +165,27 @@ class Events {
           let endYearHolidaysResponce = { data: [] };
           if (startDate.getFullYear() != endDate.getFullYear())
             endYearHolidaysResponce = await axios.get(`https://date.nager.at/api/v3/PublicHolidays/${endDate.getFullYear()}/${req.body.country}`);
-          events = events.concat(startYearHolidaysResponce.data.map(holiday => { return { calendarId: holidaysCalendar._id, name: holiday.name, startDate: holiday.date, type: 'holiday', color: holidaysCalendar.color }; })
+          events = events.concat(startYearHolidaysResponce.data.map(holiday => {
+                                                                                 return {
+                                                                                  calendarId: holidaysCalendar._id,
+                                                                                  name: holiday.name,
+                                                                                  startDate: holiday.date,
+                                                                                  endDate: new Date(new Date(holiday.date).setHours(23, 59, 59, 999)),
+                                                                                  allDay: true, type: 'holiday',
+                                                                                  color: holidaysCalendar.color
+                                                                                };
+                                                                              })
                                                                .filter(holiday => new Date(holiday.startDate) >= startDate && new Date(holiday.startDate) < endDate),
-                                 endYearHolidaysResponce.data.map(holiday => { return { calendarId: holidaysCalendar._id, name: holiday.name, startDate: holiday.date, type: 'holiday', color: holidaysCalendar.color }; })
+                                 endYearHolidaysResponce.data.map(holiday => {
+                                                                               return {
+                                                                                calendarId: holidaysCalendar._id,
+                                                                                name: holiday.name,
+                                                                                startDate: holiday.date,
+                                                                                endDate: new Date(new Date(holiday.date).setHours(23, 59, 59, 999)),
+                                                                                allDay: true, type: 'holiday',
+                                                                                color: holidaysCalendar.color
+                                                                              };
+                                                                            })
                                                                .filter(holiday => new Date(holiday.startDate) < endDate));
         }
         let repeatEvents = await Event.find({

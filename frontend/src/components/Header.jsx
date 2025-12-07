@@ -28,7 +28,10 @@ const Header = () => {
 
   const doSearch = (e) => {
     e.preventDefault();
-    console.log('Searching...'); // TODO
+    if (search && search.trim()) {
+      setSearchOpen(() => false);
+      navigate(`/events/search?search=${search.trim()}`);
+    }
   };
 
   const logout = async () => {

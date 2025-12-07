@@ -14,6 +14,7 @@ import { UpdateIcon, DeleteIcon } from '../assets';
 import { getEventIcon, getPublicEventIcon } from '../utils/getIcon.jsx';
 import { fEventDate, fDate } from '../utils/formatDate.js';
 import './ContentPage.css';
+import './EventPage.css';
 import '../components/DropdownMenu.css';
 
 const EventMenu = ({ event, user, menuOpen, setMenuOpen, setLoad }) => {
@@ -120,7 +121,7 @@ const EventPage = () => {
     <div className="content-container">
       <div className="content-info-container">
         <div className="content-name-container">
-            <h1 className="content-name" style={{ background: currEvent.color }}>{getEventIcon(currEvent.type, "content-meta-icon")}{currEvent.name}</h1>
+            <h1 className="content-name event-title" style={{ background: currEvent.color }}>{getEventIcon(currEvent.type, "content-meta-icon")}{currEvent.name}</h1>
           <div className="content-meta">
             {getPublicEventIcon(currEvent.visibleForAll, "content-meta-icon")}
             <div className="dropdown-menu-container" ref={menuRef}>
@@ -133,10 +134,12 @@ const EventPage = () => {
             </div>
           </div>
         </div>
-        <div className="searched-event-calendar">
-          <div className="searched-event-calendar-color" style={{ background: currEvent.calendar?.color || '#ade4ff' }}></div>
-          {currEvent.calendar?.name}
-        </div>
+        <Link to={`/calendars/${currEvent.calendar?.id}`}>
+          <div className="searched-event-calendar">
+            <div className="searched-event-calendar-color" style={{ background: currEvent.calendar?.color || '#ade4ff' }}></div>
+            {currEvent.calendar?.name}
+          </div>
+        </Link>
         <em>{currEvent.repeat && `each ${currEvent.repeat.parameter} ${currEvent.repeat.frequency}${currEvent.repeat.parameter > 1 ? 's' : ''} from ` }{fEventDate(currEvent.type, currEvent.startDate, currEvent.endDate, currEvent.allDay)}; created at {fDate(currEvent.createDate)}</em>
         <div className="content-description">{currEvent.description}</div>
         {currEvent.type === "task" && <Checkbox
