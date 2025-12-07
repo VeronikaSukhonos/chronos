@@ -18,6 +18,8 @@ Additionally:
 * friendly authentication (registration, login, password reset, email confirmation)
 * profile management (updating login, avatar, full name, email, password and date of birth that can be easily added to the calendars)
 
+![Homepage](./docs/calendar.png)
+
 ## Requirements and dependencies
 
 All you need preinstalled is the [**Docker Desktop**](https://docs.docker.com/get-started/introduction/get-docker-desktop/).
@@ -124,4 +126,4 @@ docker compose down
 Project documentation can be found [**here**](./docs/) and contains:
 * description of our experience (activities, findings, problems, conclusions) while working on a project according to Challenge Based Learning (CBL) framework
 * description of all API endpoints
-* description of the project structure and all features
+* screenshots of all features
