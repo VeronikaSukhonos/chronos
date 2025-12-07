@@ -29,9 +29,15 @@ const EventMenu = ({ event, user, menuOpen, setMenuOpen, setLoad }) => {
 
   const deleteEvent = () => {
     setMenuOpen(false);
-    dispatch(setForm({ form: 'confirmDeleteForm', params: { id: event.id,
-      group: 'eventsParticipation', open: true }
-    }));
+    if (event.author.id === user.id || event.calendar.author.id === user.id) {
+      dispatch(setForm({ form: 'confirmDeleteForm', params: { id: event.id,
+        group: 'events', open: true }
+      }));
+    } else {
+      dispatch(setForm({ form: 'confirmDeleteForm', params: { id: event.id,
+        group: 'eventsParticipation', open: true }
+      }));
+    }
   };
 
   useEffect(() => {
@@ -67,7 +73,7 @@ const EventMenu = ({ event, user, menuOpen, setMenuOpen, setLoad }) => {
 
   return (
     <ul className={menuOpen ? 'open' : 'close'}>
-      {event.author.id == user.id && <li onClick={updateEvent}>
+      {(event.author.id === user.id || event.calendar.author.id === user.id) && <li onClick={updateEvent}>
         <button><UpdateIcon /><div>Update</div></button>
       </li>}
       {hasRights && <li onClick={deleteEvent}>
