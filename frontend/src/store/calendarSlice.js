@@ -51,6 +51,7 @@ const initialState = {
   tagsLoad: true,
   vsLoad: true,
   eventsLoad: true,
+  vsChange: true,
 
   loadError: '',
 
@@ -155,6 +156,7 @@ export const selectCalendar = {
 
   view: (state) => state.calendar.view,
   events: (state) => state.calendar.events,
+  vsChange: (state) => state.calendar.vsChange,
 
   archived: (state) => state.calendar.archived,
   birthday: (state) => state.calendar.birthday

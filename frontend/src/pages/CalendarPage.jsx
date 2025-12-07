@@ -129,6 +129,11 @@ const CalendarPage = () => {
           setCurCalendar(res.data.calendar);
           setInitLoad(false);
           setInitFeedback({ msg: res.message, status: 'ok' });
+          dispatch(setCalendar({
+            ...(res.data.calendar.author.id === auth.id && { myCalendars: [{...res.data.calendar, visible: true}] }),
+            ...(res.data.calendar.author.id !== auth.id && { otherCalendars: [{...res.data.calendar, visible: true}] }),
+            calendarsLoad: false, vsLoad: false, vsChange: false
+          }));
         })
         .catch((err) => {
           setInitLoad(false);
@@ -195,9 +200,9 @@ const CalendarPage = () => {
           del={Calendars.updateCalendar}
         />
       </div>}
-      <div className="content-info-container">
+      <div className="content-info-container events">
         <h2>Events</h2>
-        {!curCalendar.events?.length > 0 && <div className="info-message left">No events in this calendar</div>}
+        <Calendar />
       </div>
       <ConfirmDeleteForm />
     </div>

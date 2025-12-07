@@ -45,6 +45,10 @@
   padding: 20px;
 }
 
+.content-info-container.events {
+  min-height: 700px;
+}
+
 .content-name-container {
   display: flex;
   flex-direction: row;

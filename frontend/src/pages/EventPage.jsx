@@ -86,6 +86,7 @@ const EventPage = () => {
   const [load, setLoad] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
   const doTask = (e) => {
     if (e.target.value) {
       setLoad(true);
@@ -111,6 +112,7 @@ const EventPage = () => {
         });
     }
   };
+
   useEffect(() => {
       if (eventId) {
         setInitLoad(true);
@@ -127,17 +129,22 @@ const EventPage = () => {
       }
 
     }, [eventId]);
+
   useClickOutside([menuRef], () => setMenuOpen(false));
+
   if (!auth) return <Navigate to="/login" />
   if (!eventId) return <Navigate to="/" />
   if (initLoad) return <LoadPage />
   if (initFeedback.status === 'fail')
     return <ErrorPage error={initFeedback.msg} entity="event" />
+
   return (
     <div className="content-container">
       <div className="content-info-container">
         <div className="content-name-container">
-            <h1 className="content-name event-title" style={{ background: currEvent.color }}>{getEventIcon(currEvent.type, "content-meta-icon")}{currEvent.name}</h1>
+          <h1 className="content-name event-title" style={{ background: currEvent.color || '#ade4ff' }}>
+            {getEventIcon(currEvent.type, "content-meta-icon event-icon")}{currEvent.name}
+          </h1>
           <div className="content-meta">
             {getPublicEventIcon(currEvent.visibleForAll, "content-meta-icon")}
             <div className="dropdown-menu-container" ref={menuRef}>
@@ -150,13 +157,30 @@ const EventPage = () => {
             </div>
           </div>
         </div>
-        <Link to={`/calendars/${currEvent.calendar?.id}`}>
-          <div className="searched-event-calendar">
-            <div className="searched-event-calendar-color" style={{ background: currEvent.calendar?.color || '#ade4ff' }}></div>
-            {currEvent.calendar?.name}
-          </div>
-        </Link>
-        <em>{currEvent.repeat && `each ${currEvent.repeat.parameter} ${currEvent.repeat.frequency}${currEvent.repeat.parameter > 1 ? 's' : ''} from ` }{fEventDate(currEvent.type, currEvent.startDate, currEvent.endDate, currEvent.allDay)}; created at {fDate(currEvent.createDate)}</em>
+        <div className="content-author-calendar-container">
+          <Link className="content-author" to={`/users/${currEvent.author?.id}`}>
+            <img
+              className="content-author-avatar"
+              src={`${import.meta.env.VITE_API_URL}${currEvent.author?.avatar}`}
+              alt={`${currEvent.author?.login}'s avatar`}
+            />
+            <div className="content-author-login">{currEvent.author?.login}</div>
+          </Link>
+          <span>in</span>
+          <Link to={`/calendars/${currEvent.calendar?.id}`}>
+            <div className="searched-event-calendar">
+              <div className="searched-event-calendar-color" style={{ background: currEvent.calendar?.color || '#ade4ff' }}></div>
+              <div className="event-calendar-name">{currEvent.calendar?.name}</div>
+            </div>
+          </Link>
+          <em className="event-create-date">
+            (created {fDate(currEvent.createDate)})
+          </em>
+        </div>
+        <em>{currEvent.repeat
+          && currEvent.type !== 'birthday' && `each ${currEvent.repeat.parameter} ${currEvent.repeat.frequency}${currEvent.repeat.parameter > 1 ? 's' : ''} from ` }
+          {fEventDate(currEvent.type, currEvent.startDate, currEvent.endDate, currEvent.allDay)}
+        </em>
         <div className="content-description">{currEvent.description}</div>
         {currEvent.type === "task" && <Checkbox
           label={"Done" + (currEvent.doneDate !== null ? ` (${fDate(currEvent.doneDate)})`:"")}
@@ -169,19 +193,24 @@ const EventPage = () => {
           {currEvent.tags.length > 0 && currEvent.tags.map((tag) => <li key={tag.id} className="content-name tag">{tag.title}</li>)}
         </ul>
       </div>
-      <div className="content-info-container">
-        <h2>Participants</h2>
-        <UserList
-          users={currEvent.participants}
-          setUsers={(users) => setCurrEvent({...currEvent, participants: users})}
-          author={currEvent.author}
-          resend={Events.resendParticipation} del={Events.updateEvent} entityName={'event'}
-          entityId={currEvent.id} notDeletable={[currEvent.author.id, currEvent.calendar.author.id]}
-        />
-      </div>
+
+      {currEvent.calendar.type !== 'main' &&
+        <div className="content-info-container">
+          <h2>Participants</h2>
+          <UserList
+            users={currEvent.participants} name="participants"
+            setUsers={(users) => setCurrEvent({...currEvent, participants: users})}
+            author={auth.id === currEvent.calendar.author.id ? currEvent.calendar.author : currEvent.author}
+            resend={Events.resendParticipation} del={Events.updateEvent} entityName="events"
+            entityId={currEvent.id}
+            notDeletable={[{ id: currEvent.author.id, role: 'event author' }, { id: currEvent.calendar.author.id, role: 'calendar author' }]}
+          />
+        </div>
+      }
+
       {currEvent.type === "arrangement" && currEvent.link && <div className="content-info-container">
         <h2>Link to the arrangement</h2>
-        <Link to={currEvent.link}>{currEvent.link}</Link>
+        <Link className="arrangement-link" to={currEvent.link} target="_blank">{currEvent.link}</Link>
       </div>}
       <ConfirmDeleteForm />
     </div>

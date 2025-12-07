@@ -112,9 +112,9 @@ const EventCreateForm = () => {
                   }
                 ];
 
-                if (res.data.event.calendar.authorId !== participants[0].id) {
+                if (res.data.event.calendar.author.id !== participants[0].id) {
                   participants.push({
-                    id: res.data.event.calendar.authorId,
+                    id: res.data.event.calendar.author.id,
                     role: 'calendar author'
                   });
                 }
@@ -274,6 +274,9 @@ const EventCreateForm = () => {
           onChange={(v) => {
             setParam(v);
             setParam({ target: { name: 'endDate', value: '' } });
+            if (v.target.value === true) {
+              setParam({ target: { name: 'startDate', value: new Date(params.startDate).setHours(0, 0, 0, 0) } })
+            }
           }}
           short={false}
         />}
@@ -319,7 +322,7 @@ const EventCreateForm = () => {
                   isConfirmed: true,
                   role: 'event author'
                 }];
-                const cld = f.event?.id ? f.calendar?.authorId : calendars?.find(c => c.id === params.calendar);
+                const cld = f.event?.id ? f.calendar : calendars?.find(c => c.id === params.calendar);
 
                 if (cld.author.id !== participants[0].id) {
                   participants.push({

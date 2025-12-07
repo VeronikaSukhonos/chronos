@@ -48,6 +48,7 @@ const Calendar = ({ addToNavigation }) => {
   const period = useSelector(selectCalendar.period);
   const view = useSelector(selectCalendar.view);
   const events = useSelector(selectCalendar.events);
+  const vsChange = useSelector(selectCalendar.vsChange);
 
   const vsLoad = useSelector(selectCalendarLoad.vs);
   const eventsLoad = useSelector(selectCalendarLoad.events);
@@ -157,7 +158,8 @@ const Calendar = ({ addToNavigation }) => {
         ...(cs.length && { calendar: cs }),
         ...(ets.length && { type: ets }),
         ...(ts.length && { tag: ts }),
-        ...Object.fromEntries((Object.entries(period).filter(e => e[1] !== null)))
+        ...Object.fromEntries((Object.entries(period).filter(e => e[1] !== null))),
+        vsChange
       })
         .then(({ data: res }) => {
           dispatch(setCalendar({ events: res.data.events, eventsLoad: false }));
@@ -170,7 +172,7 @@ const Calendar = ({ addToNavigation }) => {
     }, 300);
 
     return () => clearTimeout(wait);
-  }, [vsLoad, myCalendars, otherCalendars, eventTypes, tags, period, view, dispatch]);
+  }, [vsLoad, myCalendars, otherCalendars, eventTypes, tags, period, view, vsChange, dispatch]);
 
   useEffect(() => {
     const cApi = calendarRef?.current?.getApi();
@@ -180,7 +182,11 @@ const Calendar = ({ addToNavigation }) => {
       events.forEach(ev => cApi?.addEvent({
         id: ev.repeat ? (ev.id + ev.startDate) : ev.id,
         groupId: ev.id,
-        title: ev.name,
+        title: ev.name + (ev.type === 'birthday' ?
+          (() => {
+            const y = new Date(ev.startDate).getFullYear() - new Date(ev.birthday).getFullYear();
+            return y > 0 ? ` (${y} year${y > 1 ? 's' : ''})` : ''
+          })() : ''),
         start: ev.startDate, end: ev.endDate, allDay: ev.allDay,
         color: ev.color || '#ade4ff',
         ...(!ev.author && { className: 'holiday' }),
