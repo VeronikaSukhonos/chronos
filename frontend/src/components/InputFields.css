@@ -191,6 +191,14 @@
   border-radius: 10px 10px 0 0;
 }
 
+.time .react-datepicker__month-container .react-datepicker__header {
+  border-radius: 10px 0 0 0;
+}
+
+.time .react-datepicker__time-container .react-datepicker__header {
+  border-radius: 0 10px 0 0;
+}
+
 .react-datepicker__time-container .react-datepicker__time
 .react-datepicker__time-box ul.react-datepicker__time-list
 li.react-datepicker__time-list-item {

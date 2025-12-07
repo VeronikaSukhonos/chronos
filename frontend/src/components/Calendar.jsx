@@ -27,7 +27,7 @@ import './Calendar.css';
 
 const Event = ({ event: ev }) => {
   return (
-    <div className="calendar-event">
+    <div className={"calendar-event" + (ev.extendedProps.doneDate ? " done" : "")}>
       {getEventIcon(ev.extendedProps.type, "calendar-event-type")}
       <span className="calendar-event-name">{ev.title}</span>
     </div>

@@ -67,7 +67,7 @@ const TagSelect = ({ label, name, chosen = [], setChosen, req = false, err, fOpe
       <div className="field-container vertical">
         <div className="selected-tags">
           {chosen.map(ch => {
-            return <SelectedTag tag={ch}
+            return <SelectedTag key={ch.id} tag={ch}
               del={() => setChosen({ target: { name, value: chosen.filter(t => t.id !== ch.id) } })}
             />
           })}

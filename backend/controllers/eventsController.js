@@ -7,7 +7,6 @@ import User from '../models/userModel.js';
 import { UserDto } from '../dtos/userDto.js';
 import Calendar from '../models/calendarModel.js';
 import Tag from '../models/tagModel.js';
-import config from '../config.js';
 import { sendCalendarParticipation, sendEventParticipation } from '../utils/emailUtil.js';
 import { createParticipationToken } from '../utils/tokenUtil.js';
 
@@ -427,7 +426,8 @@ class Events {
         id: calendar._id,
         name: calendar.name,
         color: calendar.color,
-        authorId: calendar.authorId
+        authorId: calendar.authorId,
+        type: calendar.type
       };
       delete result.calendarId;
 
@@ -437,8 +437,8 @@ class Events {
       });
     } catch (err) {
       if (err instanceof CastError)
-        return res.status(404).json({ message: 'Invalid event ID' });
-      err.message = `Fetched event data failed: ${err.message}`;
+        return res.status(404).json({ message: 'Event is not found' });
+      err.message = `Fetching event data failed: ${err.message}`;
       throw err;
     }
   }
@@ -757,7 +757,7 @@ class Events {
       } else return res.status(200).json({ message: 'Nothing has changed' });
     } catch (err) {
       if (err instanceof CastError)
-        return res.status(404).json({ message: 'Invalid ID' });
+        return res.status(404).json({ message: 'Event is not found' });
       err.message = `Updating event failed: ${err.message}`;
       throw err;
     }
@@ -832,7 +832,7 @@ class Events {
       event.doneDate = Date.now();
       const result = await event.save();
       return res.status(result ? 200:500).json({
-        message: result ? 'Marking done successully':'Something went wrong',
+        message: result ? 'Marked the task done successully':'Something went wrong',
         data: result
         ? {
           doneDate: event.doneDate
@@ -892,7 +892,7 @@ class Events {
       event.doneDate = null;
       const result = await event.save();
       return res.status(result ? 200:500).json({
-        message: result ? 'Unmarking done successully':'Something went wrong',
+        message: result ? 'Unmarked the task successully':'Something went wrong',
         data: result
         ? {
           doneDate: event.doneDate

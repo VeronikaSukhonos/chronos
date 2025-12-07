@@ -33,7 +33,7 @@ const ParticipationConfirmationPage = () => {
         .then(({ data: res }) => {
           setLoad(false);
           setFeedback({ msg: res.message, status: 'ok' });
-          setParticipation(res.data.calendar);
+          setParticipation(entity === 'event' ? res.data.event : res.data.calendar);
         })
         .catch((err) => {
           setLoad(false);
@@ -51,13 +51,13 @@ const ParticipationConfirmationPage = () => {
         .then(({ data: res }) => {
           setLoad(false);
           toast(res.message);
-          navigate(`/calendars/${participation.id}`);
+          navigate(`/${entity}s/${participation.id}`);
         })
         .catch((err) => {
           setLoad(false);
           if ((err.message).includes('already')) {
             toast(err.message);
-            navigate(`/calendars/${participation.id}`);
+            navigate(`/${entity}s/${participation.id}`);
           } else {
             setFeedback({ msg: err.message, status: 'fail' });
           }

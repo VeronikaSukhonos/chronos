@@ -209,6 +209,12 @@
   min-width: 0;
 }
 
+.calendar-event.done {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  opacity: 0.5;
+}
+
 .fc-daygrid-dot-event {
   transition: all ease-in-out 0.3s;
 }
