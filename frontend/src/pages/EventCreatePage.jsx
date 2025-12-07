@@ -289,7 +289,7 @@ const EventCreatePage = () => {
           chosen={params.participants} setChosen={setParam}
           author={event?.author || auth}
           resend={params.visibleForAll ? undefined: Events.resendParticipation}
-          entityId={eventId} entityName='events'
+          entityId={eventId} entityName="events"
           del={Events.updateEvent}
           fOpen={null}
           notDeletable={notDeletable}

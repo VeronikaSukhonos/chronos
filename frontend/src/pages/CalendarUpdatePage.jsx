@@ -113,7 +113,7 @@ const CalendarUpdatePage = () => {
               author={calendar.author}
               resend={Calendars.resendParticipation}
               entityId={calendarId}
-              entityName='calendar'
+              entityName="calendars"
               del={Calendars.updateCalendar}
               removeFollower={calendar.isPublic
                 ? (id) => setParam({ target: { name: 'followers',
@@ -125,7 +125,9 @@ const CalendarUpdatePage = () => {
                 label="Followers" name="followers" err={errors}
                 chosen={params.followers}
                 author={calendar.author}
-                setChosen={setParam}
+                setChosen={setParam} 
+                entityId={calendarId}
+                entityName="calendars"
                 del={Calendars.updateCalendar}
               />}
             <Checkbox

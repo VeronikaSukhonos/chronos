@@ -140,7 +140,7 @@ const CalendarCreateForm = () => {
               chosen={params.participants} setChosen={setParam}
               author={f.calendar?.author || auth}
               resend={Calendars.resendParticipation}
-              entityId={f.calendar?.id} entityName='calendar'
+              entityId={f.calendar?.id} entityName="calendars"
               del={Calendars.updateCalendar}
               fOpen={formOpenRef.current}
               removeFollower={f.calendar?.id && f.calendar?.isPublic
@@ -150,11 +150,11 @@ const CalendarCreateForm = () => {
             />
             {f.calendar?.id && f.calendar?.isPublic &&
               <UserSearchForm
-                label="Participants" name="participants" err={errors}
+                label="Followers" name="followers" err={errors}
                 chosen={params.followers} setChosen={setParam}
                 author={f.calendar?.author || auth}
                 del={Calendars.updateCalendar}
-                entityName='followers'
+                entityId={f.calendar?.id} entityName="calendars"
               />}
             <Checkbox
               label="Make this calendar public?"
@@ -165,7 +165,7 @@ const CalendarCreateForm = () => {
             />
           </>
         }
-        {f.findMode && <CalendarSearchForm fOpen={formOpenRef.current} findMode={f.findMode} />}
+        {f.findMode && <CalendarSearchForm />}
 
         {feedback && <p className={"basic-form-feedback " + (feedback.status)}>{feedback.msg}</p>}
 

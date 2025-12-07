@@ -177,8 +177,7 @@ const EventPage = () => {
             (created {fDate(currEvent.createDate)})
           </em>
         </div>
-        <em>{currEvent.repeat
-          && currEvent.type !== 'birthday' && `each ${currEvent.repeat.parameter} ${currEvent.repeat.frequency}${currEvent.repeat.parameter > 1 ? 's' : ''} from ` }
+        <em>{currEvent.repeat && `each ${currEvent.repeat.parameter} ${currEvent.repeat.frequency}${currEvent.repeat.parameter > 1 ? 's' : ''} since ` }
           {fEventDate(currEvent.type, currEvent.startDate, currEvent.endDate, currEvent.allDay)}
         </em>
         <div className="content-description">{currEvent.description}</div>
@@ -201,8 +200,7 @@ const EventPage = () => {
             users={currEvent.participants} name="participants"
             setUsers={(users) => setCurrEvent({...currEvent, participants: users})}
             author={auth.id === currEvent.calendar.author.id ? currEvent.calendar.author : currEvent.author}
-            resend={Events.resendParticipation} del={Events.updateEvent} entityName="events"
-            entityId={currEvent.id}
+            resend={Events.resendParticipation} del={Events.updateEvent} entityName="events" entityId={currEvent.id}
             notDeletable={[{ id: currEvent.author.id, role: 'event author' }, { id: currEvent.calendar.author.id, role: 'calendar author' }]}
           />
         </div>

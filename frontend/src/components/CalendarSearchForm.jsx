@@ -11,22 +11,33 @@ const CalendarSearchForm = () => {
   const [calendars, setCalendars] = useState([]);
 
   const [_, setLoad] = useState(false);
+  const [feedback, setFeedback] = useState({ msg: '', status: '' });
 
   useEffect(() => {
+    if ((!search.name || search.name.trim() === '') && (!search.author || search.author.trim() === '')) {
+      setLoad(false);
+      setFeedback({ msg: '', status: '' });
+      setCalendars([]);
+      return;
+    }
+
     const wait = setTimeout(() => {
       setLoad(true);
-      Calendars.fetchCalendars(`?name=${search.name}&author=${search.author}`)
+      Calendars.fetchCalendars(`?name=${encodeURIComponent(search.name)}&author=${encodeURIComponent(search.author)}`)
         .then(({data: res}) => {
           setCalendars(res.data.calendars.filter((calendar) => calendar.role === "guest"));
           setLoad(false);
+          setFeedback({ msg: res.message, status: 'ok' });
         })
         .catch(err => {
           setLoad(false);
           setCalendars([]);
+          setFeedback({ msg: err.message, status: 'fail' });
         });
     }, 300);
+
     return () => clearTimeout(wait);
-  }), [search];
+  }, [search]);
 
   useEffect(() => {
     return () => setSearch({ name: '', author: '' });
@@ -37,27 +48,27 @@ const CalendarSearchForm = () => {
       <TextField
         label="Name"
         onChange={(e) => setSearch({...search, name: e.target.value})}
-        id="name"
+        id="search-name"
         val={search.name}
       />
       <TextField
         label="Author"
         onChange={(e) => setSearch({...search, author: e.target.value})}
-        id="author"
+        id="search-author"
         val={search.author}
       />
-      <div className="calendar-search-results">
-        <ul>
-          {calendars.length > 0 && calendars.map((calendar) => <li key={calendar.id}>
+      {feedback.msg && <div className="calendar-search-results">
+        <ul className="calendar-search-form">
+          {calendars.length > 0 ? calendars.map((calendar) => <li key={calendar.id}>
             <Link to={`/calendars/${calendar.id}`}>
-              <div className="searched-event-calendar">
+              <div className="searched-event-calendar search-form-result">
                 <div className="searched-event-calendar-color" style={{ background: calendar.color || '#ade4ff' }} id={calendar.id}></div>
-                {calendar.name} | Author: {calendar.author.login}
+                {calendar.name} <span>by</span> {calendar.author.login}
               </div>
             </Link>
-          </li>)}
+          </li>) : (feedback.status === 'ok' ? <li className="info-message">No calendars found</li> : <li className="info-message">{feedback.msg}</li>)}
         </ul>
-      </div>
+      </div>}
     </>
   );
 };

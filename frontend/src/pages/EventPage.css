@@ -25,13 +25,9 @@
 }
 
 .events-container {
-  width: 100%;
+  max-width: 100%;
 }
 
 .events-container .searched-event-date {
   font-size: 0.9rem;
-}
-
-.arrangement-link {
-  width: max-content;
 }

@@ -20,7 +20,7 @@ const SearchedUser = ({ user, onClick }) => {
 
 const UserSearchForm = (
   { label, name, id, chosen = [], author, setChosen, notDeletable = [],
-    req = false, resend, entityId, entityName = 'calendar', del, err, fOpen, removeFollower }
+    req = false, resend, entityId, entityName = 'calendars', del, err, fOpen, removeFollower }
 ) => {
   const auth = useSelector(selectAuthUser.user);
 
