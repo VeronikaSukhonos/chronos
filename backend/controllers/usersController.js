@@ -88,11 +88,12 @@ class Users {
       await Calendar.deleteMany({ authorId: user.id });
       await Tag.deleteMany({ authorId: user.id });
       await Event.updateMany(
-        { participants: user.id }, { $pull: { participants: user.id } }
+        { participants: { $elemMatch: { participantId: user.id } } },
+        { $pull: { participants: { $elemMatch: { participantId: user.id } } } }
       );
       await Calendar.updateMany(
-        { $or: [{ participants: user._id }, { followers: user._id }] },
-        { $pull: { participants: user.id, followers: user.id } }
+        { $or: [{ participants: { $elemMatch: { participantId: user.id } } }, { followers: user._id }] },
+        { $pull: { participants: { $elemMatch: { participantId: user.id } }, followers: user.id } }
       );
       await user.deleteAvatar();
       await User.deleteOne({ _id: user.id });
