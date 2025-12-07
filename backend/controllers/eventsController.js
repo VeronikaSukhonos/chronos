@@ -430,10 +430,14 @@ class Events {
       if (event.author.id.toString() === req.user._id.toString())
         hasAccess = true;
       else if (event.visibleForAll) {
-        for (let i of calendar.participants) {
-          if ((i.participantId.toString() === req.user._id.toString() && i.isConfirmed === null) || (calendar.isPublic && calendar.followers.includes(req.user._id))) {
-            hasAccess = true;
-            break;
+        if (calendar.isPublic && calendar.followers.includes(req.user._id))
+          hasAccess = true;
+        else {
+          for (let i of calendar.participants) {
+            if (i.participantId.toString() === req.user._id.toString() && i.isConfirmed === null) {
+              hasAccess = true;
+              break;
+            }
           }
         }
       } else {
@@ -447,7 +451,8 @@ class Events {
       
       if (hasAccess) {
         const result = new EventDto(event, true);
-        if (event.author.id.toString() !== req.user._id.toString())
+        if (event.author.id.toString() !== req.user._id.toString()
+          && calendar.authorId.toString() !== req.user._id.toString())
           event.participants = event.participants.filter(participant => participant.isConfirmed === null);
         result.participants = [];
         for (let i of event.participants) {
@@ -713,10 +718,10 @@ class Events {
           if (!filteredParticipants.includes(req.user._id.toString()))
             filteredParticipants.splice(0, 0, req.user._id.toString())
           for (let i = filteredParticipants.length - 1; i >= 0; --i) {
-            if (!(filteredParticipants[i] === req.user._id.toString()
+            if (filteredParticipants.indexOf(filteredParticipants[i]) < i
+              || !(filteredParticipants[i] === req.user._id.toString()
               || filteredParticipants[i] === calendar.authorId.toString()
-              || await User.findOne({ _id: filteredParticipants[i] }))
-              || filteredParticipants.indexOf(filteredParticipants[i]) < i)
+              || await User.findOne({ _id: filteredParticipants[i] })))
               filteredParticipants.splice(i, 1);
             else {
               let present = false;
@@ -732,30 +737,40 @@ class Events {
                   _id: filteredParticipants[i]
                 }).select("+email");
                 if (user) {
-                  let calendarParticipant = false;
-                  for (let j of calendar.participants) {
-                    if (j.participantId.toString() === filteredParticipants[i] && j.isConfirmed === null) {
-                      calendarParticipant = true;
-                      break;
-                    }
-                  }
-                  if (!calendarParticipant) {
-                    calendar.participants.push({
+                  if (filteredParticipants[i] === req.user._id.toString()
+                    || filteredParticipants[i] === calendar.authorId.toString())
+                    filteredParticipants[i] = {
                       participantId: user._id,
-                      isConfirmed: await createParticipationToken(user, calendar.id)
-                    });
-                    await calendar.save();
-                    await sendCalendarParticipation(user, calendar, calendar.participants[calendar.participants.length - 1].isConfirmed);
+                      isConfirmed: null
+                    };
+                  else {
+                    let calendarParticipant = false;
+                    for (let j = 0; j < calendar.participants.length; i += 1) {
+                      if (calendar.participants[j].participantId.toString() === filteredParticipants[i]) {
+                        calendarParticipant = calendar.participants[j].isConfirmed === null ? true : j;
+                        break;
+                      }
+                    }
+                    if (calendarParticipant === false)
+                      calendar.participants.push({
+                        participantId: user._id,
+                        isConfirmed: await createParticipationToken(user, calendar.id)
+                      });
+                    else if (calendarParticipant !== true)
+                      calendar.participants[calendarParticipant].isConfirmed = await createParticipationToken(user, calendar.id);
+                    if (calendarParticipant !== true)
+                      await sendCalendarParticipation(user, calendar, calendar.participants[calendarParticipant === false ? calendar.participants.length - 1 : j].isConfirmed);
+                    filteredParticipants[i] = {
+                      participantId: user._id,
+                      isConfirmed: await createParticipationToken(user, undefined, event.id)
+                    };
+                    await sendEventParticipation(user, event, filteredParticipants[i].isConfirmed);
                   }
-                  filteredParticipants[i] = {
-                    participantId: user._id,
-                    isConfirmed: await createParticipationToken(user, undefined, event.id)
-                  };
-                  await sendEventParticipation(user, event, filteredParticipants[i].isConfirmed);
                 }
               }
             }
           }
+          await calendar.save();
           filteredParticipants.sort((p1, p2) => {
             if (p1.participantId.toString() === req.user._id.toString()
                 || p1.participantId.toString() === calendar.authorId.toString())
