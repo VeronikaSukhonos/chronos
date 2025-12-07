@@ -64,7 +64,7 @@ class Calendars {
           });
         else
           parameters.name = {
-            $regex: req.query.name
+            $regex: new RegExp(req.query.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), 'i')
           };
       }
       if (req.query.author) {
@@ -496,17 +496,17 @@ class Calendars {
         } else {
           if (!req.body.participants)
             req.body.participants = [];
+          for (let i = req.body.participants.length - 1; i >= 0; --i) {
+            if (req.body.participants.indexOf(req.body.participants[i]) < i
+              || !(req.body.participants[i] === req.user._id.toString()
+              || req.body.participants[i] === calendar.authorId.toString()
+              || await User.findOne({ _id: req.body.participants[i] })))
+              req.body.participants.splice(i, 1);
+          }
           if (!req.body.participants.includes(calendar.authorId.toString()))
             req.body.participants.splice(0, 0, calendar.authorId.toString())
           if (!req.body.participants.includes(req.user._id.toString()))
             req.body.participants.splice(0, 0, req.user._id.toString())
-          for (let i = req.body.participants.length - 1; i >= 0; --i) {
-            if (!(req.body.participants[i] === req.user._id.toString()
-              || req.body.participants[i] === calendar.authorId.toString()
-              || await User.findOne({ _id: req.body.participants[i] }))
-              || req.body.participants.indexOf(req.body.participants[i]) < i)
-              req.body.participants.splice(i, 1);
-          }
         }
         if (req.body.tags) {
           for (let i = req.body.tags.length - 1; i >= 0; --i) {
@@ -518,17 +518,7 @@ class Calendars {
         if (req.body.allDay) {
           req.body.endDate = new Date(new Date(req.body.startDate).getTime() + 23 * 3600000 + 59 * 60000 + 59 * 1000 + 999).toISOString();
         }
-        let participants = [];
-        for (let i of req.body.participants) {
-          const user = await User.findOne({
-            _id: new mongoose.Types.ObjectId(i)
-          });
-          if (user) {
-            participants.push({
-              participantId: user._id
-            });
-          }
-        }
+        let participants = req.body.participants.map(participant => { return { participantId: participant }; });
         participants.sort((p1, p2) => {
           if (p1.participantId.toString() === req.user._id.toString()
               || p1.participantId.toString() === calendar.authorId.toString())
@@ -560,32 +550,33 @@ class Calendars {
             const user = await User.findOne({
               _id: newEvent.participants[i].participantId
             }).select("+email");
-            if (!user) {
-              return res.status(404).json({
-                message: 'Participant is not found'
-              });
-            }
-            if (newEvent.participants[i].participantId.toString() !== req.user._id.toString() && newEvent.participants[i].participantId.toString() !== calendar.authorId.toString()) {
-              let calendarParticipant = false;
-              for (let j of calendar.participants) {
-                if (j.participantId.toString() === newEvent.participants[i].participantId.toString() && j.isConfirmed === null) {
-                  calendarParticipant = true;
-                  break;
+            if (user) {
+              if (newEvent.participants[i].participantId.toString() !== req.user._id.toString()
+                && newEvent.participants[i].participantId.toString() !== calendar.authorId.toString()) {
+                let calendarParticipant = false;
+                for (let j = 0; j < calendar.participants.length; i += 1) {
+                  if (calendar.participants[j].participantId.toString() === newEvent.participants[i].participantId.toString()) {
+                    calendarParticipant = calendar.participants[j].isConfirmed === null ? true : j;
+                    break;
+                  }
                 }
-              }
-              if (!calendarParticipant) {
-                calendar.participants.push({
-                  participantId: user._id,
-                  isConfirmed: await createParticipationToken(user, calendar.id)
-                });
-                await calendar.save();
-                await sendCalendarParticipation(user, calendar, calendar.participants[calendar.participants.length - 1].isConfirmed);
-              }
-              newEvent.participants[i].isConfirmed = await createParticipationToken(user, undefined, newEvent.id);
-              await newEvent.save();
-              await sendEventParticipation(user, newEvent, newEvent.participants[i].isConfirmed);
+                if (calendarParticipant === false)
+                  calendar.participants.push({
+                    participantId: user._id,
+                    isConfirmed: await createParticipationToken(user, calendar.id)
+                  });
+                else if (calendarParticipant !== true)
+                  calendar.participants[calendarParticipant].isConfirmed = await createParticipationToken(user, calendar.id);
+                if (calendarParticipant !== true)
+                  await sendCalendarParticipation(user, calendar, calendar.participants[calendarParticipant === false ? calendar.participants.length - 1 : j].isConfirmed);
+                newEvent.participants[i].isConfirmed = await createParticipationToken(user, undefined, newEvent.id);
+                await sendEventParticipation(user, newEvent, newEvent.participants[i].isConfirmed);
+              } else
+                newEvent.participants[i].isConfirmed = null;
             }
           }
+          await calendar.save();
+          await newEvent.save();
         }
         const result = await newEvent.populate('tags');
         result.author = new UserDto(await User.findOne({ _id: req.user._id }).select('id login avatar'));
