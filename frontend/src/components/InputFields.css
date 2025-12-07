@@ -505,3 +505,19 @@ li.react-datepicker__time-list-item:hover,
 .select-field-container.nav .select-field-option label {
   color: var(--accent-color);
 }
+
+.repeat-field {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.repeat-field .select-field-button {
+  min-height: 36px;
+}
+
+@media screen and (max-width: 500px) {
+  .repeat-field {
+    flex-direction: column;
+  }
+}

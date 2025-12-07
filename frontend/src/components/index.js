@@ -1,7 +1,8 @@
 export { default as Header } from './Header.jsx';
 export { MainButton, MenuButton } from './Buttons.jsx';
 export {
-  TextField, TextAreaField, PasswordField, DateField, Checkbox, ColorField, SelectField
+  TextField, TextAreaField, PasswordField, DateField,
+  Checkbox, ColorField, SelectField, RepeatField
 } from './InputFields.jsx';
 export { default as Modal } from './Modal.jsx';
 export { default as AccordionMenu } from './AccordionMenu.jsx';
@@ -20,4 +21,5 @@ export { default as EventSearchForm } from './EventSearchForm.jsx';
 export { default as EventCreateForm } from './EventCreateForm.jsx';
 
 export { default as TagCreateForm } from './TagCreateForm.jsx';
+export { default as TagSelect } from './TagSelect.jsx';
 export { default as ConfirmDeleteForm } from './ConfirmDeleteForm.jsx';

@@ -204,7 +204,8 @@
   padding: 4px 7px 0;
 }
 
-.search-results.users {
+.search-results.users,
+.search-results.tags {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -230,4 +231,81 @@
   color: var(--accent-color);
   font-size: 0.9rem;
   font-weight: 400;
+}
+
+.tag-add-container {
+  position: relative;
+}
+
+.search-results.tags {
+  padding: 0;
+  top: 140%;
+}
+
+.searched-tag {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+  flex-grow: 1;
+  width: 100%;
+  padding: 5px 0;
+  cursor: pointer;
+  transition: all ease-in-out 0.3s;
+}
+
+.searched-tag:hover {
+  background: var(--lighter-shadow-color);
+}
+
+.selected-tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.selected-tag {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 5px;
+  background: var(--faded-accent-color);
+  border-radius: 15px;
+  color: var(--lighter-main-bg-color);
+  font-weight: 600;
+  padding: 3px 5px;
+  width: max-content;
+  transition: all ease-in-out 0.3s;
+}
+
+.selected-tag:hover {
+  background: var(--accent-color);
+}
+
+.selected-tag-title {
+  display: flex;
+  align-items: center;
+  padding-left: 5px;
+}
+
+.selected-tag-delete {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  border: none;
+  padding-left: 3px;
+  cursor: pointer;
+}
+
+.selected-tag-delete svg {
+  height: 18px;
+  width: 18px;
+  transform: rotate(45deg);
+}
+
+.selected-tag-delete svg path {
+  fill: var(--lighter-main-bg-color) !important;
+  transition: all ease-in-out 0.3s;
 }

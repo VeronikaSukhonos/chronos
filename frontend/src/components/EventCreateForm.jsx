@@ -10,8 +10,8 @@ import {
   selectCalendar, addToCalendar, updateInCalendar, selectEventCreateForm, setForm, closeForm
 } from '../store/calendarSlice.js';
 import {
-  Modal, TextField, SelectField, TextAreaField, DateField, ColorField,
-  UserSearchForm, Checkbox, MainButton
+  Modal, TextField, SelectField, TextAreaField, DateField, ColorField, RepeatField,
+  UserSearchForm, TagSelect, Checkbox, MainButton
 } from '../components';
 import { useForm } from '../hooks';
 import { getEventIcon } from '../utils/getIcon.jsx';
@@ -30,7 +30,7 @@ const EventCreateForm = () => {
     name: '', type: 'arrangement', startDate: '', endDate: '', allDay: false,
     description: '', calendar: null, color: '#ade4ff',
     participants: [{ id: auth.id, login: auth.login, avatar: auth.avatar, isConfirmed: true }], visibleForAll: false,
-    // repeat: { frequency: '', parameter: '' }, tags: [],
+    repeat: { frequency: 'never', parameter: 1 }, tags: [],
     link: ''
   };
 
@@ -71,7 +71,10 @@ const EventCreateForm = () => {
         .catch((err) => { if (formOpenRef.current) setFailure(err); });
     } else {
       Calendars.createEvent(params.calendar, {...params,
-        participants: params.participants.map(p => p.id) })
+        participants: params.participants.map(p => p.id),
+        repeat: params.repeat.frequency === 'never' ? null : params.repeat,
+        tags: params.tags.map(t => t.id)
+      })
         .then(({ data: res }) => {
           dispatch(addToCalendar({ group: 'events', item: res.data.event }));
           dispatch(closeForm('eventCreateForm'));
@@ -307,7 +310,25 @@ const EventCreateForm = () => {
           }}
           short={false}
         />
-        {/* {repeat, tags} TODO !!!!! */}
+        {!['task', 'holiday', 'birthday'].includes(params.type) &&
+          <RepeatField
+            label="Repeat"
+            selectedFrequency={params.repeat.frequency}
+            selectedParameter={params.repeat.parameter}
+            onChangeFrequency={setParam}
+            onChangeParameter={setParam}
+            fOpen={formOpenRef.current}
+            err={errors}
+          />
+        }
+        <TagSelect
+          label="Tags"
+          name="tags"
+          chosen={params.tags}
+          setChosen={setParam}
+          fOpen={formOpenRef.current}
+          err={errors}
+        />
         {params.type === 'arrangement' && <TextField
           label="Link"
           onChange={setParam}

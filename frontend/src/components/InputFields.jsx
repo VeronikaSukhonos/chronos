@@ -176,3 +176,61 @@ export const SelectField = (
     </div>
   );
 };
+
+export const RepeatField = ({ label, onChangeFrequency, onChangeParameter, selectedFrequency, selectedParameter, name='repeat', err, req = false, dis = false, fOpen }) => {
+  const [parameterVisible, setParameterVisible] = useState(selectedFrequency !== 'never');
+
+  useEffect(() => {
+    if (fOpen === false) setParameterVisible(false);
+  }, [fOpen]);
+
+  return (
+    <div className="field">
+      <div className="repeat-field">
+        <SelectField
+          label={`${label} Frequency`}
+          name="frequency"
+          options={[
+            { label: 'Never', value: 'never' },
+            { label: 'Day', value: 'day' },
+            { label: 'Week', value: 'week' },
+            { label: 'Month', value: 'month' },
+            { label: 'Year', value: 'year' }
+          ]}
+          selected={selectedFrequency || null}
+          onChange={(v) => {
+            onChangeFrequency({ target: {
+              name: 'repeat',
+              value: {
+                frequency: v.target.value,
+                parameter: v.target.value === 'never' ? 1 : selectedParameter
+              }
+            }});
+            setParameterVisible(v.target.value !== 'never');
+          }}
+          req={req}
+          dis={dis}
+        />
+        {parameterVisible && <TextField
+          label="Parameter"
+          id="parameter" name="parameter"
+          onChange={(v) => {
+            if (/^[1-9]\d*$/.test(v.target.value) || v.target.value === '')
+              onChangeParameter({ target: {
+                name: 'repeat',
+                value: {
+                  frequency: selectedFrequency,
+                  parameter: v.target.value
+                }
+              }});
+          }}
+          ph={`each x ${selectedFrequency}s`}
+          val={selectedParameter}
+          dis={dis}
+        />}
+      </div>
+
+      {err?.[name] && <div className="field-err">{err[name]}</div>}
+    </div>
+  );
+};
