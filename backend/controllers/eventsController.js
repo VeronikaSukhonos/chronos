@@ -81,7 +81,7 @@ class Events {
       let startDate, endDate, events;
       if (req.body.search !== undefined) {
         parameters.name = {
-          $regex: new RegExp(req.body.search, 'i')
+          $regex: new RegExp(req.body.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), 'i')
         };
         events = await Event.find({
                                     ...parameters,

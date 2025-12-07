@@ -64,7 +64,7 @@ class Calendars {
           });
         else
           parameters.name = {
-            $regex: new RegExp(req.query.name, 'i')
+            $regex: new RegExp(req.query.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), 'i')
           };
       }
       if (req.query.author) {
