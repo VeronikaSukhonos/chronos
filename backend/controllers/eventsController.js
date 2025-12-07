@@ -169,7 +169,6 @@ class Events {
                                                                                   calendarId: holidaysCalendar._id,
                                                                                   name: holiday.name,
                                                                                   startDate: holiday.date,
-                                                                                  endDate: new Date(new Date(holiday.date).setHours(23, 59, 59, 999)),
                                                                                   allDay: true, type: 'holiday',
                                                                                   color: holidaysCalendar.color
                                                                                 };
@@ -180,7 +179,6 @@ class Events {
                                                                                 calendarId: holidaysCalendar._id,
                                                                                 name: holiday.name,
                                                                                 startDate: holiday.date,
-                                                                                endDate: new Date(new Date(holiday.date).setHours(23, 59, 59, 999)),
                                                                                 allDay: true, type: 'holiday',
                                                                                 color: holidaysCalendar.color
                                                                               };
@@ -208,6 +206,7 @@ class Events {
           repeatEvents = repeatEvents.filter(event => event.tags.some(tag => searchTags.includes(tag.title)));
         for (let i of repeatEvents) {
           let eventDate = new Date(i.startDate);
+          let eventEndDate = new Date(i.endDate);
           let repeatDelta, nextRepeatEventTime, prevRepeatEventTime, prevRepeatEventEndTime, startMonth, eventMonth, newDate, prevDate;
           if (i.authorId)
             i.author = new UserDto(await User.findOne({ _id: i.authorId }).select('id login avatar'));
@@ -216,7 +215,9 @@ class Events {
               repeatDelta = (Math.ceil((startDate - eventDate) / 86400000) % i.repeat.parameter) || i.repeat.parameter;
               nextRepeatEventTime = startDate.getTime() + (i.repeat.parameter - repeatDelta) * 86400000;
               prevRepeatEventTime = nextRepeatEventTime - i.repeat.parameter * 86400000;
-              prevRepeatEventEndTime = prevRepeatEventTime + (new Date(i.endDate).setHours(0, 0, 0, 0) - new Date(i.startDate).setHours(0, 0, 0, 0)) * 86400000;
+              prevRepeatEventEndTime = prevRepeatEventTime +
+                                       (eventEndDate.getTime() - (eventEndDate.getUTCHours() * 3600000 + eventEndDate.getUTCMinutes() * 60000 + eventEndDate.getUTCSeconds() * 1000 + eventEndDate.getUTCMilliseconds()) -
+                                       eventDate.getTime() - (eventDate.getUTCHours() * 3600000 + eventDate.getUTCMinutes() * 60000 + eventDate.getUTCSeconds() * 1000 + eventDate.getUTCMilliseconds())) * 86400000;
               if ((prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate)
                 || (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate)) {
                 const newEvent = JSON.parse(JSON.stringify(new EventDto(i, true)));
@@ -231,7 +232,9 @@ class Events {
               repeatDelta = ((Math.ceil((startDate - eventDate) / 86400000) / 7) % i.repeat.parameter) || i.repeat.parameter;
               nextRepeatEventTime = startDate.getTime() + (i.repeat.parameter - repeatDelta) * 86400000 * 7 + (7 - ((Math.ceil((startDate - eventDate) / 86400000) % 7) || 7)) * 86400000;
               prevRepeatEventTime = nextRepeatEventTime - i.repeat.parameter * 7 * 86400000;
-              prevRepeatEventEndTime = prevRepeatEventTime + (new Date(i.endDate).setHours(0, 0, 0, 0) - new Date(i.startDate).setHours(0, 0, 0, 0)) * 86400000;
+              prevRepeatEventEndTime = prevRepeatEventTime +
+                                       (eventEndDate.getTime() - (eventEndDate.getUTCHours() * 3600000 + eventEndDate.getUTCMinutes() * 60000 + eventEndDate.getUTCSeconds() * 1000 + eventEndDate.getUTCMilliseconds()) -
+                                       eventDate.getTime() - (eventDate.getUTCHours() * 3600000 + eventDate.getUTCMinutes() * 60000 + eventDate.getUTCSeconds() * 1000 + eventDate.getUTCMilliseconds())) * 86400000;
               if ((prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate)
                 || (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate)) {
                 const newEvent = JSON.parse(JSON.stringify(new EventDto(i, true)));
@@ -309,7 +312,7 @@ class Events {
         for (let i = 0; i < currEventCount; ++i) {
           if (events[i].authorId)
             events[i].author = new UserDto(await User.findOne({ _id: events[i].authorId }).select('id login avatar'));
-          if (events[i].type == 'birthday')
+          if (events[i].type == 'birthday' && !events[i].birthday)
             events[i].birthday = events[i].startDate;
           events[i] = new EventDto(events[i]);
           if (events[i].repeat && events[i].repeat.frequency && events[i].repeat.parameter) {
@@ -635,8 +638,7 @@ class Events {
         && allDay !== undefined && allDay !== event.allDay) {
         event.allDay = allDay;
         if (event.allDay) {
-          event.startDate = new Date(new Date(event.startDate).setHours(0, 0, 0, 0)).toISOString();
-          event.endDate = new Date(new Date(event.startDate).setHours(23, 59, 59, 999)).toISOString();
+          event.endDate = new Date(new Date(event.startDate).getTime() + 23 * 3600000 + 59 * 60000 + 59 * 1000 + 999).toISOString();
         }
       }
       if (!event.allDay) {

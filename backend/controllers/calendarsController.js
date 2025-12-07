@@ -516,8 +516,7 @@ class Calendars {
           }
         }
         if (req.body.allDay) {
-          req.body.startDate = new Date(new Date(req.body.startDate).setHours(0, 0, 0, 0)).toISOString();
-          req.body.endDate = new Date(new Date(req.body.startDate).setHours(23, 59, 59, 999)).toISOString();
+          req.body.endDate = new Date(new Date(req.body.startDate).getTime() + 23 * 3600000 + 59 * 60000 + 59 * 1000 + 999).toISOString();
         }
         let participants = [];
         for (let i of req.body.participants) {
@@ -556,6 +555,7 @@ class Calendars {
           visibleForAll: calendar.type == 'main' || calendar.type == 'holidays' ? false:req.body.visibleForAll,
           allDay: req.body.allDay
         });
+        console.log(newEvent);
         if (participants.length !== 0) {
           for (let i = 0; i < newEvent.participants.length; i += 1) {
             const user = await User.findOne({
