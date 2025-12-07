@@ -32,7 +32,7 @@ body {
   flex-direction: column;
   background: var(--main-bg-color);
   color: var(--main-color);
-  padding: 10px calc(10px + 2vw);
+  padding: 0 calc(10px + 2vw) 10px;
   height: 100vh;
   width: 100%;
   min-width: 388px;
