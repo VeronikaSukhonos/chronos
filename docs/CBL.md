@@ -88,4 +88,4 @@ In Teams, notifications about creating new events and tasks are sent by push-not
 
 ## Share
 
-➔ **[LinkedIn post]([TODO](https://www.linkedin.com/feed/update/urn:li:share:7403547740258861056/))**
+➔ **[LinkedIn post](https://www.linkedin.com/feed/update/urn:li:share:7403547740258861056/)**
