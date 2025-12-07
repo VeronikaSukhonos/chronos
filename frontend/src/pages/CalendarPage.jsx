@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 
 import Calendars from '../api/calendarsApi.js';
 import { selectAuthUser } from '../store/authSlice.js';
-import { setCalendar, setForm, closeForm, selectConfirmDeleteForm } from '../store/calendarSlice.js';
+import { setCalendar, setForm, closeForm, selectConfirmDeleteForm, deleteFromCalendar } from '../store/calendarSlice.js';
 import ErrorPage from './ErrorPage.jsx';
 import LoadPage from './LoadPage.jsx';
 import { Calendar, ConfirmDeleteForm, MenuButton, UserList } from '../components';
@@ -15,7 +15,7 @@ import { getCalendarIcon } from '../utils/getIcon.jsx';
 import './ContentPage.css';
 import '../components/DropdownMenu.css';
 
-const CalendarMenu = ({ calendar, setCalendar, menuOpen, setMenuOpen, setLoad }) => {
+const CalendarMenu = ({ calendar, setCalendar, menuOpen, setMenuOpen, setLoad, auth }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -26,7 +26,7 @@ const CalendarMenu = ({ calendar, setCalendar, menuOpen, setMenuOpen, setLoad })
     setLoad(true);
     Calendars.followCalendar(calendar.id)
       .then(({ data: res }) => {
-        setCalendar({...calendar, role: 'follower'});
+        setCalendar({...calendar, role: 'follower', followers: [...calendar.followers, auth] });
         setLoad(false);
         toast(res.message);
       })
@@ -69,6 +69,7 @@ const CalendarMenu = ({ calendar, setCalendar, menuOpen, setMenuOpen, setLoad })
       setLoad(true);
       Calendars.deleteCalendar(calendar.id)
         .then(({ data: res }) => {
+          dispatch(deleteFromCalendar({ group: confirmDeleteForm.group, id: calendar.id }));
           navigate('/');
           setLoad(false);
           toast(res.message);
@@ -164,7 +165,7 @@ const CalendarPage = () => {
                 onClick={() => { if (!menuOpen && !load) setMenuOpen(true); else setMenuOpen(false); }}
               />
               <CalendarMenu calendar={curCalendar} setCalendar={setCurCalendar}
-                menuOpen={menuOpen} setMenuOpen={setMenuOpen} setLoad={setLoad}
+                menuOpen={menuOpen} setMenuOpen={setMenuOpen} setLoad={setLoad} auth={auth}
               />
             </div>
           </div>
