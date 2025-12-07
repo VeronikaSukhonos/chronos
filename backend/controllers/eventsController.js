@@ -664,9 +664,14 @@ class Events {
       const event = await Event.findOne({ _id: eventId });
 
       if (!event) return res.status(404).json({ message: 'Event is not found' });
-      if (event.authorId.toString() != req.user._id.toString())
-        return res.status(403).json({ message: 'You are not an author of the event' });
       const calendar = await Calendar.findOne({ _id: event.calendarId });
+      if (!calendar)
+        return res.status(404).json({
+          message: "Calendar is not found"
+        });
+      if (event.authorId.toString() != req.user._id.toString()
+        && calendar.authorId.toString() != req.user._id.toString())
+        return res.status(403).json({ message: 'You do not have rights to edit the event' });
 
       if (name)
         event.name = name;
@@ -816,8 +821,14 @@ class Events {
         return res.status(404).json({
           message: "Event is not found"
         });
+      const calendar = await Calendar.findOne({ _id: event.calendarId });
+      if (!calendar)
+        return res.status(404).json({
+          message: "Calendar is not found"
+        });
       let hasRights = false;
-      if (event.authorId.toString() === req.user._id.toString())
+      if (event.authorId.toString() === req.user._id.toString()
+        || calendar.authorId.toString() === req.user._id.toString())
         hasRights = true;
       else {
         for (let i of event.participants) {
@@ -828,7 +839,8 @@ class Events {
         }
       }
       if (hasRights) {
-        if (event.authorId.toString() === req.user._id.toString()) {
+        if (event.authorId.toString() === req.user._id.toString()
+          || calendar.authorId.toString() === req.user._id.toString()) {
           await Event.deleteOne({ _id: event.id });
           return res.status(200).json({ message: 'Deleted event successfully' });
         } else {
