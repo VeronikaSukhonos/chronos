@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import Events from '../api/eventsApi.js';
 import { SearchIcon } from '../assets';
@@ -21,7 +21,7 @@ const SearchedEvent = ({ event }) => {
         {event.calendar?.name}
       </div>
       <div className="searched-event-date">
-        {event.repeat && `each ${event.repeat.parameter} ${event.repeat.frequency}${event.repeat.parameter > 1 ? 's' : ''} from ` }
+        {event.repeat && `each ${event.repeat.parameter} ${event.repeat.frequency}${event.repeat.parameter > 1 ? 's' : ''} since ` }
         {fEventDate(event.type, event.startDate, event.endDate, event.allDay)}
       </div>
     </Link>
@@ -29,6 +29,8 @@ const SearchedEvent = ({ event }) => {
 };
 
 const EventSearchForm = ({ label, id, onSubmit, search, setSearch, searchOpen, setSearchOpen }) => {
+  const location = useLocation();
+
   const [_, setLoad] = useState(false);
   const [feedback, setFeedback] = useState({ msg: '', status: '' });
   const [events, setEvents] = useState([]);
@@ -74,6 +76,12 @@ const EventSearchForm = ({ label, id, onSubmit, search, setSearch, searchOpen, s
   useEffect(() => {
     return () => setSearch('');
   }, []);
+
+  useEffect(() => {
+    if (!location.pathname.includes('search'))
+      setSearch('');
+    inputRef.current.blur();
+  }, [location.pathname]);
 
   return (
     <div className={"event-search-form-container " + (searchOpen ? "open" : "close")}>

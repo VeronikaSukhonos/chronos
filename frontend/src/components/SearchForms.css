@@ -309,3 +309,28 @@
   fill: var(--lighter-main-bg-color) !important;
   transition: all ease-in-out 0.3s;
 }
+
+.calendar-search-results {
+  width: 100%;
+}
+
+.calendar-search-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.searched-event-calendar.search-form-result {
+  border-radius: 10px;
+  padding: 3px 5px;
+  width: 100%;
+  transition: all ease-in-out 0.3s;
+}
+
+.searched-event-calendar.search-form-result span {
+  font-weight: normal;
+}
+
+.searched-event-calendar.search-form-result:hover {
+  background: var(--lighter-shadow-color);
+}

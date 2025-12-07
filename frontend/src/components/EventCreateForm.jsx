@@ -299,7 +299,7 @@ const EventCreateForm = () => {
           chosen={params.participants} setChosen={setParam}
           author={f.event?.author || auth}
           resend={params.visibleForAll ? undefined: Events.resendParticipation}
-          entityId={f.event?.id} entityName='events'
+          entityId={f.event?.id} entityName="events"
           del={Events.updateEvent}
           fOpen={formOpenRef.current}
           notDeletable={notDeletable}

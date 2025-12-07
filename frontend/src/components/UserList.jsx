@@ -7,7 +7,7 @@ import { selectAuthUser } from '../store/authSlice.js';
 import { MainButton } from '../components';
 import { ConfirmIcon, AddIcon, QuestionIcon } from '../assets';
 
-const UserList = ({ users, name, setUsers, author, resend, del, entityId, entityName = 'calendar', notDeletable = [] }) => {
+const UserList = ({ users, name, setUsers, author, resend, del, entityId, entityName = 'calendars', notDeletable = [] }) => {
   const auth = useSelector(selectAuthUser.user);
   const [load, setLoad] = useState(false);
 
@@ -87,7 +87,7 @@ const UserList = ({ users, name, setUsers, author, resend, del, entityId, entity
         })
       }
     </div>
-  ) : (entityName === 'calendar'
+  ) : (entityName === 'calendars'
       ? <div className="info-message left">No {name} in this calendar</div> :
         <div className="info-message left">This event is public</div>);
 };

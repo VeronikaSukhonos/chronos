@@ -29,9 +29,15 @@ const EventMenu = ({ event, user, menuOpen, setMenuOpen, setLoad }) => {
 
   const deleteEvent = () => {
     setMenuOpen(false);
-    dispatch(setForm({ form: 'confirmDeleteForm', params: { id: event.id,
-      group: 'eventsParticipation', open: true }
-    }));
+    if (event.author.id === user.id || event.calendar.author.id === user.id) {
+      dispatch(setForm({ form: 'confirmDeleteForm', params: { id: event.id,
+        group: 'events', open: true }
+      }));
+    } else {
+      dispatch(setForm({ form: 'confirmDeleteForm', params: { id: event.id,
+        group: 'eventsParticipation', open: true }
+      }));
+    }
   };
 
   useEffect(() => {
@@ -67,7 +73,7 @@ const EventMenu = ({ event, user, menuOpen, setMenuOpen, setLoad }) => {
 
   return (
     <ul className={menuOpen ? 'open' : 'close'}>
-      {event.author.id == user.id && <li onClick={updateEvent}>
+      {(event.author.id === user.id || event.calendar.author.id === user.id) && <li onClick={updateEvent}>
         <button><UpdateIcon /><div>Update</div></button>
       </li>}
       {hasRights && <li onClick={deleteEvent}>
@@ -177,8 +183,7 @@ const EventPage = () => {
             (created {fDate(currEvent.createDate)})
           </em>
         </div>
-        <em>{currEvent.repeat
-          && currEvent.type !== 'birthday' && `each ${currEvent.repeat.parameter} ${currEvent.repeat.frequency}${currEvent.repeat.parameter > 1 ? 's' : ''} from ` }
+        <em>{currEvent.repeat && `each ${currEvent.repeat.parameter} ${currEvent.repeat.frequency}${currEvent.repeat.parameter > 1 ? 's' : ''} since ` }
           {fEventDate(currEvent.type, currEvent.startDate, currEvent.endDate, currEvent.allDay)}
         </em>
         <div className="content-description">{currEvent.description}</div>
@@ -201,8 +206,7 @@ const EventPage = () => {
             users={currEvent.participants} name="participants"
             setUsers={(users) => setCurrEvent({...currEvent, participants: users})}
             author={auth.id === currEvent.calendar.author.id ? currEvent.calendar.author : currEvent.author}
-            resend={Events.resendParticipation} del={Events.updateEvent} entityName="events"
-            entityId={currEvent.id}
+            resend={Events.resendParticipation} del={Events.updateEvent} entityName="events" entityId={currEvent.id}
             notDeletable={[{ id: currEvent.author.id, role: 'event author' }, { id: currEvent.calendar.author.id, role: 'calendar author' }]}
           />
         </div>

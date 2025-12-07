@@ -18,15 +18,15 @@ const EventPreview = ({ event }) => {
     <div className="content-info-container">
       <div className="content-name-container">
         <Link className="event-title" to={`/events/${event.id}`}>
-          <h1 className="content-name event-title" style={{ background: event.color }}>
-            {getEventIcon(event.type, "content-meta-icon")}
+          <h1 className="content-name event-title" style={{ background: event.color || '#ade4ff' }}>
+            {getEventIcon(event.type, "content-meta-icon event-icon")}
             {event.name}
           </h1>
           {getPublicEventIcon(event.visibleForAll, "content-meta-icon")}
         </Link>
         <div className="content-meta">
           <div className="searched-event-date">
-            {event.repeat && `each ${event.repeat.parameter} ${event.repeat.frequency}${event.repeat.parameter > 1 ? 's' : ''} from `}
+            {event.repeat && `each ${event.repeat.parameter} ${event.repeat.frequency}${event.repeat.parameter > 1 ? 's' : ''} since ` }
             {fEventDate(event.type, event.startDate, event.endDate, event.allDay)}
           </div>
         </div>
