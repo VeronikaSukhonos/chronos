@@ -535,7 +535,7 @@ class Calendars {
           name: req.body.name,
           description: req.body.description,
           startDate: req.body.startDate,
-          endDate: req.body.endDate,
+          endDate: req.body.endDate ? req.body.endDate:undefined,
           link: req.body.type == 'arrangement' ? req.body.link:undefined,
           color: req.body.color,
           repeat: req.body.type !== 'task' && req.body.repeat !== null ? req.body.repeat:undefined,

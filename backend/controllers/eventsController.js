@@ -194,19 +194,28 @@ class Events {
         let repeatEvents = await Event.find({
                                               ...parameters,
                                               startDate: { $lt: startDate },
-                                              endDate: { $lt: startDate },
                                               repeat: { $exists: true },
-                                              $or: [
-                                                { authorId: req.user._id },
+                                              $and: [
                                                 {
-                                                  participants: {
-                                                    $elemMatch: {
-                                                      participantId: req.user._id,
-                                                      isConfirmed: null
-                                                    }
-                                                  }
+                                                  $or: [
+                                                    { authorId: req.user._id },
+                                                    {
+                                                      participants: {
+                                                        $elemMatch: {
+                                                          participantId: req.user._id,
+                                                          isConfirmed: null
+                                                        }
+                                                      }
+                                                    },
+                                                    { visibleForAll: true }
+                                                  ]
                                                 },
-                                                { visibleForAll: true }
+                                                {
+                                                  $or: [
+                                                    { endDate: { $exists: false } },
+                                                    { endDate: { $lt: startDate } }
+                                                  ]
+                                                }
                                               ]
                                             })
                                       .select("-participants")
@@ -225,8 +234,8 @@ class Events {
               nextRepeatEventTime = startDate.getTime() + (i.repeat.parameter - repeatDelta) * 86400000;
               prevRepeatEventTime = nextRepeatEventTime - i.repeat.parameter * 86400000;
               prevRepeatEventEndTime = prevRepeatEventTime +
-                                       (eventEndDate.getTime() - (eventEndDate.getUTCHours() * 3600000 + eventEndDate.getUTCMinutes() * 60000 + eventEndDate.getUTCSeconds() * 1000 + eventEndDate.getUTCMilliseconds()) -
-                                       eventDate.getTime() - (eventDate.getUTCHours() * 3600000 + eventDate.getUTCMinutes() * 60000 + eventDate.getUTCSeconds() * 1000 + eventDate.getUTCMilliseconds())) * 86400000;
+                                       ((eventEndDate.getTime() - (eventEndDate.getUTCHours() * 3600000 + eventEndDate.getUTCMinutes() * 60000 + eventEndDate.getUTCSeconds() * 1000 + eventEndDate.getUTCMilliseconds())) -
+                                       (eventDate.getTime() - (eventDate.getUTCHours() * 3600000 + eventDate.getUTCMinutes() * 60000 + eventDate.getUTCSeconds() * 1000 + eventDate.getUTCMilliseconds()))) * 86400000;
               if ((prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate)
                 || (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate)) {
                 const newEvent = JSON.parse(JSON.stringify(new EventDto(i, true)));
@@ -242,8 +251,8 @@ class Events {
               nextRepeatEventTime = startDate.getTime() + (i.repeat.parameter - repeatDelta) * 86400000 * 7 + (7 - ((Math.ceil((startDate - eventDate) / 86400000) % 7) || 7)) * 86400000;
               prevRepeatEventTime = nextRepeatEventTime - i.repeat.parameter * 7 * 86400000;
               prevRepeatEventEndTime = prevRepeatEventTime +
-                                       (eventEndDate.getTime() - (eventEndDate.getUTCHours() * 3600000 + eventEndDate.getUTCMinutes() * 60000 + eventEndDate.getUTCSeconds() * 1000 + eventEndDate.getUTCMilliseconds()) -
-                                       eventDate.getTime() - (eventDate.getUTCHours() * 3600000 + eventDate.getUTCMinutes() * 60000 + eventDate.getUTCSeconds() * 1000 + eventDate.getUTCMilliseconds())) * 86400000;
+                                       ((eventEndDate.getTime() - (eventEndDate.getUTCHours() * 3600000 + eventEndDate.getUTCMinutes() * 60000 + eventEndDate.getUTCSeconds() * 1000 + eventEndDate.getUTCMilliseconds())) -
+                                       (eventDate.getTime() - (eventDate.getUTCHours() * 3600000 + eventDate.getUTCMinutes() * 60000 + eventDate.getUTCSeconds() * 1000 + eventDate.getUTCMilliseconds()))) * 86400000;
               if ((prevRepeatEventTime < startDate && prevRepeatEventEndTime >= startDate)
                 || (nextRepeatEventTime >= startDate && nextRepeatEventTime < endDate)) {
                 const newEvent = JSON.parse(JSON.stringify(new EventDto(i, true)));
