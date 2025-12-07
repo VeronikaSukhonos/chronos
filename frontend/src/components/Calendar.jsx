@@ -149,7 +149,7 @@ const Calendar = ({ addToNavigation }) => {
 
       if (myCalendars.some(c => c.type === 'holidays' && c.visible)) {
         country = await getCountryCode();
-        if (!country) toast('We were unable to determine your location to show local holidays. Sorry!');
+        // if (!country) toast('We were unable to determine your location to show local holidays. Sorry!');
       }
 
       dispatch(setCalendar({ eventsLoad: true }));

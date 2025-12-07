@@ -6,7 +6,17 @@ The application was developed as a solution to the `chronos` challenge of **Trac
 
 ## Features
 
-// TODO
+* automatically created default calendar for each user and a calendar with the national holidays in the user's country
+* ability to create, update, delete, archive calendars, invite other users to them by email, search and follow public calendars (admin access for an author of the calendar)
+* ability to create, update, delete events of different types (arrangement, reminder, task, holiday, birthday) in own calendars and calendars you were invited to by email (admin access for an author of the event and an author of the calendar)
+* ability to create, update, delete tags for events
+* ability to search events, filter visible events by calendars, types, tags and view them in month, week, day representations
+
+Additionally:
+
+* pleasant and responsive design with satisfying colors, helpful icons and many custom components
+* friendly authentication (registration, login, password reset, email confirmation)
+* profile management (updating login, avatar, full name, email, password and date of birth that can be easily added to the calendars)
 
 ## Requirements and dependencies
 

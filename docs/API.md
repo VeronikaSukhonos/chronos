@@ -175,7 +175,7 @@ All endpoints require authorization.
 
 13. `POST /api/calendars/:calendarId/events` - creates a new event in the calendar
 
-**Parameters**: `name`, `type`, `startDate`, optional `description`, `color` (default - color of calendar), `participants` (if isn't visible for all, default - author, calendar's author), `repeat`, `tags`, optional for arrangements `endDate` (default is `startDate` + 1 hour), `link`, `visibleForAll` (default - false)
+**Parameters**: `name`, `type`, `startDate`, optional `description`, `color` (default - color of calendar), `participants` (if isn't visible for all, default - author, calendar's author), `repeat` (object with `frequency` and `parameter`), `tags`, optional for arrangements `endDate` (default is `startDate` + 1 hour), `link`, `visibleForAll` (default - false)
 
 **Data**: created event data (everything except participants, author is an object (`id`, `login`, `avatar`))
 
@@ -205,7 +205,7 @@ All endpoints require authorization.
 
 2. `GET /api/events/:eventId` - gets information about a specified event
 
-**Data**: event data (everything, participants are array of objects (`id`, `login`, `avatar` and `isConfirmed`), author is an object (`id`, `login`, `avatar`), calendar is an object (`id`, `name`, `color` and `authorId`), tags are array of objects (`id`, `title`))
+**Data**: event data (everything, participants are array of objects (`id`, `login`, `avatar` and `isConfirmed`), author is an object (`id`, `login`, `avatar`), calendar is an object (`id`, `name`, `color` and `author`, wich is also an object), tags are array of objects (`id`, `title`))
 
 **Important:** works if an authorized user has access to the event
 
@@ -225,7 +225,7 @@ All endpoints require authorization.
 
 **Data**: updated event data (everything except participants, author is an object (`id`, `login`, `avatar`))
 
-**Important**: works if an authorized user is an author of a event
+**Important**: works if an authorized user is an author of the event or an author of the calendar
 
 7. `POST /api/events/:eventId/done` - does a task
 
@@ -237,7 +237,7 @@ All endpoints require authorization.
 
 9. `DELETE /api/events/eventId` - deletes an event
 
-**Important**: works if an authorized user is an author of an event
+**Important**: works if an authorized user is an author of an event or an author of the calendar
 
 # Tags Module
 
