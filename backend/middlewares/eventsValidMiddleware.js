@@ -94,15 +94,16 @@ const eventParams = {
     .isISO8601({strict: true}).withMessage('End date must be a valid date').bail()
     .custom((val, { req }) => new Date(val) > new Date(req.body.startDate))
     .withMessage('End date must be later than start date'),
-  repeat: body('repeat').if(body('type').isIn(['arrangement', 'reminder'])).optional()
+  repeat: body('repeat').if(body('type').isIn(['arrangement', 'reminder'])).optional().if(body('repeat').notEmpty())
     .isObject().withMessage('Repeat must be an object').bail()
     .custom((value, { req }) => {
       if (value.frequency === undefined || value.parameter === undefined)
         throw new Error("Repeat object must contain 'frequency' and 'parameter' fields");
       else if (typeof value.frequency != 'string' || !['year', 'month', 'week', 'day'].includes(value.frequency))
         throw new Error("Repeat frequency can be 'year', 'month', 'week' or 'day'");
-      else if (typeof value.parameter != 'number' || value.parameter <= 0)
+      else if (isNaN(value.parameter) || parseInt(value.parameter) <= 0)
         throw new Error('Repeat parameter must be a positive number');
+      value.parameter = parseInt(value.parameter);
       if (req.body.type == 'arrangement') {
         const timeDelta = new Date(req.body.endDate) - new Date(req.body.startDate);
         let repetitionTime = 86400000 * value.parameter;

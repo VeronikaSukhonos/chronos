@@ -79,6 +79,7 @@ const App = () => {
           <Route path="/calendars/:calendarId/update" element={<CalendarUpdatePage />} />
 
           <Route path="/events" element={<EventPage />} />
+          <Route path="/events/search" element={<EventsSearchPage />} />
           <Route path="/events/create" element={<EventCreatePage />} />
           <Route path="/events/:eventId" element={<EventPage />} />
 

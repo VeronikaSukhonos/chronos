@@ -66,6 +66,7 @@ class Events {
         if (req.body.type.length < 0 || !req.body.type.includes('holiday'))
           getHolidays = false;
       }
+      const searchTags = [];
       if (req.body.tag) {
         if (!(req.body.tag instanceof Array))
           req.body.tag = [req.body.tag];
@@ -74,7 +75,7 @@ class Events {
           if (!tag || req.body.tag.indexOf(req.body.tag[i]) < i)
             req.body.tag.splice(i, 1);
           else
-            req.body.tag[i] = tag.title;
+            searchTags.splice(0, 0, tag.title);
         }
       }
       const today = new Date();
@@ -155,9 +156,9 @@ class Events {
                             .populate('tags');
       }
       if (req.body.tag)
-        events = events.filter(event => event.tags.some(tag => req.body.tag.includes(tag.title)));
+        events = events.filter(event => event.tags.some(tag => searchTags.includes(tag.title)));
       if (req.body.search === undefined) {
-        if (getHolidays && req.body.country) {
+        if (getHolidays && req.body.country && !req.body.tag) {
           if (!holidaysCalendar)
             holidaysCalendar = await Calendar.findOne({ authorId: req.user._id, type: 'holidays' });
           const startYearHolidaysResponce = await axios.get(`https://date.nager.at/api/v3/PublicHolidays/${startDate.getFullYear()}/${req.body.country}`);
@@ -187,7 +188,7 @@ class Events {
                                       .select("-participants")
                                       .populate('tags');
         if (req.body.tag)
-          repeatEvents = repeatEvents.filter(event => event.tags.some(tag => req.body.tag.includes(tag.title)));
+          repeatEvents = repeatEvents.filter(event => event.tags.some(tag => searchTags.includes(tag.title)));
         for (let i of repeatEvents) {
           let eventDate = new Date(i.startDate);
           let repeatDelta, nextRepeatEventTime, prevRepeatEventTime, prevRepeatEventEndTime, startMonth, eventMonth, newDate, prevDate;
@@ -328,7 +329,7 @@ class Events {
         req.user.visibilitySettings = {
           calendars: req.body.calendar,
           eventTypes: req.body.type,
-          tags: parameters.tags?.$in
+          tags: req.body.tag
         };
         await req.user.save();
       } else
