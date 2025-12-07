@@ -21,6 +21,8 @@ export class EventDto {
       this.link = model.link;
     else if (this.type == 'task')
       this.doneDate = model.doneDate;
+    else if (this.type == 'birthday')
+      this.birthday = model.birthday;
     this.allDay = model.allDay;
   }
 }

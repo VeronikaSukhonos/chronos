@@ -66,7 +66,7 @@ const eventParams = {
     .isISO8601({strict: true}).withMessage('Start date must be a valid date').bail()
     .custom((val, { req }) => {
       if (req.body.type == 'birthday') {
-        if (new Date(val) > Date.now())
+        if (new Date(val).setHours(0, 0, 0, 0) > Date.now())
           throw new Error("Birthday can't be in the future");
         return true;
       } else if (new Date(val) <= Date.now())
@@ -152,7 +152,7 @@ const update = [
     .isISO8601({strict: true}).withMessage('Start date must be a valid date').bail()
     .custom((val, { req }) => {
       if (req.body.type == 'birthday') {
-        if (new Date(val) > Date.now())
+        if (new Date(val).setHours(0, 0, 0, 0) > Date.now())
           throw new Error("Birthday can't be in the future");
         return true;
       } else if (new Date(val) <= Date.now())

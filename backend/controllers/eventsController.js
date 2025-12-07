@@ -298,6 +298,8 @@ class Events {
                     newEndDate.setDate(0);
                   newEvent.endDate = newEndDate.toISOString();
                 }
+                if (i.type == 'birthday')
+                  newEvent.birthday = i.startDate;
                 events.push(newEvent);
               }
               break;
@@ -307,6 +309,8 @@ class Events {
         for (let i = 0; i < currEventCount; ++i) {
           if (events[i].authorId)
             events[i].author = new UserDto(await User.findOne({ _id: events[i].authorId }).select('id login avatar'));
+          if (events[i].type == 'birthday')
+            events[i].birthday = events[i].startDate;
           events[i] = new EventDto(events[i]);
           if (events[i].repeat && events[i].repeat.frequency && events[i].repeat.parameter) {
             let eventDate = new Date(events[i].startDate);
