@@ -117,7 +117,8 @@ const eventParams = {
       }
       return true;
     }),
-  link: body('link').if(body('type').equals('arrangement')).optional().trim()
+  link: body('link').if(body('type').equals('arrangement')).optional()
+    .if(body('link').notEmpty()).trim()
     .isURL().withMessage('Link must be a URL')
 };
 
