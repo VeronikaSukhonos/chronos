@@ -1,22 +1,40 @@
-import { useState, useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import Calendars from '../api/calendarsApi.js';
-import { addToCalendar, setForm, closeForm } from '../store/calendarSlice.js';
 import { TextField } from '../components';
 import '../components/SearchForms.css';
 
-const CalendarSearchForm = ({ fOpen }) => {
+const CalendarSearchForm = () => {
   const initSearch = { name: '', author: '' };
   const [search, setSearch] = useState(initSearch);
+  const [calendars, setCalendars] = useState([]);
 
   const [_, setLoad] = useState(false);
-  const [feedback, setFeedback] = useState({ msg: '', status: '' });
+
+  useEffect(() => {
+    const wait = setTimeout(() => {
+      setLoad(true);
+      Calendars.fetchCalendars(`?name=${search.name}&author=${search.author}`)
+        .then(({data: res}) => {
+          setCalendars(res.data.calendars.filter((calendar) => calendar.role === "guest"));
+          setLoad(false);
+        })
+        .catch(err => {
+          setLoad(false);
+          setCalendars([]);
+        });
+    }, 300);
+    return () => clearTimeout(wait);
+  }), [search];
+
+  useEffect(() => {
+    return () => setSearch({ name: '', author: '' });
+  }, []);
 
   return (
     <>
-      {/* <TextField TODO
+      <TextField
         label="Name"
         onChange={(e) => setSearch({...search, name: e.target.value})}
         id="name"
@@ -29,8 +47,17 @@ const CalendarSearchForm = ({ fOpen }) => {
         val={search.author}
       />
       <div className="calendar-search-results">
-
-      </div> */}
+        <ul>
+          {calendars.length > 0 && calendars.map((calendar) => <li key={calendar.id}>
+            <Link to={`/calendars/${calendar.id}`}>
+              <div className="searched-event-calendar">
+                <div className="searched-event-calendar-color" style={{ background: calendar.color || '#ade4ff' }} id={calendar.id}></div>
+                {calendar.name} | Author: {calendar.author.login}
+              </div>
+            </Link>
+          </li>)}
+        </ul>
+      </div>
     </>
   );
 };

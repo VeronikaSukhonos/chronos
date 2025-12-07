@@ -169,7 +169,7 @@ const CalendarCreateForm = () => {
 
         {feedback && <p className={"basic-form-feedback " + (feedback.status)}>{feedback.msg}</p>}
 
-        <MainButton title={f.calendar?.id ? "Update" : (f.findMode ? "Find" : "Create")} dis={load || initLoad} />
+        {!f.findMode && <MainButton title={f.calendar?.id ? "Update" : "Create"} dis={load || initLoad} />}
       </form>
     </Modal>
   );

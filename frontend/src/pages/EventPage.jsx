@@ -75,6 +75,7 @@ const EventPage = () => {
   const menuRef = useRef(null);
   const doTask = (e) => {
     if (e.target.value) {
+      setLoad(true);
       Events.doTask(currEvent.id)
         .then(({ data: res }) => {
           setCurrEvent({...currEvent, doneDate: res.data.doneDate});
@@ -85,6 +86,7 @@ const EventPage = () => {
           toast(err.message);
         });
     } else {
+      setLoad(true);
       Events.undoTask(currEvent.id)
         .then(({ data: res }) => {
           setCurrEvent({...currEvent, doneDate: res.data.doneDate});
@@ -98,6 +100,7 @@ const EventPage = () => {
   };
   useEffect(() => {
       if (eventId) {
+        setInitLoad(true);
         Events.fetchEvent(eventId)
           .then(({ data: res }) => {
             setCurrEvent(res.data.event);
