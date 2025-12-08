@@ -439,7 +439,8 @@ class Events {
       if (event.author.id.toString() === req.user._id.toString())
         hasAccess = true;
       else if (event.visibleForAll) {
-        if (calendar.isPublic && calendar.followers.includes(req.user._id))
+        if (calendar.isPublic
+          && (calendar.followers.includes(req.user._id) || calendar.authorId.toString() == req.user._id.toString()))
           hasAccess = true;
         else {
           for (let i of calendar.participants) {
