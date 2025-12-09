@@ -692,6 +692,12 @@ class Events {
         event.name = name;
       if (event.description || description !== undefined) event.description = description;
       if (event.color || color) event.color = color;
+      if (startDate) {
+        event.startDate = startDate;
+        if (event.allDay) {
+          event.endDate = new Date(new Date(event.startDate).getTime() + 23 * 3600000 + 59 * 60000 + 59 * 1000 + 999).toISOString();
+        }
+      }
       if (!(event.type == 'birthday' || event.type == 'holiday')
         && allDay !== undefined && allDay !== event.allDay) {
         event.allDay = allDay;
@@ -700,8 +706,6 @@ class Events {
         }
       }
       if (!event.allDay) {
-        if (startDate)
-          event.startDate = startDate;
         if ((event.type == 'arrangement' || event.type == 'task') && endDate) {
           if (new Date(endDate) <= new Date(event.startDate))
             return res.status(400).json({

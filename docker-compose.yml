@@ -35,6 +35,9 @@ services:
       context: .
       dockerfile: backend/Dockerfile.backend
       target: prod
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     ports:
       - "8888:8888"
     env_file:
